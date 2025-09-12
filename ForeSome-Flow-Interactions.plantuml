@@ -1,0 +1,191 @@
+@startuml ForeSome User Flow Interactions
+
+!define RECTANGLE class
+
+' Color scheme for different flow types
+!define AUTH_COLOR #E3F2FD
+!define MATCH_COLOR #E8F5E8
+!define GROUP_COLOR #FFF3E0
+!define SOCIAL_COLOR #F3E5F5
+!define SYSTEM_COLOR #FAFAFA
+
+title ForeSome Golf App - User Flow Interactions
+
+' Authentication & User Management Flows
+package "Authentication System" AUTH_COLOR {
+  RECTANGLE Landing {
+    +showHeroSection()
+    +displayFeatures()
+    +routeToAuth()
+  }
+  
+  RECTANGLE Registration {
+    +validateForm()
+    +createAccount()
+    +autoLogin()
+  }
+  
+  RECTANGLE Login {
+    +authenticateUser()
+    +redirectToDashboard()
+  }
+  
+  RECTANGLE Profile {
+    +updateProfile()
+    +uploadAvatar()
+    +setPreferences()
+  }
+}
+
+' Match Management Flows
+package "Match Management" MATCH_COLOR {
+  RECTANGLE MatchCreation {
+    +createMatch()
+    +selectCourse()
+    +setPrivacy()
+    +notifyMembers()
+  }
+  
+  RECTANGLE MatchDiscovery {
+    +searchMatches()
+    +filterResults()
+    +viewDetails()
+  }
+  
+  RECTANGLE MatchJoining {
+    +joinPublicMatch()
+    +requestPrivateMatch()
+    +manageRequests()
+  }
+  
+  RECTANGLE MatchManagement {
+    +approveRequests()
+    +kickMembers()
+    +updateDetails()
+    +completeMatch()
+  }
+}
+
+' Group & Social Flows
+package "Group Management" GROUP_COLOR {
+  RECTANGLE GroupCreation {
+    +createGroup()
+    +inviteMembers()
+    +setPermissions()
+  }
+  
+  RECTANGLE GroupDiscovery {
+    +browseGroups()
+    +requestJoin()
+    +acceptInvitation()
+  }
+  
+  RECTANGLE GroupManagement {
+    +manageMembers()
+    +shareMatches()
+    +updateSettings()
+  }
+}
+
+' Social & Rating System
+package "Social Features" SOCIAL_COLOR {
+  RECTANGLE RatingSystem {
+    +ratePlayer()
+    +viewRatings()
+    +calculateReputation()
+  }
+  
+  RECTANGLE Achievements {
+    +trackProgress()
+    +unlockBadges()
+    +displayLeaderboard()
+  }
+  
+  RECTANGLE Notifications {
+    +sendAlerts()
+    +managePreferences()
+    +displayBadges()
+  }
+}
+
+' System & Data Management
+package "System Features" SYSTEM_COLOR {
+  RECTANGLE Dashboard {
+    +displayOverview()
+    +showNotifications()
+    +quickActions()
+  }
+  
+  RECTANGLE SearchSystem {
+    +locationSearch()
+    +filterMatches()
+    +savePreferences()
+  }
+  
+  RECTANGLE DataManagement {
+    +syncData()
+    +cacheQueries()
+    +validateInput()
+  }
+}
+
+' Flow Relationships and Interactions
+
+' Authentication flows
+Landing --> Registration : "Sign Up"
+Landing --> Login : "Sign In"
+Registration --> Dashboard : "Account Created"
+Login --> Dashboard : "Authenticated"
+Dashboard --> Profile : "Edit Profile"
+
+' Match management flows
+Dashboard --> MatchCreation : "Create Round"
+Dashboard --> MatchDiscovery : "Find Matches"
+MatchDiscovery --> MatchJoining : "Join Match"
+MatchCreation --> MatchManagement : "Manage Created"
+MatchManagement --> RatingSystem : "Complete Match"
+
+' Group flows
+Dashboard --> GroupCreation : "Create Group"
+Dashboard --> GroupDiscovery : "Browse Groups"
+GroupCreation --> GroupManagement : "Manage Group"
+GroupManagement --> MatchCreation : "Share Match"
+
+' Social interactions
+MatchManagement --> RatingSystem : "Rate Players"
+RatingSystem --> Achievements : "Update Stats"
+Achievements --> Notifications : "Badge Unlocked"
+
+' System integrations
+SearchSystem --> MatchDiscovery : "Search Results"
+MatchJoining --> Notifications : "Request Sent"
+MatchManagement --> Notifications : "Request Approved"
+DataManagement --> Dashboard : "Cache Update"
+
+' Cross-system interactions
+Profile --> SearchSystem : "Location Update"
+GroupManagement --> Notifications : "Member Added"
+RatingSystem --> Dashboard : "Stats Update"
+
+' User journey paths
+note right of Landing
+  New User Journey:
+  Landing → Registration → Dashboard → Profile Setup
+end note
+
+note right of Dashboard
+  Core User Loop:
+  Dashboard → Search/Browse → Join Match → Rate Players → Achievements
+end note
+
+note left of GroupManagement
+  Group Leader Journey:
+  Group Creation → Member Management → Match Sharing → Community Building
+end note
+
+note left of MatchManagement
+  Match Creator Journey:
+  Match Creation → Request Management → Match Completion → Player Rating
+end note
+
+@enduml

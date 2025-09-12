@@ -1,0 +1,405 @@
+{
+  "foreSomeUserJourneyMap": {
+    "meta": {
+      "version": "1.0",
+      "created": "2024-12-10",
+      "description": "Comprehensive user journey mapping for ForeSome golf application",
+      "personas": ["Social Golfer", "Course Explorer", "Organizer", "Competitive Player"]
+    },
+    
+    "journeys": {
+      
+      "newUserOnboarding": {
+        "title": "New User Onboarding Journey",
+        "persona": "Social Golfer",
+        "duration": "15-30 minutes",
+        "touchpoints": [
+          {
+            "step": 1,
+            "phase": "Discovery",
+            "action": "Lands on homepage",
+            "userThoughts": "Is this the right app for finding golf partners?",
+            "emotions": ["curious", "skeptical"],
+            "painPoints": ["Uncertain about app value"],
+            "opportunities": ["Clear value proposition", "Social proof"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 2,
+            "phase": "Registration",
+            "action": "Clicks Sign Up",
+            "userThoughts": "The registration looks simple enough",
+            "emotions": ["hopeful", "cautious"],
+            "painPoints": ["Another account to create"],
+            "opportunities": ["Quick social login", "Progressive disclosure"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 3,
+            "phase": "Account Creation",
+            "action": "Fills out registration form",
+            "userThoughts": "Just basic info needed, that's good",
+            "emotions": ["satisfied", "eager"],
+            "painPoints": ["Password requirements", "Email verification"],
+            "opportunities": ["Clear field validation", "Password strength indicator"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 4,
+            "phase": "First Login",
+            "action": "Automatically logged in after registration",
+            "userThoughts": "Nice, I'm already in the app",
+            "emotions": ["pleased", "curious"],
+            "painPoints": ["Overwhelming dashboard"],
+            "opportunities": ["Guided tour", "Welcome message"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 5,
+            "phase": "Profile Setup",
+            "action": "Prompted to complete profile",
+            "userThoughts": "Should I fill this out now or explore first?",
+            "emotions": ["torn", "eager"],
+            "painPoints": ["Too many fields", "Not sure what's required"],
+            "opportunities": ["Progressive profile completion", "Skip option"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 6,
+            "phase": "First Exploration",
+            "action": "Browses available matches",
+            "userThoughts": "Wow, there are actually matches in my area!",
+            "emotions": ["excited", "optimistic"],
+            "painPoints": ["Information overload", "Unclear joining process"],
+            "opportunities": ["Filter defaults", "Clear CTAs"],
+            "channels": ["Web", "Mobile"]
+          }
+        ]
+      },
+
+      "matchCreationJourney": {
+        "title": "Creating First Golf Match",
+        "persona": "Organizer",
+        "duration": "10-15 minutes",
+        "touchpoints": [
+          {
+            "step": 1,
+            "phase": "Intent",
+            "action": "Decides to create a match",
+            "userThoughts": "I want to organize a round for this weekend",
+            "emotions": ["determined", "organized"],
+            "painPoints": ["Complex scheduling", "Coordinating multiple people"],
+            "opportunities": ["Quick match templates", "Recurring match options"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 2,
+            "phase": "Navigation",
+            "action": "Clicks 'Create Round' button",
+            "userThoughts": "The button is prominent, good",
+            "emotions": ["confident", "focused"],
+            "painPoints": ["Too many navigation options"],
+            "opportunities": ["Streamlined navigation", "Context-aware buttons"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 3,
+            "phase": "Form Filling",
+            "action": "Fills out match details",
+            "userThoughts": "I need to make sure all details are correct",
+            "emotions": ["careful", "responsible"],
+            "painPoints": ["Course search complexity", "Time zone confusion"],
+            "opportunities": ["Auto-complete", "Intelligent defaults"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 4,
+            "phase": "Course Selection",
+            "action": "Searches and selects golf course",
+            "userThoughts": "I hope I can find my preferred course",
+            "emotions": ["hopeful", "particular"],
+            "painPoints": ["Course not in database", "Incomplete course info"],
+            "opportunities": ["Course suggestion", "Add course option"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 5,
+            "phase": "Privacy Settings",
+            "action": "Chooses match visibility",
+            "userThoughts": "Should this be public or just for my group?",
+            "emotions": ["uncertain", "protective"],
+            "painPoints": ["Privacy implications unclear"],
+            "opportunities": ["Clear privacy explanations", "Preview mode"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 6,
+            "phase": "Creation Success",
+            "action": "Match created successfully",
+            "userThoughts": "Great! Now I need to invite people",
+            "emotions": ["accomplished", "excited"],
+            "painPoints": ["What happens next?"],
+            "opportunities": ["Next steps guidance", "Share options"],
+            "channels": ["Web", "Mobile"]
+          }
+        ]
+      },
+
+      "matchJoiningJourney": {
+        "title": "Discovering and Joining a Match",
+        "persona": "Course Explorer",
+        "duration": "5-10 minutes",
+        "touchpoints": [
+          {
+            "step": 1,
+            "phase": "Discovery",
+            "action": "Searches matches by location",
+            "userThoughts": "I'm traveling to Cleveland, any matches there?",
+            "emotions": ["hopeful", "adventurous"],
+            "painPoints": ["Limited search options", "No matches found"],
+            "opportunities": ["Expanded search radius", "Alternative suggestions"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 2,
+            "phase": "Evaluation",
+            "action": "Reviews match details",
+            "userThoughts": "This looks like a good match and course",
+            "emotions": ["interested", "evaluative"],
+            "painPoints": ["Insufficient course info", "Unknown players"],
+            "opportunities": ["Course photos/reviews", "Player previews"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 3,
+            "phase": "Decision",
+            "action": "Decides to join",
+            "userThoughts": "I'll take a chance on this group",
+            "emotions": ["optimistic", "slightly nervous"],
+            "painPoints": ["Uncertainty about group dynamics"],
+            "opportunities": ["Group compatibility indicators", "Reviews"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 4,
+            "phase": "Joining",
+            "action": "Clicks join match",
+            "userThoughts": "Hope this works and I get accepted",
+            "emotions": ["anxious", "hopeful"],
+            "painPoints": ["Unclear approval process", "Waiting time"],
+            "opportunities": ["Instant feedback", "Status updates"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 5,
+            "phase": "Confirmation",
+            "action": "Receives confirmation",
+            "userThoughts": "Excellent! I'm in. What's next?",
+            "emotions": ["relieved", "excited"],
+            "painPoints": ["Unclear next steps"],
+            "opportunities": ["Pre-match communication", "Course info"],
+            "channels": ["Mobile", "Web", "Email"]
+          },
+          {
+            "step": 6,
+            "phase": "Preparation",
+            "action": "Reviews match details and prepares",
+            "userThoughts": "I should check the course and prepare accordingly",
+            "emotions": ["excited", "prepared"],
+            "painPoints": ["Limited course information"],
+            "opportunities": ["Course tips", "Weather integration"],
+            "channels": ["Mobile", "Web"]
+          }
+        ]
+      },
+
+      "groupManagementJourney": {
+        "title": "Creating and Managing Golf Group",
+        "persona": "Organizer",
+        "duration": "20-30 minutes",
+        "touchpoints": [
+          {
+            "step": 1,
+            "phase": "Group Formation",
+            "action": "Creates new group",
+            "userThoughts": "I want to organize regular rounds with my buddies",
+            "emotions": ["organized", "social"],
+            "painPoints": ["Complex group setup"],
+            "opportunities": ["Template groups", "Quick setup"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 2,
+            "phase": "Member Invitation",
+            "action": "Invites members to group",
+            "userThoughts": "I need to find and add my regular playing partners",
+            "emotions": ["methodical", "social"],
+            "painPoints": ["Finding users", "Bulk invitations"],
+            "opportunities": ["Contact integration", "Invite links"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 3,
+            "phase": "Group Configuration",
+            "action": "Sets up group rules and preferences",
+            "userThoughts": "I want to make sure this group works for everyone",
+            "emotions": ["responsible", "diplomatic"],
+            "painPoints": ["Balancing different preferences"],
+            "opportunities": ["Flexible settings", "Member voting"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 4,
+            "phase": "Match Coordination",
+            "action": "Creates group matches",
+            "userThoughts": "Time to schedule our weekly round",
+            "emotions": ["efficient", "anticipatory"],
+            "painPoints": ["Scheduling conflicts", "RSVP tracking"],
+            "opportunities": ["Calendar integration", "Auto-scheduling"],
+            "channels": ["Web", "Mobile"]
+          },
+          {
+            "step": 5,
+            "phase": "Ongoing Management",
+            "action": "Manages requests and member activity",
+            "userThoughts": "I need to keep the group active and engaged",
+            "emotions": ["dedicated", "sometimes overwhelmed"],
+            "painPoints": ["Time-consuming management", "Member disputes"],
+            "opportunities": ["Admin delegation", "Automated tasks"],
+            "channels": ["Web", "Mobile"]
+          }
+        ]
+      },
+
+      "ratingAndReputationJourney": {
+        "title": "Post-Match Rating and Reputation Building",
+        "persona": "Competitive Player",
+        "duration": "5-10 minutes",
+        "touchpoints": [
+          {
+            "step": 1,
+            "phase": "Match Completion",
+            "action": "Match is marked as completed",
+            "userThoughts": "That was a great round, time to rate everyone",
+            "emotions": ["satisfied", "social"],
+            "painPoints": ["Rating fatigue", "Bias concerns"],
+            "opportunities": ["Quick rating options", "Rating guidance"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 2,
+            "phase": "Player Rating",
+            "action": "Rates fellow players",
+            "userThoughts": "I want to be fair but honest in my ratings",
+            "emotions": ["thoughtful", "responsible"],
+            "painPoints": ["Difficult to rate objectively", "Social pressure"],
+            "opportunities": ["Rating criteria", "Anonymous options"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 3,
+            "phase": "Feedback Submission",
+            "action": "Submits ratings and comments",
+            "userThoughts": "Hope my feedback helps others",
+            "emotions": ["helpful", "contributory"],
+            "painPoints": ["Time-consuming", "Public visibility"],
+            "opportunities": ["Quick templates", "Privacy controls"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 4,
+            "phase": "Reputation Tracking",
+            "action": "Checks own rating and reputation",
+            "userThoughts": "I wonder how others rated me",
+            "emotions": ["curious", "anxious"],
+            "painPoints": ["Negative feedback impact", "Rating transparency"],
+            "opportunities": ["Growth insights", "Improvement suggestions"],
+            "channels": ["Mobile", "Web"]
+          },
+          {
+            "step": 5,
+            "phase": "Achievement Recognition",
+            "action": "Receives achievement notifications",
+            "userThoughts": "Cool, I unlocked a new badge!",
+            "emotions": ["proud", "motivated"],
+            "painPoints": ["Meaningless achievements"],
+            "opportunities": ["Skill-based achievements", "Social sharing"],
+            "channels": ["Mobile", "Web", "Push"]
+          }
+        ]
+      }
+
+    },
+
+    "keyMetrics": {
+      "userEngagement": {
+        "averageSessionDuration": "15-20 minutes",
+        "matchJoinRate": "65%",
+        "profileCompletionRate": "78%",
+        "returnUserRate": "72%"
+      },
+      "matchSuccess": {
+        "completionRate": "87%",
+        "averagePlayersPerMatch": 3.4,
+        "creatorSatisfaction": "4.3/5",
+        "joinerSatisfaction": "4.1/5"
+      },
+      "socialEngagement": {
+        "groupParticipationRate": "43%",
+        "ratingFrequency": "67%",
+        "achievementEngagement": "54%",
+        "referralRate": "23%"
+      }
+    },
+
+    "painPointSummary": {
+      "authentication": [
+        "Password complexity requirements",
+        "Email verification delays",
+        "Social login missing"
+      ],
+      "discovery": [
+        "Limited search filters",
+        "Overwhelming results",
+        "No saved searches"
+      ],
+      "matching": [
+        "Course database gaps",
+        "Unclear skill matching",
+        "Limited preview information"
+      ],
+      "communication": [
+        "No in-app messaging",
+        "Limited contact sharing",
+        "No match updates"
+      ],
+      "gamification": [
+        "Achievement clarity",
+        "Progress visibility",
+        "Meaningful rewards"
+      ]
+    },
+
+    "opportunityMap": {
+      "shortTerm": [
+        "Enhanced search filters",
+        "Improved course database",
+        "Better mobile experience",
+        "In-app notifications"
+      ],
+      "mediumTerm": [
+        "Social login integration",
+        "Calendar integration",
+        "Weather integration",
+        "Advanced matching algorithms"
+      ],
+      "longTerm": [
+        "AI-powered recommendations",
+        "Integration with golf courses",
+        "Tournament organization",
+        "Professional coaching features"
+      ]
+    }
+
+  }
+}

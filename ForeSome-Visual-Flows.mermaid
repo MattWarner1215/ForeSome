@@ -1,0 +1,268 @@
+```mermaid
+%% ForeSome Golf App - Key User Flows
+%% Use this file with Mermaid.js to generate visual flowcharts
+
+%% NEW USER ONBOARDING FLOW
+graph TD
+    A[Landing Page] --> B{User Type?}
+    B -->|New User| C[Sign Up Form]
+    B -->|Existing User| D[Sign In Form]
+    
+    C --> E[Account Creation]
+    E --> F[Auto Login]
+    F --> G[Dashboard - First Time]
+    
+    D --> H{Valid Credentials?}
+    H -->|Yes| I[Dashboard]
+    H -->|No| J[Error Message]
+    J --> D
+    
+    G --> K[Profile Setup Prompt]
+    K -->|Complete| L[Profile Form]
+    K -->|Skip| M[Limited Dashboard]
+    
+    L --> N[Full Dashboard Access]
+    M --> O[Profile Completion Reminder]
+
+%% MATCH CREATION & JOINING FLOW
+graph TD
+    A[Dashboard] --> B[Create Round]
+    B --> C[Match Form]
+    C --> D{Form Valid?}
+    D -->|Yes| E[Match Created]
+    D -->|No| F[Show Errors]
+    F --> C
+    
+    E --> G[Match Details Page]
+    G --> H[Manage Options Available]
+    
+    %% Joining Flow
+    I[Browse Matches] --> J[Select Match]
+    J --> K{Match Type?}
+    K -->|Public| L[Instant Join]
+    K -->|Private| M[Request to Join]
+    
+    L --> N[Added to Match]
+    M --> O[Request Pending]
+    O --> P{Creator Decision}
+    P -->|Accept| N
+    P -->|Decline| Q[Request Denied]
+    P -->|No Response| O
+
+%% MATCH MANAGEMENT FLOW (CREATOR)
+graph TD
+    A[My Rounds] --> B[Created Match]
+    B --> C[Manage Button]
+    C --> D[Management Dashboard]
+    
+    D --> E{Pending Requests?}
+    E -->|Yes| F[Request Management]
+    E -->|No| G[No Pending Requests]
+    
+    F --> H[Review Request]
+    H --> I{Decision}
+    I -->|Accept| J[Add Player]
+    I -->|Decline| K[Remove Request]
+    
+    J --> L[Notify Player]
+    K --> M[No Notification]
+    
+    D --> N[Status Management]
+    N --> O{Action}
+    O -->|Complete| P[Mark Completed]
+    O -->|Cancel| Q[Cancel Match]
+    O -->|Edit| R[Edit Details]
+    
+    P --> S[Rating Modal]
+    S --> T[Rate Players]
+    T --> U[Update Stats]
+
+%% GROUP MANAGEMENT FLOW
+graph TD
+    A[Groups Page] --> B{User Action}
+    B -->|Create| C[New Group Form]
+    B -->|Browse| D[View Groups]
+    B -->|Manage| E[My Groups]
+    
+    C --> F[Group Details]
+    F --> G[Add Members]
+    G --> H[Group Created]
+    
+    D --> I[Select Group]
+    I --> J{Group Type}
+    J -->|Public| K[Join Instantly]
+    J -->|Private| L[Request Join]
+    
+    E --> M[Group Actions]
+    M --> N{Admin Actions}
+    N -->|Members| O[Member Management]
+    N -->|Settings| P[Group Settings]
+    N -->|Matches| Q[Share Matches]
+
+%% RATING & REPUTATION FLOW
+graph TD
+    A[Match Completed] --> B[Rating Modal Opens]
+    B --> C[List Participants]
+    C --> D[Rate Each Player]
+    D --> E[Add Comments]
+    E --> F[Submit Ratings]
+    
+    F --> G[Update Player Stats]
+    G --> H[Check Achievements]
+    H --> I{Achievement Unlocked?}
+    I -->|Yes| J[Show Achievement]
+    I -->|No| K[Update Complete]
+    
+    J --> L[Badge Added]
+    L --> M[Leaderboard Update]
+    M --> N[Notification Sent]
+
+%% NOTIFICATION SYSTEM FLOW
+graph TD
+    A[User Action Trigger] --> B{Notification Type}
+    B -->|Join Request| C[Creator Notification]
+    B -->|Request Approved| D[Player Notification]
+    B -->|Match Reminder| E[All Players Notification]
+    B -->|Achievement| F[User Achievement Notification]
+    
+    C --> G[Dashboard Badge]
+    D --> H[Success Message]
+    E --> I[Match Reminder Alert]
+    F --> J[Achievement Popup]
+    
+    G --> K{User Response}
+    K -->|View| L[Match Details]
+    K -->|Ignore| M[Badge Remains]
+    
+    L --> N[Pending Requests Section]
+    N --> O[Accept/Decline Actions]
+
+%% SEARCH & DISCOVERY FLOW
+graph TD
+    A[Dashboard] --> B[Search Options]
+    B --> C{Search Type}
+    C -->|Location| D[ZIP Code Search]
+    C -->|Browse| E[All Matches]
+    C -->|Filter| F[Advanced Filters]
+    
+    D --> G[Nearby Matches]
+    E --> H[Match Categories]
+    F --> I[Filtered Results]
+    
+    G --> J[Location-Based Results]
+    H --> K{Category}
+    K -->|Public| L[Public Matches]
+    K -->|Private| M[Group Matches]
+    K -->|My Matches| N[User Matches]
+    
+    I --> O[Apply Filters]
+    O --> P[Updated Results]
+    
+    J --> Q[Select Match]
+    L --> Q
+    M --> Q
+    N --> Q
+    P --> Q
+    
+    Q --> R[Match Details]
+    R --> S[Join/View Options]
+
+%% ERROR HANDLING FLOW
+graph TD
+    A[User Action] --> B{Action Result}
+    B -->|Success| C[Success Flow]
+    B -->|Network Error| D[Retry Mechanism]
+    B -->|Auth Error| E[Login Prompt]
+    B -->|Validation Error| F[Show Errors]
+    B -->|Server Error| G[Error Message]
+    
+    D --> H{Retry Count}
+    H -->|< 3| I[Retry Action]
+    H -->|>= 3| J[Show Error]
+    
+    E --> K[Authentication Flow]
+    K --> L{Auth Success}
+    L -->|Yes| M[Retry Original Action]
+    L -->|No| N[Login Failed]
+    
+    F --> O[Highlight Issues]
+    O --> P[User Correction]
+    P --> A
+    
+    I --> A
+    G --> Q[Contact Support Option]
+    J --> Q
+
+%% ACHIEVEMENT SYSTEM FLOW
+graph TD
+    A[User Action] --> B[Action Tracking]
+    B --> C{Achievement Trigger}
+    C -->|Match Complete| D[Match Achievements]
+    C -->|Social Action| E[Social Achievements]
+    C -->|Course Visit| F[Explorer Achievements]
+    C -->|Rating Given| G[Community Achievements]
+    
+    D --> H[Check Progress]
+    E --> H
+    F --> H
+    G --> H
+    
+    H --> I{Milestone Reached?}
+    I -->|Yes| J[Unlock Achievement]
+    I -->|No| K[Update Progress]
+    
+    J --> L[Award Badge]
+    L --> M[Update Leaderboard]
+    M --> N[Show Notification]
+    N --> O[Profile Update]
+    
+    K --> P[Progress Bar Update]
+    P --> Q[Save Progress]
+
+%% PRIVACY & SECURITY FLOW
+graph TD
+    A[User Data Input] --> B[Client Validation]
+    B --> C[Server Validation]
+    C --> D{Valid Data?}
+    D -->|No| E[Validation Error]
+    D -->|Yes| F[Authorization Check]
+    
+    F --> G{Authorized?}
+    G -->|No| H[401 Unauthorized]
+    G -->|Yes| I[Process Request]
+    
+    I --> J[Data Sanitization]
+    J --> K[Database Operation]
+    K --> L{Operation Success?}
+    L -->|No| M[Database Error]
+    L -->|Yes| N[Success Response]
+    
+    E --> O[Return to Form]
+    H --> P[Login Required]
+    M --> Q[Error Response]
+    N --> R[Update UI]
+
+%% MOBILE RESPONSIVE FLOW
+graph TD
+    A[User Device] --> B{Screen Size}
+    B -->|Desktop| C[Full Layout]
+    B -->|Tablet| D[Adapted Layout]
+    B -->|Mobile| E[Mobile Layout]
+    
+    C --> F[All Features Visible]
+    D --> G[Condensed Navigation]
+    E --> H[Hamburger Menu]
+    
+    F --> I[Standard Interactions]
+    G --> J[Touch Optimized]
+    H --> K[Mobile Gestures]
+    
+    I --> L[Mouse/Keyboard Events]
+    J --> M[Touch Events]
+    K --> M
+    
+    L --> N[Desktop UX]
+    M --> O[Mobile UX]
+    O --> P[GPS Integration]
+    P --> Q[Location Services]
+```

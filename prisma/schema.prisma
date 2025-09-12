@@ -1,0 +1,209 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  emailVerified DateTime?
+  image         String?
+  handicap      Float?
+  zipCode       String?
+  bio           String?
+  phoneNumber   String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts      Account[]
+  sessions      Session[]
+  matches       Match[]
+  matchPlayers  MatchPlayer[]
+  ratings       Rating[]        @relation("UserRatings")
+  givenRatings  Rating[]        @relation("GivenRatings")
+  groups        GroupMember[]
+  createdGroups Group[]         @relation("GroupCreator")
+  notifications Notification[]  @relation("UserNotifications")
+  sentNotifications Notification[] @relation("NotificationSender")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Match {
+  id          String      @id @default(cuid())
+  title       String
+  description String?
+  course      String
+  address     String
+  zipCode     String
+  date        DateTime
+  time        String
+  maxPlayers  Int         @default(4)
+  isPublic    Boolean     @default(true)
+  status      String      @default("scheduled") // scheduled, completed, cancelled
+  creatorId   String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  creator      User          @relation(fields: [creatorId], references: [id])
+  players      MatchPlayer[]
+  groupMatches GroupMatch[]
+  notifications Notification[]
+}
+
+model MatchPlayer {
+  id       String @id @default(cuid())
+  matchId  String
+  playerId String
+  status   String @default("pending") // pending, accepted, declined
+
+  match  Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player User  @relation(fields: [playerId], references: [id])
+
+  @@unique([matchId, playerId])
+}
+
+model Group {
+  id          String      @id @default(cuid())
+  name        String
+  description String?
+  isPrivate   Boolean     @default(true)
+  creatorId   String
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  creator      User          @relation("GroupCreator", fields: [creatorId], references: [id])
+  members      GroupMember[]
+  groupMatches GroupMatch[]
+  notifications Notification[]
+}
+
+model GroupMember {
+  id      String @id @default(cuid())
+  groupId String
+  userId  String
+  role    String @default("member") // member, admin
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id])
+
+  @@unique([groupId, userId])
+}
+
+model GroupMatch {
+  id      String @id @default(cuid())
+  groupId String
+  matchId String
+
+  group Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  match Match @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, matchId])
+}
+
+model Rating {
+  id         String   @id @default(cuid())
+  value      Int // 1-5 stars
+  comment    String?
+  matchId    String?
+  ratedById  String
+  ratedUserId String
+  createdAt  DateTime @default(now())
+
+  ratedBy   User @relation("GivenRatings", fields: [ratedById], references: [id])
+  ratedUser User @relation("UserRatings", fields: [ratedUserId], references: [id])
+
+  @@unique([ratedById, ratedUserId, matchId])
+}
+
+model GolfCourse {
+  id          String   @id @default(cuid())
+  name        String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  country     String   @default("USA")
+  phone       String?
+  website     String?
+  type        String   @default("Public") // Public, Private, Semi-Private
+  holes       Int?     @default(18)
+  par         Int?
+  rating      Float?
+  slope       Int?
+  yards       Int?
+  latitude    Float?
+  longitude   Float?
+  features    String?  // JSON string for additional features
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([zipCode])
+  @@index([city, state])
+  @@index([name])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  type        String   // "join_request", "join_approved", "join_declined", "match_update"
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  userId      String   // recipient
+  senderId    String?  // who triggered the notification
+  matchId     String?  // related match
+  groupId     String?  // related group
+  metadata    String?  // JSON for additional data
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user   User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  sender User? @relation("NotificationSender", fields: [senderId], references: [id])
+  match  Match? @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  group  Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+}
