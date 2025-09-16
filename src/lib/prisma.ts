@@ -12,9 +12,10 @@ export const prisma = globalForPrisma.prisma ?? new PrismaClient({
   },
   log: process.env.NODE_ENV === 'development' ? ['warn', 'error'] : ['error'],
   transactionOptions: {
-    timeout: 15000, // 15 seconds
-    maxWait: 10000,  // 10 seconds
-  },
+    timeout: 8000,  // Reduced from 15s to 8s
+    maxWait: 5000,  // Reduced from 10s to 5s
+    isolationLevel: 'ReadCommitted', // Better performance for read-heavy workloads
+  }
 })
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
@@ -50,14 +51,60 @@ export async function connectWithRetry(maxRetries = 3) {
   return false
 }
 
-// Wrapper function for database operations with retry logic
+// Simple in-memory cache for frequent queries
+const queryCache = new Map<string, { data: any; timestamp: number; ttl: number }>()
+
+// Cache management
+export function getCachedQuery<T>(key: string): T | null {
+  const cached = queryCache.get(key)
+  if (!cached) return null
+  
+  const now = Date.now()
+  if (now - cached.timestamp > cached.ttl) {
+    queryCache.delete(key)
+    return null
+  }
+  
+  return cached.data
+}
+
+export function setCachedQuery<T>(key: string, data: T, ttlMs = 30000): void {
+  queryCache.set(key, { data, timestamp: Date.now(), ttl: ttlMs })
+}
+
+// Clean up expired cache entries every 5 minutes
+setInterval(() => {
+  const now = Date.now()
+  for (const [key, value] of Array.from(queryCache.entries())) {
+    if (now - value.timestamp > value.ttl) {
+      queryCache.delete(key)
+    }
+  }
+}, 300000)
+
+// Wrapper function for database operations with retry logic and caching
 export async function executeWithRetry<T>(
   operation: () => Promise<T>,
-  maxRetries = 2
+  maxRetries = 2,
+  cacheKey?: string,
+  cacheTtl = 30000
 ): Promise<T | null> {
+  // Check cache first
+  if (cacheKey) {
+    const cached = getCachedQuery<T>(cacheKey)
+    if (cached) return cached
+  }
+
   for (let i = 0; i <= maxRetries; i++) {
     try {
-      return await operation()
+      const result = await operation()
+      
+      // Cache successful results
+      if (cacheKey && result !== null) {
+        setCachedQuery(cacheKey, result, cacheTtl)
+      }
+      
+      return result
     } catch (error) {
       if (error instanceof Error && 
           (error.message.includes('connect') || 

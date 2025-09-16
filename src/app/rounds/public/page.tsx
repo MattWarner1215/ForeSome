@@ -20,6 +20,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
+import { BACKGROUND_IMAGES } from '@/lib/images'
 
 interface Match {
   id: string
@@ -103,7 +104,7 @@ export default function PublicRoundsPage() {
     <div 
       className="min-h-screen relative"
       style={{
-        backgroundImage: `url('/images/golf_public_background.jpg')`,
+        backgroundImage: `url('${BACKGROUND_IMAGES.golf_public_background}')`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat'
@@ -116,41 +117,25 @@ export default function PublicRoundsPage() {
       <div className="relative z-10 bg-white/95 backdrop-blur-sm shadow-lg border-b border-green-100">
         <div className="container mx-auto px-4 py-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <Button 
-                onClick={() => router.push('/')}
-                variant="outline"
-                size="sm"
-                className="border-green-200 hover:bg-green-50"
-              >
-                <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
-                Back to Dashboard
-              </Button>
-              <div>
-                <h1 className="text-2xl font-bold text-green-800">
-                  {showPublicRounds ? 'Public Rounds' : 'Private Rounds'}
-                </h1>
-                <p className="text-gray-600 text-sm">
-                  {showPublicRounds 
-                    ? 'Join public rounds open to everyone' 
-                    : 'Rounds created by members of your groups'}
-                </p>
-              </div>
+            <div>
+              <h1 className="text-2xl font-bold text-green-800">
+                {showPublicRounds ? 'Public Rounds' : 'Private Rounds'}
+              </h1>
+              <p className="text-gray-600 text-sm">
+                {showPublicRounds 
+                  ? 'Join public rounds open to everyone' 
+                  : 'Rounds created by members of your groups'}
+              </p>
             </div>
             
-            <button
-              onClick={() => setShowPublicRounds(!showPublicRounds)}
-              className="flex items-center space-x-3 text-lg text-green-600 hover:text-green-800 transition-colors"
-              title={showPublicRounds ? 'Show Private Rounds' : 'Show Public Rounds'}
+            <Button 
+              onClick={() => router.push('/')}
+              size="lg"
+              className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium px-6 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
             >
-              <span className="hidden sm:inline font-medium">
-                {showPublicRounds ? 'Show Private' : 'Show Public'}
-              </span>
-              <FontAwesomeIcon 
-                icon={showPublicRounds ? faToggleOn : faToggleOff} 
-                className="h-10 w-10 transform transition-transform hover:scale-110" 
-              />
-            </button>
+              <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
+              Back to Dashboard
+            </Button>
           </div>
         </div>
       </div>
@@ -164,6 +149,33 @@ export default function PublicRoundsPage() {
               : 'to-orange-50/80 border-orange-200/30 hover:shadow-2xl'
           }`}>
             <CardContent className="p-6">
+              {/* Rounds Section Headline with Toggle */}
+              <div className="mb-6 flex items-center justify-between">
+                <h2 className={`text-2xl font-bold ${
+                  showPublicRounds ? 'text-blue-600' : 'text-orange-600'
+                }`}>
+                  {showPublicRounds ? 'Public Rounds' : 'Private Rounds'}
+                </h2>
+                
+                <button
+                  onClick={() => setShowPublicRounds(!showPublicRounds)}
+                  className={`flex items-center space-x-3 text-lg transition-colors ${
+                    showPublicRounds 
+                      ? 'text-blue-600 hover:text-blue-800' 
+                      : 'text-orange-600 hover:text-orange-800'
+                  }`}
+                  title={showPublicRounds ? 'Show Private Rounds' : 'Show Public Rounds'}
+                >
+                  <span className="hidden sm:inline font-medium">
+                    {showPublicRounds ? 'Show Private' : 'Show Public'}
+                  </span>
+                  <FontAwesomeIcon 
+                    icon={showPublicRounds ? faToggleOn : faToggleOff} 
+                    className="h-8 w-8 transform transition-transform hover:scale-110" 
+                  />
+                </button>
+              </div>
+              
               {isLoading ? (
                 <div className="space-y-4">
                   {Array.from({ length: 6 }).map((_, i) => (

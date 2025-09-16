@@ -1,17 +1,18 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, Suspense } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendarDays, faLocationDot, faUsers, faClock } from '@fortawesome/free-solid-svg-icons'
+import { faCalendarDays, faLocationDot, faUsers, faClock, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
+import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
 
 interface Round {
   id: string
@@ -46,10 +47,11 @@ interface Round {
   pendingRequestsCount?: number
 }
 
-export default function RoundesPage() {
+function RoundesPageContent() {
   const { data: session } = useSession()
   const queryClient = useQueryClient()
   const searchParams = useSearchParams()
+  const router = useRouter()
   
   // Initialize activeTab based on URL parameters
   const [activeTab, setActiveTab] = useState<'public' | 'my'>(() => {
@@ -182,7 +184,7 @@ export default function RoundesPage() {
       <div 
         className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-30"
         style={{
-          backgroundImage: "url('/images/golf_public_background.jpg')",
+          backgroundImage: `url('${BACKGROUND_IMAGES.golf_public_background}')`,
           zIndex: -1
         }}
       ></div>
@@ -190,7 +192,7 @@ export default function RoundesPage() {
         <div className="container mx-auto px-4 h-full flex items-center justify-between overflow-visible">
           <div className="flex items-center">
             <img 
-              src="/images/foresum_logo.png" 
+              src={LOGO_IMAGES.foresum_logo} 
               alt="ForeSum Logo" 
               className="h-[150px] w-[150px] object-contain"
             />
@@ -199,8 +201,13 @@ export default function RoundesPage() {
             <Button asChild>
               <Link href="/matches/create">Create Round</Link>
             </Button>
-            <Button asChild variant="outline">
-              <Link href="/">Dashboard</Link>
+            <Button 
+              onClick={() => router.push('/')}
+              variant="outline"
+              className="border-green-200 hover:bg-green-50"
+            >
+              <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
+              Back to Dashboard
             </Button>
           </div>
         </div>
@@ -411,5 +418,13 @@ export default function RoundesPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function RoundesPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RoundesPageContent />
+    </Suspense>
   )
 }

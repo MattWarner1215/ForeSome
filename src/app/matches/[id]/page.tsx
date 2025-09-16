@@ -7,6 +7,10 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
+import { Chat } from '@/components/ui/chat'
+import { ChatNotification } from '@/components/ui/chat-notification'
+import { SocketProvider } from '@/contexts/socket-context'
+import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faArrowLeft, 
@@ -24,7 +28,8 @@ import {
   faTimes,
   faStar,
   faFlag,
-  faBan
+  faBan,
+  faComments
 } from '@fortawesome/free-solid-svg-icons'
 
 interface PendingRequest {
@@ -88,6 +93,7 @@ export default function RoundDetailsPage() {
   const [showRatingModal, setShowRatingModal] = useState(false)
   const [ratings, setRatings] = useState<Rating[]>([])
   const [submittingRatings, setSubmittingRatings] = useState(false)
+  const [showChat, setShowChat] = useState(false)
 
   const { data: round, isLoading, error } = useQuery<Round>({
     queryKey: ['round', roundId],
@@ -326,14 +332,16 @@ export default function RoundDetailsPage() {
   // - Match is scheduled (not completed or cancelled)
   const canJoin = !isCreator && !userStatus && !isFull && isScheduled
   const isMatchInPast = round ? new Date(round.date) < new Date() : false
+  const canAccessChat = isCreator || isAccepted
 
   return (
-    <div className="min-h-screen relative">
+    <SocketProvider>
+      <div className="min-h-screen relative">
       {/* Background Image */}
       <div className="absolute inset-0">
         <div 
           className="w-full h-full bg-cover bg-center bg-fixed bg-no-repeat"
-          style={{ backgroundImage: "url('/images/clubs_back.jpg')" }}
+          style={{ backgroundImage: `url('${BACKGROUND_IMAGES.clubs_back}')` }}
         ></div>
         <div className="absolute inset-0 bg-white bg-opacity-40"></div>
       </div>
@@ -342,18 +350,18 @@ export default function RoundDetailsPage() {
         <div className="container mx-auto px-4 h-full flex items-center justify-between overflow-visible">
           <div className="flex items-center">
             <img 
-              src="/images/foresum_logo.png" 
+              src={LOGO_IMAGES.foresum_logo} 
               alt="Foresum Logo" 
               className="w-[150px] h-[150px] object-contain"
             />
           </div>
           <Button 
             variant="outline" 
-            onClick={() => router.back()}
+            onClick={() => router.push('/')}
             className="border-green-300 text-green-700 hover:bg-green-50 transition-all duration-200"
           >
             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
-            Back
+            Back to Dashboard
           </Button>
         </div>
       </nav>
@@ -361,7 +369,7 @@ export default function RoundDetailsPage() {
       <div className="container mx-auto px-4 py-8 max-w-4xl relative">
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Main Round Details */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
             <Card className="bg-white/80 backdrop-blur-sm shadow-2xl border-0">
               <CardHeader className="bg-gradient-to-r from-green-50 to-green-100/50 border-b border-green-200">
                 <div className="flex items-center justify-between">
@@ -564,6 +572,18 @@ export default function RoundDetailsPage() {
                       <span className="text-sm">No other players to rate in this match</span>
                     </div>
                   )}
+
+                  {/* Chat Button */}
+                  {canAccessChat && (
+                    <Button
+                      onClick={() => setShowChat(!showChat)}
+                      variant="outline"
+                      className="border-blue-300 text-blue-700 hover:bg-blue-50"
+                    >
+                      <FontAwesomeIcon icon={faComments} className="h-4 w-4 mr-2" />
+                      {showChat ? 'Hide Chat' : 'Show Chat'}
+                    </Button>
+                  )}
                 </div>
                 
                 {(joinRound.error || leaveRound.error || handleRequest.error) && (
@@ -690,8 +710,23 @@ export default function RoundDetailsPage() {
               </CardContent>
             </Card>
 
+            {/* Chat Section */}
+            {showChat && canAccessChat && (
+              <div className="w-full min-w-0 overflow-hidden">
+                <Chat matchId={roundId} matchTitle={round?.title} />
+              </div>
+            )}
+
           </div>
         </div>
+
+        {/* Chat Notification */}
+        {canAccessChat && !showChat && (
+          <ChatNotification 
+            matchId={roundId}
+            onOpenChat={() => setShowChat(true)}
+          />
+        )}
 
         {/* Rating Modal */}
         {showRatingModal && (
@@ -794,5 +829,6 @@ export default function RoundDetailsPage() {
         )}
       </div>
     </div>
+    </SocketProvider>
   )
 }

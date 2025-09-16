@@ -1,0 +1,12 @@
+{
+  "backgrounds": {
+    "/images/golf_public_background.jpg": "https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/backgrounds/golf_public_background.jpg",
+    "/images/golf_Back_groups.jpg": "https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/backgrounds/golf_Back_groups.jpg",
+    "/images/clubs_back.jpg": "https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/backgrounds/clubs_back.jpg",
+    "/images/golf_manage_back.jpg": "https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/backgrounds/golf_manage_back.jpg"
+  },
+  "logos": {
+    "/images/foresum_logo.png": "https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/foresum_logo.png",
+    "/logos": "https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/logos"
+  }
+}

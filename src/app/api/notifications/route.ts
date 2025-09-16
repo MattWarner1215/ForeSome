@@ -27,7 +27,14 @@ export async function GET(request: NextRequest) {
 
     const notifications = await prisma.notification.findMany({
       where: whereClause,
-      include: {
+      select: {
+        id: true,
+        type: true,
+        title: true,
+        message: true,
+        isRead: true,
+        createdAt: true,
+        metadata: true,
         sender: {
           select: {
             id: true,
@@ -92,7 +99,7 @@ export async function GET(request: NextRequest) {
 
 // POST - Create a new notification
 const createNotificationSchema = z.object({
-  type: z.enum(['join_request', 'join_approved', 'join_declined', 'match_update', 'group_invite']),
+  type: z.enum(['join_request', 'join_approved', 'join_declined', 'match_update', 'group_invite', 'chat_message']),
   title: z.string().min(1),
   message: z.string().min(1),
   userId: z.string().min(1),

@@ -11,7 +11,7 @@ export async function GET() {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get groups where user is creator or member
+    // Get groups where user is creator or member, sorted with owned groups first
     const groups = await prisma.group.findMany({
       where: {
         OR: [
@@ -46,10 +46,28 @@ export async function GET() {
           }
         }
       },
-      orderBy: { createdAt: 'desc' }
+      orderBy: [
+        // Order by ownership status first (owned groups first), then by creation date
+        { creatorId: session.user.id ? 'desc' : 'asc' },
+        { createdAt: 'desc' }
+      ]
     })
 
-    return NextResponse.json(groups)
+    // Sort groups to ensure owned groups appear first
+    const sortedGroups = groups.sort((a, b) => {
+      const aIsOwned = a.creatorId === session.user.id
+      const bIsOwned = b.creatorId === session.user.id
+      
+      // If both are owned or both are not owned, sort by creation date (newest first)
+      if (aIsOwned === bIsOwned) {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      }
+      
+      // Owned groups first
+      return aIsOwned ? -1 : 1
+    })
+
+    return NextResponse.json(sortedGroups)
   } catch (error) {
     console.error('Groups fetch error:', error)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })

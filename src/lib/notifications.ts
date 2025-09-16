@@ -1,7 +1,7 @@
 import { prisma } from './prisma'
 
 export interface NotificationData {
-  type: 'join_request' | 'join_approved' | 'join_declined' | 'match_update' | 'group_invite'
+  type: 'join_request' | 'join_approved' | 'join_declined' | 'match_update' | 'group_invite' | 'chat_message'
   title: string
   message: string
   userId: string
@@ -206,6 +206,42 @@ export class NotificationService {
       where: {
         userId: userId,
         isRead: false
+      }
+    })
+  }
+
+  /**
+   * Create chat message notification for offline users
+   */
+  static async createChatMessageNotification(
+    recipientId: string,
+    senderId: string,
+    senderName: string,
+    matchId: string,
+    matchTitle: string,
+    messageContent: string,
+    chatRoomId: string,
+    messageId: string
+  ) {
+    // Truncate long messages for notification preview
+    const truncatedMessage = messageContent.length > 100 
+      ? messageContent.substring(0, 97) + '...' 
+      : messageContent
+    
+    return this.create({
+      type: 'chat_message',
+      title: 'New Message',
+      message: `${senderName}: ${truncatedMessage}`,
+      userId: recipientId,
+      senderId: senderId,
+      matchId: matchId,
+      metadata: {
+        action: 'chat_message',
+        chatRoomId,
+        messageId,
+        matchTitle,
+        senderName,
+        originalMessage: messageContent
       }
     })
   }

@@ -61,6 +61,8 @@ model User {
   createdGroups Group[]         @relation("GroupCreator")
   notifications Notification[]  @relation("UserNotifications")
   sentNotifications Notification[] @relation("NotificationSender")
+  chatRooms     ChatRoom[]
+  chatMessages  ChatMessage[]
 }
 
 model VerificationToken {
@@ -91,6 +93,7 @@ model Match {
   players      MatchPlayer[]
   groupMatches GroupMatch[]
   notifications Notification[]
+  chatRoom     ChatRoom?
 }
 
 model MatchPlayer {
@@ -206,4 +209,35 @@ model Notification {
 
   @@index([userId, isRead])
   @@index([createdAt])
+}
+
+model ChatRoom {
+  id        String   @id @default(cuid())
+  matchId   String   @unique
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  match    Match         @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  messages ChatMessage[]
+  members  User[]
+
+  @@index([matchId])
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  content    String   @db.Text
+  chatRoomId String
+  senderId   String
+  isRead     Boolean  @default(false)
+  messageType String  @default("text") // text, system, image
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  chatRoom ChatRoom @relation(fields: [chatRoomId], references: [id], onDelete: Cascade)
+  sender   User     @relation(fields: [senderId], references: [id])
+
+  @@index([chatRoomId, createdAt])
+  @@index([senderId])
 }

@@ -74,3 +74,76 @@
     pointer-events: none;
   }
 }
+
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Custom scrollbar styles */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #d1d5db #f9fafb;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #f9fafb;
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+  border: 1px solid #f9fafb;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+*::-webkit-scrollbar-corner {
+  background: #f9fafb;
+}
+
+/* Chat scroll container */
+.chat-scroll-container {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+  scrollbar-color: #d1d5db #f9fafb !important;
+}
+
+.chat-scroll-container::-webkit-scrollbar {
+  width: 8px !important;
+  display: block !important;
+}
+
+.chat-scroll-container::-webkit-scrollbar-track {
+  background: #f9fafb !important;
+  border-radius: 4px !important;
+}
+
+.chat-scroll-container::-webkit-scrollbar-thumb {
+  background: #d1d5db !important;
+  border-radius: 4px !important;
+  border: 1px solid #f9fafb !important;
+}
+
+.chat-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af !important;
+}

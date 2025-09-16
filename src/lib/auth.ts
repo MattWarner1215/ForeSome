@@ -79,13 +79,13 @@ export const authOptions: NextAuthOptions = {
               select: { image: true, name: true }
             }),
             new Promise((_, reject) => 
-              setTimeout(() => reject(new Error('Database query timeout')), 5000)
+              setTimeout(() => reject(new Error('Database query timeout')), 3000)
             )
           ])
           
           if (user && typeof user === 'object' && 'image' in user && 'name' in user) {
-            session.user.image = user.image as string | null
-            session.user.name = user.name as string | null
+            session.user.image = user.image as string | null | undefined
+            session.user.name = user.name as string | null | undefined
           }
         } catch (error) {
           // More detailed error logging for debugging

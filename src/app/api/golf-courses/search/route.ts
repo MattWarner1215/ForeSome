@@ -78,10 +78,21 @@ export async function GET(request: NextRequest) {
       orderBy: {
         name: 'asc'
       },
-      take: limit
+      take: limit * 2 // Get more to allow for deduplication
     })
 
-    return NextResponse.json({ courses })
+    // Deduplicate by course name (case-insensitive)
+    const seenNames = new Set<string>()
+    const uniqueCourses = courses.filter(course => {
+      const normalizedName = course.name.toLowerCase().trim()
+      if (seenNames.has(normalizedName)) {
+        return false
+      }
+      seenNames.add(normalizedName)
+      return true
+    }).slice(0, limit) // Take only the requested limit after deduplication
+
+    return NextResponse.json({ courses: uniqueCourses })
   } catch (error) {
     console.error('Golf course search error:', error)
     return NextResponse.json(

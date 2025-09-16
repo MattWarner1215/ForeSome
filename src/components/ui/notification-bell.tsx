@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell, faTimes, faCheck, faCheckDouble, faCalendarDays, faUsers, faInfoCircle } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faTimes, faCheck, faCheckDouble, faCalendarDays, faUsers, faInfoCircle, faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
@@ -14,6 +15,7 @@ interface Notification {
   message: string
   isRead: boolean
   createdAt: string
+  metadata?: string | null
   sender?: {
     id: string
     name: string | null
@@ -48,6 +50,7 @@ export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
+  const router = useRouter()
 
   // Fetch notifications
   const { data: notificationData, isLoading } = useQuery<NotificationResponse>({
@@ -118,6 +121,38 @@ export function NotificationBell() {
     markAllAsReadMutation.mutate()
   }
 
+  const handleNotificationClick = (notification: Notification) => {
+    // Mark as read if not already read
+    if (!notification.isRead) {
+      markAsReadMutation.mutate([notification.id])
+    }
+
+    // Parse metadata if available
+    let metadata = null
+    try {
+      if (notification.metadata) {
+        metadata = JSON.parse(notification.metadata)
+      }
+    } catch (error) {
+      console.error('Failed to parse notification metadata:', error)
+    }
+
+    // Navigate based on notification type
+    if (notification.type === 'chat_message' && notification.match?.id) {
+      // Navigate to the match page which contains the chat
+      router.push(`/matches/${notification.match.id}`)
+      setIsOpen(false)
+    } else if (notification.match?.id) {
+      // For other match-related notifications, also go to match page
+      router.push(`/matches/${notification.match.id}`)
+      setIsOpen(false)
+    } else if (notification.group?.id) {
+      // For group-related notifications, go to groups page
+      router.push('/groups')
+      setIsOpen(false)
+    }
+  }
+
   const getNotificationIcon = (type: string) => {
     switch (type) {
       case 'join_request':
@@ -126,6 +161,8 @@ export function NotificationBell() {
         return faUsers
       case 'match_update':
         return faCalendarDays
+      case 'chat_message':
+        return faCommentDots
       default:
         return faInfoCircle
     }
@@ -141,6 +178,8 @@ export function NotificationBell() {
         return 'text-red-600 bg-red-50'
       case 'match_update':
         return 'text-orange-600 bg-orange-50'
+      case 'chat_message':
+        return 'text-purple-600 bg-purple-50'
       default:
         return 'text-gray-600 bg-gray-50'
     }
@@ -228,9 +267,11 @@ export function NotificationBell() {
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-gray-50 transition-colors ${
-                        !notification.isRead ? 'bg-blue-50/30' : ''
+                      className={`p-4 hover:bg-green-50 hover:border-l-4 hover:border-green-500 transition-all duration-200 cursor-pointer ${
+                        !notification.isRead ? 'bg-blue-50/30 border-l-4 border-blue-500' : ''
                       }`}
+                      onClick={() => handleNotificationClick(notification)}
+                      title="Click to view"
                     >
                       <div className="flex items-start space-x-3">
                         <div className={`p-2 rounded-full ${getNotificationColor(notification.type)}`}>
@@ -263,7 +304,10 @@ export function NotificationBell() {
                               <Button
                                 size="sm"
                                 variant="ghost"
-                                onClick={() => handleMarkAsRead(notification.id)}
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  handleMarkAsRead(notification.id)
+                                }}
                                 disabled={markAsReadMutation.isPending}
                                 className="text-green-600 hover:text-green-700 hover:bg-green-50 ml-2"
                               >

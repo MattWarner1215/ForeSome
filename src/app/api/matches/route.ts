@@ -51,74 +51,58 @@ export async function GET(request: Request) {
       })
     } else if (privateOnly) {
       // Private matches: matches created by members of groups I'm connected to (excluding my own matches)
-      
-      // Get all user IDs that are connected to me through groups (excluding myself)
-      const connectedUserIds = new Set()
-      
-      // 1. Get members of groups I created
-      const myGroupMembers = await prisma.groupMember.findMany({
-        where: {
-          group: {
-            creatorId: session.user.id
-          }
-        },
-        select: { userId: true }
-      })
-      myGroupMembers.forEach(member => {
-        if (member.userId !== session.user.id) {
-          connectedUserIds.add(member.userId)
-        }
-      })
-      
-      // 2. Get creators of groups where I'm a member
-      const groupsImIn = await prisma.group.findMany({
-        where: {
-          members: {
-            some: {
-              userId: session.user.id
-            }
-          }
-        },
-        select: { creatorId: true }
-      })
-      groupsImIn.forEach(group => {
-        if (group.creatorId !== session.user.id) {
-          connectedUserIds.add(group.creatorId)
-        }
-      })
-      
-      // 3. Get other members of groups where I'm a member
-      const otherGroupMembers = await prisma.groupMember.findMany({
-        where: {
-          group: {
-            members: {
-              some: {
-                userId: session.user.id
-              }
-            }
-          }
-        },
-        select: { userId: true }
-      })
-      otherGroupMembers.forEach(member => {
-        if (member.userId !== session.user.id) {
-          connectedUserIds.add(member.userId)
-        }
-      })
-      
-      const connectedUserIdsArray = Array.from(connectedUserIds)
-      
-      // If no connected users, return empty results
-      if (connectedUserIdsArray.length === 0) {
-        whereClause = addActiveMatchFilters({
-          id: 'no-rounds-found' // This will return no rounds
-        })
-      } else {
-        whereClause = addActiveMatchFilters({
-          creatorId: {
-            in: connectedUserIdsArray
+      try {
+        // Get all connected user IDs in a single optimized query
+        const groups = await prisma.group.findMany({
+          where: {
+            OR: [
+              { creatorId: session.user.id },
+              { members: { some: { userId: session.user.id } } }
+            ]
           },
-          isPublic: false // Only show private rounds from group members
+          include: {
+            members: {
+              select: { userId: true }
+            }
+          }
+        })
+        
+        const connectedUserIds = new Set<string>()
+        
+        groups.forEach(group => {
+          // Add group creator if not current user
+          if (group.creatorId !== session.user.id) {
+            connectedUserIds.add(group.creatorId)
+          }
+          
+          // Add all members except current user
+          group.members.forEach(member => {
+            if (member.userId !== session.user.id) {
+              connectedUserIds.add(member.userId)
+            }
+          })
+        })
+        
+        const connectedUserIdsArray = Array.from(connectedUserIds)
+        
+        // If no connected users, return empty results
+        if (connectedUserIdsArray.length === 0) {
+          whereClause = addActiveMatchFilters({
+            id: 'no-rounds-found' // This will return no rounds
+          })
+        } else {
+          whereClause = addActiveMatchFilters({
+            creatorId: {
+              in: connectedUserIdsArray
+            },
+            isPublic: false // Only show private rounds from group members
+          })
+        }
+      } catch (error) {
+        console.error('Error fetching connected users for private rounds:', error)
+        // If there's an error, return empty results
+        whereClause = addActiveMatchFilters({
+          id: 'no-rounds-found'
         })
       }
     } else if (zipCode) {
@@ -223,7 +207,15 @@ export async function GET(request: Request) {
       }
     })
 
-    return NextResponse.json(enrichedRounds)
+    // Add caching headers for better performance
+    const response = NextResponse.json(enrichedRounds)
+    
+    // Cache for 1 minute for my matches, 30 seconds for public matches
+    const cacheTime = myMatches ? 60 : 30
+    response.headers.set('Cache-Control', `private, max-age=${cacheTime}, stale-while-revalidate=60`)
+    response.headers.set('X-Cache-Tag', `matches-${session.user.id}`)
+    
+    return response
   } catch (error) {
     console.error('Rounds fetch error:', error)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })
@@ -278,6 +270,7 @@ export async function POST(request: Request) {
 
     // Verify user belongs to selected groups (for security)
     if (isPublic === 'false' && selectedGroups.length > 0) {
+      // Get groups where user is a member
       const userGroupMemberships = await prisma.groupMember.findMany({
         where: {
           userId: session.user.id,
@@ -288,8 +281,23 @@ export async function POST(request: Request) {
         select: { groupId: true }
       })
       
-      const userGroupIds = userGroupMemberships.map(m => m.groupId)
-      const invalidGroups = selectedGroups.filter((groupId: string) => !userGroupIds.includes(groupId))
+      // Get groups where user is the creator
+      const userOwnedGroups = await prisma.group.findMany({
+        where: {
+          creatorId: session.user.id,
+          id: {
+            in: selectedGroups
+          }
+        },
+        select: { id: true }
+      })
+      
+      // Combine both member groups and owned groups
+      const memberGroupIds = userGroupMemberships.map(m => m.groupId)
+      const ownedGroupIds = userOwnedGroups.map(g => g.id)
+      const allUserGroupIds = Array.from(new Set([...memberGroupIds, ...ownedGroupIds]))
+      
+      const invalidGroups = selectedGroups.filter((groupId: string) => !allUserGroupIds.includes(groupId))
       
       if (invalidGroups.length > 0) {
         return NextResponse.json(

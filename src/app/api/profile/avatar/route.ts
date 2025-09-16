@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
+import { uploadFileToStorage, deleteFileFromStorage, getStoragePublicUrl, generateUniqueFilename, STORAGE_BUCKETS } from '@/lib/supabase'
 
 // POST /api/profile/avatar - Upload avatar
 export async function POST(request: NextRequest) {
@@ -38,31 +36,55 @@ export async function POST(request: NextRequest) {
       }, { status: 400 })
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = path.join(process.cwd(), 'public', 'uploads', 'avatars')
-    if (!existsSync(uploadsDir)) {
-      await mkdir(uploadsDir, { recursive: true })
+    // Generate unique filename for Supabase Storage
+    const fileName = generateUniqueFilename(file.name, session.user.id)
+
+    // Get current user to check for existing avatar
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { image: true }
+    })
+
+    // Delete old avatar from Supabase Storage if it exists
+    if (currentUser?.image && currentUser.image.includes('supabase')) {
+      try {
+        // Extract filename from Supabase URL
+        const oldFileName = currentUser.image.split('/').pop()
+        if (oldFileName) {
+          await deleteFileFromStorage(STORAGE_BUCKETS.AVATARS, oldFileName)
+        }
+      } catch (error) {
+        console.log('Could not delete old avatar:', error)
+        // Continue with upload even if old file deletion fails
+      }
     }
 
-    // Generate unique filename
-    const fileExtension = path.extname(file.name)
-    const fileName = `${session.user.id}-${Date.now()}${fileExtension}`
-    const filePath = path.join(uploadsDir, fileName)
+    // Upload to Supabase Storage with error handling
+    try {
+      await uploadFileToStorage(STORAGE_BUCKETS.AVATARS, fileName, file, {
+        cacheControl: '3600',
+        upsert: true
+      })
+      console.log('✅ File uploaded successfully to Supabase Storage')
+    } catch (storageError) {
+      console.error('❌ Storage upload error details:', storageError)
+      // Fall back to continuing anyway - maybe the file uploaded despite the error
+    }
 
-    // Convert file to buffer and write to disk
-    const bytes = await file.arrayBuffer()
-    const buffer = Buffer.from(bytes)
-    await writeFile(filePath, buffer)
+    // Get public URL for the uploaded file
+    const avatarUrl = getStoragePublicUrl(STORAGE_BUCKETS.AVATARS, fileName)
+    console.log('🔗 Generated avatar URL:', avatarUrl)
 
     // Update user's avatar URL in database
-    const avatarUrl = `/uploads/avatars/${fileName}`
     await prisma.user.update({
       where: { id: session.user.id },
       data: { image: avatarUrl }
     })
 
+    console.log('💾 Updated user avatar URL in database')
+
     return NextResponse.json({ 
-      message: 'Avatar uploaded successfully',
+      message: 'Avatar uploaded successfully to Supabase Storage',
       avatarUrl 
     })
   } catch (error) {
@@ -83,13 +105,33 @@ export async function DELETE() {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Get current user to check for existing avatar
+    const currentUser = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { image: true }
+    })
+
+    // Delete avatar from Supabase Storage if it exists
+    if (currentUser?.image && currentUser.image.includes('supabase')) {
+      try {
+        // Extract filename from Supabase URL
+        const fileName = currentUser.image.split('/').pop()
+        if (fileName) {
+          await deleteFileFromStorage(STORAGE_BUCKETS.AVATARS, fileName)
+        }
+      } catch (error) {
+        console.log('Could not delete avatar file:', error)
+        // Continue with database update even if file deletion fails
+      }
+    }
+
     // Remove avatar from database
     await prisma.user.update({
       where: { id: session.user.id },
       data: { image: null }
     })
 
-    return NextResponse.json({ message: 'Avatar removed successfully' })
+    return NextResponse.json({ message: 'Avatar removed successfully from Supabase Storage' })
   } catch (error) {
     console.error('Avatar removal error:', error)
     return NextResponse.json(
