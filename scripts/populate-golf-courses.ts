@@ -154,7 +154,7 @@ async function populateDatabase() {
     await prisma.golfCourse.deleteMany()
     
     // Parse the markdown file
-    const filePath = path.join(process.cwd(), 'Golf courses.md')
+    const filePath = path.join(process.cwd(), 'docs', 'Golf courses.md')
     console.log(`📖 Parsing golf courses from: ${filePath}`)
     
     if (!fs.existsSync(filePath)) {

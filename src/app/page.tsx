@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendarDays, faLocationDot, faUsers, faStar, faSearch, faPlus, faUser, faGlobe, faLock, faChevronUp, faChevronDown, faBars, faTimes, faHistory, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faUsers, faStar, faSearch, faPlus, faUser, faGlobe, faLock, faChevronUp, faChevronDown, faBars, faTimes, faHistory, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import StatsLeaderboardToggle from '@/components/ui/stats-leaderboard-toggle'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
@@ -656,8 +656,8 @@ export default function HomePage() {
                 <div className="flex justify-between items-center">
                   <div className="flex-1">
                     <CardTitle className="flex items-center space-x-2 text-green-800">
-                      <div className="p-2 bg-green-100 rounded-lg relative">
-                        <FontAwesomeIcon icon={faCalendarDays} className="h-5 w-5 text-green-600" />
+                      <div className="relative">
+                        <img src={LOGO_IMAGES.myrounds_icon} alt="My Rounds" className="h-[50px] w-[50px]" />
                         {recentRounds && recentRounds.some(match => match.pendingRequestsCount && match.pendingRequestsCount > 0) && (
                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                         )}
@@ -793,7 +793,7 @@ export default function HomePage() {
                           <div className="flex items-center justify-between text-xs">
                             <div className="flex items-center space-x-2">
                               <span className="flex items-center text-gray-600">
-                                <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3 mr-1 text-blue-500" />
+                                <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-3 w-3 mr-1" />
                                 {formatDate(match.date)}
                               </span>
                               <span className="flex items-center text-gray-600">
@@ -849,8 +849,8 @@ export default function HomePage() {
                   </div>
                 ) : (
                   <div className="text-center py-12 bg-gradient-to-br from-green-50 to-white rounded-xl border border-green-200/50 shadow-sm mx-2">
-                    <div className="p-3 bg-green-100 rounded-full w-fit mx-auto mb-4">
-                      <FontAwesomeIcon icon={faCalendarDays} className="h-8 w-8 text-green-600" />
+                    <div className="w-fit mx-auto mb-4">
+                      <img src={LOGO_IMAGES.myrounds_icon} alt="My Rounds" className="h-[50px] w-[50px]" />
                     </div>
                     <p className="text-green-800 font-medium mb-4">No rounds yet</p>
                     <Button asChild size="sm" className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">

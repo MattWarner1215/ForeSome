@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendarDays, faLocationDot, faUsers, faClock, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faUsers, faClock, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
 import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
@@ -313,7 +313,7 @@ function RoundesPageContent() {
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
                           <div className="flex items-center space-x-2">
-                            <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 text-gray-400" />
+                            <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-4 w-4" />
                             <span>{formatDate(match.date)}</span>
                           </div>
                           <div className="flex items-center space-x-2">

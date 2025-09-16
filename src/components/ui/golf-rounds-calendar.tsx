@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
@@ -8,7 +9,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faChevronLeft, 
   faChevronRight, 
-  faCalendarDays,
   faClock,
   faUsers,
   faMapMarkerAlt,
@@ -22,6 +22,7 @@ import {
   faUserPlus
 } from '@fortawesome/free-solid-svg-icons'
 import { cn } from '@/lib/utils'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface Match {
   id: string
@@ -48,6 +49,7 @@ interface GolfRoundsCalendarProps {
 }
 
 export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps) {
+  const router = useRouter()
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDayMatches, setSelectedDayMatches] = useState<Match[]>([])
   const [selectedDate, setSelectedDate] = useState<string>('')
@@ -164,7 +166,7 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
             <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm">
-              <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 text-white" />
+              <img src={LOGO_IMAGES.myrounds_icon} alt="Calendar" className="h-4 w-4" />
             </div>
             <span className="text-green-800 font-bold">Golf Calendar</span>
           </CardTitle>
@@ -215,7 +217,7 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
           {/* Calendar Days */}
           {calendarDays.map((day, index) => {
             if (!day) {
-              return <div key={index} className="h-16 p-1"></div>
+              return <div key={`empty-${index}`} className="h-16 p-1"></div>
             }
 
             const dayMatches = getMatchesForDate(day)
@@ -321,12 +323,12 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
 
       {/* Round Details Modal */}
       {isModalOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+        <div
+          className="fixed inset-0 bg-black bg-opacity-75 backdrop-blur-sm flex items-center justify-center z-[9999] p-4 overflow-y-auto"
           onClick={closeModal}
         >
-          <div 
-            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+          <div
+            className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto my-auto"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="p-6 border-b border-gray-200">
@@ -442,7 +444,7 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
                         <div className="pt-2">
                           <Button
                             size="sm"
-                            onClick={() => window.open(`/matches/${match.id}`, '_blank')}
+                            onClick={() => router.push(`/matches/${match.id}`)}
                             className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white"
                           >
                             View Details

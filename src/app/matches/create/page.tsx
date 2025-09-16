@@ -11,9 +11,10 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faArrowLeft, faLocationDot, faCalendarDays, faClock, faUsers, faGlobe, faLock, faBullseye } from '@fortawesome/free-solid-svg-icons'
+import { faArrowLeft, faLocationDot, faClock, faUsers, faGlobe, faLock, faBullseye } from '@fortawesome/free-solid-svg-icons'
 import { CourseSearch } from '@/components/ui/course-search'
 import { GolfCourse } from '@/data/golf-courses'
+import { LOGO_IMAGES } from '@/lib/images'
 
 export default function CreateRoundPage() {
   const router = useRouter()
@@ -287,7 +288,7 @@ export default function CreateRoundPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-3">
                   <Label htmlFor="date" className="text-sm font-semibold text-gray-700 flex items-center">
-                    <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 mr-2 text-green-600" />
+                    <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-4 w-4 mr-2" />
                     Date *
                   </Label>
                   <Input

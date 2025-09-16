@@ -5,6 +5,9 @@ node_modules/
 
 # Testing
 /coverage/
+test-*.js
+*-test.js
+*.test.js
 
 # Next.js
 /.next/
@@ -12,18 +15,23 @@ node_modules/
 
 # Production
 /build
+/dist
 
 # Misc
 .DS_Store
 *.pem
+*.log
 
 # Debug
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+.vscode/
 
-# Local env files
+# Environment files
+.env
 .env*.local
+.env.production
 
 # Vercel
 .vercel
@@ -38,3 +46,17 @@ next-env.d.ts
 # Uploads (keep structure but ignore files)
 /public/uploads/**/*
 !/public/uploads/.gitkeep
+
+# Development files
+performance-test.js
+migrate-*.js
+
+# Cache directories
+.cache/
+.parcel-cache/
+
+# OS generated files
+Thumbs.db
+*.swp
+*.swo
+*~

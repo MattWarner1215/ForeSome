@@ -6,8 +6,9 @@ import { useParams } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faUser, faCrown, faCalendarDays, faEnvelope } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faUser, faCrown, faEnvelope } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface Group {
   id: string
@@ -135,7 +136,7 @@ export default function GroupDetailPage() {
                     <span>{group._count.members} members</span>
                   </span>
                   <span className="flex items-center space-x-1">
-                    <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4" />
+                    <img src={LOGO_IMAGES.myrounds_icon} alt="Rounds" className="h-4 w-4" />
                     <span>{group._count.groupMatches} shared rounds</span>
                   </span>
                   <span className={`px-2 py-1 rounded-full text-xs font-medium ${
@@ -219,7 +220,7 @@ export default function GroupDetailPage() {
                             <span className="truncate">{member.user.email}</span>
                           </div>
                           <div className="flex items-center space-x-1 text-sm text-gray-600 mt-1">
-                            <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3" />
+                            <img src={LOGO_IMAGES.myrounds_icon} alt="Handicap" className="h-3 w-3" />
                             <span>
                               Handicap: {member.user.handicap !== null ? member.user.handicap : 'Not set'}
                             </span>

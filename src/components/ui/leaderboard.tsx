@@ -10,9 +10,9 @@ import {
   faUser, 
   faStar,
   faGolfBall,
-  faCalendarDays,
   faMapMarkedAlt
 } from '@fortawesome/free-solid-svg-icons'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface LeaderboardEntry {
   id: string
@@ -177,7 +177,7 @@ export default function Leaderboard({ compact = false, limit = 5 }: LeaderboardP
                           <span>{player.averageRating > 0 ? player.averageRating : '-'} rating</span>
                         </div>
                         <div className="flex items-center space-x-1">
-                          <FontAwesomeIcon icon={faCalendarDays} className="h-3 w-3 text-blue-500" />
+                          <img src={LOGO_IMAGES.myrounds_icon} alt="Rounds" className="h-3 w-3" />
                           <span>{player.roundsCreated} created</span>
                         </div>
                         <div className="flex items-center space-x-1">

@@ -6,10 +6,11 @@ import { useQuery } from '@tanstack/react-query'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faCalendarDays, faLocationDot, faUsers, faStar, faHistory, faArrowLeft, faFlag } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faUsers, faStar, faHistory, faArrowLeft, faFlag } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface CompletedMatch {
   id: string
@@ -240,7 +241,7 @@ export default function CompletedMatchesPage() {
                     </div>
 
                     <div className="flex items-center gap-2 text-sm text-gray-700">
-                      <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 text-green-600" />
+                      <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-4 w-4" />
                       <div>
                         <p className="font-medium">{formatDate(match.date)}</p>
                         <p className="text-gray-600">{formatTime(match.time)}</p>

@@ -11,9 +11,10 @@ export const BACKGROUND_IMAGES = {
   golf_manage_back: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/backgrounds/golf_manage_back.jpg'
 } as const
 
-// Logo images from Supabase Storage  
+// Logo images from Supabase Storage
 export const LOGO_IMAGES = {
-  foresum_logo: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/foresum_logo.png'
+  foresum_logo: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/foresum_logo.png',
+  myrounds_icon: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/MYRounds_Icon.png'
 } as const
 
 // Legacy local paths for reference (can be removed after migration)
@@ -22,7 +23,8 @@ export const LEGACY_PATHS = {
   '/images/golf_Back_groups.jpg': BACKGROUND_IMAGES.golf_Back_groups,
   '/images/clubs_back.jpg': BACKGROUND_IMAGES.clubs_back,
   '/images/golf_manage_back.jpg': BACKGROUND_IMAGES.golf_manage_back,
-  '/images/foresum_logo.png': LOGO_IMAGES.foresum_logo
+  '/images/foresum_logo.png': LOGO_IMAGES.foresum_logo,
+  '/images/MYRounds_Icon.png': LOGO_IMAGES.myrounds_icon
 } as const
 
 // Helper function to get Supabase image URL

@@ -12,7 +12,6 @@ import {
   faLock, 
   faLocationDot, 
   faUsers, 
-  faCalendarDays, 
   faStar, 
   faToggleOn, 
   faToggleOff,
@@ -20,7 +19,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
-import { BACKGROUND_IMAGES } from '@/lib/images'
+import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
 
 interface Match {
   id: string
@@ -248,9 +247,10 @@ export default function PublicRoundsPage() {
                           </div>
                           <div className="flex flex-wrap items-center justify-start sm:justify-end gap-1 sm:gap-2 text-xs">
                             <span className="flex items-center text-gray-600">
-                              <FontAwesomeIcon 
-                                icon={faCalendarDays} 
-                                className={`h-2 w-2 mr-1 ${showPublicRounds ? 'text-blue-500' : 'text-orange-500'}`}
+                              <img
+                                src={LOGO_IMAGES.myrounds_icon}
+                                alt="Date"
+                                className="h-2 w-2 mr-1"
                               />
                               {formatDate(match.date)}
                             </span>

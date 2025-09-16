@@ -4,9 +4,10 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell, faTimes, faCheck, faCheckDouble, faCalendarDays, faUsers, faInfoCircle, faCommentDots } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faTimes, faCheck, faCheckDouble, faUsers, faInfoCircle, faCommentDots } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface Notification {
   id: string
@@ -160,7 +161,7 @@ export function NotificationBell() {
       case 'join_declined':
         return faUsers
       case 'match_update':
-        return faCalendarDays
+        return faInfoCircle // This won't be used since we handle it specially
       case 'chat_message':
         return faCommentDots
       default:
@@ -275,10 +276,14 @@ export function NotificationBell() {
                     >
                       <div className="flex items-start space-x-3">
                         <div className={`p-2 rounded-full ${getNotificationColor(notification.type)}`}>
-                          <FontAwesomeIcon 
-                            icon={getNotificationIcon(notification.type)} 
-                            className="h-3 w-3" 
-                          />
+                          {notification.type === 'match_update' ? (
+                            <img src={LOGO_IMAGES.myrounds_icon} alt="Match Update" className="h-3 w-3" />
+                          ) : (
+                            <FontAwesomeIcon
+                              icon={getNotificationIcon(notification.type)}
+                              className="h-3 w-3"
+                            />
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between">

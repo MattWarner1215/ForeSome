@@ -14,7 +14,6 @@ import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { 
   faArrowLeft, 
-  faCalendarDays, 
   faLocationDot, 
   faUsers, 
   faUser,
@@ -366,10 +365,10 @@ export default function RoundDetailsPage() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8 max-w-4xl relative">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Round Details */}
-          <div className="lg:col-span-2 space-y-6 min-w-0 overflow-hidden">
+      <div className="container mx-auto px-4 py-8 max-w-7xl relative">
+        <div className="grid lg:grid-cols-5 gap-8">
+          {/* Main Content Area */}
+          <div className="lg:col-span-3 space-y-6 min-w-0 overflow-hidden">
             <Card className="bg-white/80 backdrop-blur-sm shadow-2xl border-0">
               <CardHeader className="bg-gradient-to-r from-green-50 to-green-100/50 border-b border-green-200">
                 <div className="flex items-center justify-between">
@@ -411,7 +410,7 @@ export default function RoundDetailsPage() {
                     
                     <div className="flex items-start space-x-3">
                       <div className="p-2 bg-blue-100 rounded-lg mt-1">
-                        <FontAwesomeIcon icon={faCalendarDays} className="h-5 w-5 text-blue-600" />
+                        <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-5 w-5" />
                       </div>
                       <div>
                         <p className="font-semibold text-gray-800">{formatDate(round.date)}</p>
@@ -449,13 +448,13 @@ export default function RoundDetailsPage() {
                         isCompleted ? 'bg-green-100' : 
                         isCancelled ? 'bg-red-100' : 'bg-blue-100'
                       }`}>
-                        <FontAwesomeIcon 
-                          icon={isCompleted ? faFlag : isCancelled ? faBan : faCalendarDays} 
-                          className={`h-5 w-5 ${
-                            isCompleted ? 'text-green-600' : 
-                            isCancelled ? 'text-red-600' : 'text-blue-600'
-                          }`} 
-                        />
+                        {isCompleted ? (
+                          <FontAwesomeIcon icon={faFlag} className="h-5 w-5 text-green-600" />
+                        ) : isCancelled ? (
+                          <FontAwesomeIcon icon={faBan} className="h-5 w-5 text-red-600" />
+                        ) : (
+                          <img src={LOGO_IMAGES.myrounds_icon} alt="Status" className="h-5 w-5" />
+                        )}
                       </div>
                       <div>
                         <p className={`font-semibold ${
@@ -651,15 +650,17 @@ export default function RoundDetailsPage() {
                 </CardContent>
               </Card>
             )}
+
           </div>
 
-          {/* Players Sidebar */}
-          <div className="space-y-6">
+          {/* Right Sidebar - Players always visible, Chat when toggled */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Players Section - In right sidebar */}
             <Card className="bg-white/80 backdrop-blur-sm shadow-lg">
-              <CardHeader>
+              <CardHeader className="bg-gradient-to-r from-green-50 to-green-100/50 border-b border-green-200">
                 <CardTitle className="flex items-center space-x-2">
                   <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-green-600" />
-                  <span>Players ({(round?.players?.length ?? 0) + 1})</span>
+                  <span className="text-gray-800">Players ({(round?.players?.length ?? 0) + 1})</span>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-4">
@@ -710,13 +711,12 @@ export default function RoundDetailsPage() {
               </CardContent>
             </Card>
 
-            {/* Chat Section */}
+            {/* Chat Section - Below players in right sidebar */}
             {showChat && canAccessChat && (
               <div className="w-full min-w-0 overflow-hidden">
                 <Chat matchId={roundId} matchTitle={round?.title} />
               </div>
             )}
-
           </div>
         </div>
 

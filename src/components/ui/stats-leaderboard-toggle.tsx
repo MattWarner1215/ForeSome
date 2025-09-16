@@ -14,11 +14,11 @@ import {
   faUser,
   faStar,
   faGolfBall,
-  faCalendarDays,
   faMapMarkedAlt,
   faQuestionCircle,
   faTimes
 } from '@fortawesome/free-solid-svg-icons'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface UserStats {
   roundsCompleted: number
@@ -371,7 +371,7 @@ export default function StatsLeaderboardToggle() {
                 
                 <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
                   <div className="flex items-center space-x-3">
-                    <FontAwesomeIcon icon={faCalendarDays} className="h-4 w-4 text-blue-600" />
+                    <img src={LOGO_IMAGES.myrounds_icon} alt="Rounds" className="h-4 w-4" />
                     <span className="text-sm font-medium text-blue-800">Rounds Created</span>
                   </div>
                   <span className="text-sm font-bold text-blue-700">15 pts each</span>

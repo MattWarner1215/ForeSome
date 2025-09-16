@@ -41,6 +41,7 @@ const BUCKET_MAPPINGS = {
     bucket: 'logos',
     paths: [
       'public/images/foresum_logo.png',
+      'public/images/MYRounds_Icon.png',
       'public/logos'
     ]
   }
@@ -173,6 +174,12 @@ async function migrateImages() {
   // Upload main logo
   if (existsSync('public/images/foresum_logo.png')) {
     const success = await uploadFile('logos', 'public/images/foresum_logo.png', 'foresum_logo.png')
+    if (success) totalUploaded++
+  }
+
+  // Upload MYRounds icon
+  if (existsSync('public/images/MYRounds_Icon.png')) {
+    const success = await uploadFile('logos', 'public/images/MYRounds_Icon.png', 'MYRounds_Icon.png')
     if (success) totalUploaded++
   }
   

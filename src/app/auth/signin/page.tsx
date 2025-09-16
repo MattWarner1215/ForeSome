@@ -162,13 +162,23 @@ export default function SignInPage() {
               </div>
             </form>
 
+            {/* Forgot Password Link */}
+            <div className="mt-6 text-center">
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-green-600 hover:text-green-700 transition-colors hover:underline"
+              >
+                Forgot your password?
+              </Link>
+            </div>
+
             {/* Divider */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <div className="text-center">
                 <p className="text-gray-600">
                   Don't have an account?{' '}
-                  <Link 
-                    href="/auth/signup" 
+                  <Link
+                    href="/auth/signup"
                     className="font-semibold text-green-600 hover:text-green-700 transition-colors hover:underline"
                   >
                     Sign up for free
