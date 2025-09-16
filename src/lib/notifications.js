@@ -48,6 +48,79 @@ class NotificationService {
   }
 
   /**
+   * Create join request notification
+   */
+  static async createJoinRequestNotification(
+    matchCreatorId,
+    requesterId,
+    matchId,
+    matchTitle,
+    requesterName
+  ) {
+    return this.create({
+      type: 'join_request',
+      title: 'New Join Request',
+      message: `${requesterName} wants to join your round "${matchTitle}"`,
+      userId: matchCreatorId,
+      senderId: requesterId,
+      matchId: matchId,
+      metadata: {
+        action: 'join_request',
+        matchTitle,
+        requesterName
+      }
+    })
+  }
+
+  /**
+   * Create join approval notification
+   */
+  static async createJoinApprovedNotification(
+    requesterId,
+    matchCreatorId,
+    matchId,
+    matchTitle
+  ) {
+    return this.create({
+      type: 'join_approved',
+      title: 'Join Request Approved',
+      message: `Your request to join "${matchTitle}" has been approved!`,
+      userId: requesterId,
+      senderId: matchCreatorId,
+      matchId: matchId,
+      metadata: {
+        action: 'join_approved',
+        matchTitle
+      }
+    })
+  }
+
+  /**
+   * Create join declined notification
+   */
+  static async createJoinDeclinedNotification(
+    requesterId,
+    matchCreatorId,
+    matchId,
+    matchTitle,
+    reason
+  ) {
+    return this.create({
+      type: 'join_declined',
+      title: 'Join Request Declined',
+      message: `Your request to join "${matchTitle}" was declined${reason ? `: ${reason}` : ''}`,
+      userId: requesterId,
+      senderId: matchCreatorId,
+      matchId: matchId,
+      metadata: {
+        action: 'join_declined',
+        matchTitle,
+        reason
+      }
+    })
+  }
+
+  /**
    * Create chat message notification for offline users
    */
   static async createChatMessageNotification(
@@ -61,10 +134,10 @@ class NotificationService {
     messageId
   ) {
     // Truncate long messages for notification preview
-    const truncatedMessage = messageContent.length > 100 
-      ? messageContent.substring(0, 97) + '...' 
+    const truncatedMessage = messageContent.length > 100
+      ? messageContent.substring(0, 97) + '...'
       : messageContent
-    
+
     return this.create({
       type: 'chat_message',
       title: 'New Message',

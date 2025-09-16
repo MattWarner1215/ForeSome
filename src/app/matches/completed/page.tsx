@@ -88,12 +88,8 @@ export default function CompletedMatchesPage() {
   }
 
   const filteredMatches = completedMatches?.filter(match => {
-    // Filter out future matches and non-completed matches
-    const matchDate = new Date(match.date)
-    const isCompleted = match.status === 'completed'
-    const isPast = matchDate < new Date()
-    
-    return isCompleted || isPast
+    // Only show completed matches (not cancelled or other statuses)
+    return match.status === 'completed'
   }) || []
 
   if (!session) {

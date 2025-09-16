@@ -1,5 +1,5 @@
 const { prisma } = require('./prisma')
-const { NotificationService } = require('./notifications.js')
+const { NotificationService } = require('./notifications')
 
 function initializeSocketIO(io) {
   const authenticatedUsers = new Map()

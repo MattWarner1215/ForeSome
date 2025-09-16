@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query'
 import { useSession } from 'next-auth/react'
@@ -33,6 +33,12 @@ export default function CreateRoundPage() {
   })
   const [selectedGroups, setSelectedGroups] = useState<string[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  // Ensure form is visible on page load
+  useEffect(() => {
+    // Scroll to top on component mount to show form properly
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [])
 
   // Fetch user's groups
   const { data: userGroups } = useQuery({
@@ -150,7 +156,7 @@ export default function CreateRoundPage() {
   }
 
   return (
-    <div className="min-h-screen relative">
+    <div className="min-h-screen relative overflow-auto">
       {/* Background Image */}
       <div className="absolute inset-0">
         <div 
@@ -160,13 +166,13 @@ export default function CreateRoundPage() {
         <div className="absolute inset-0 bg-white bg-opacity-40"></div>
       </div>
       
-      <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-green-100 sticky top-0 z-50 h-20">
+      <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-green-100 sticky top-0 z-50 h-16 md:h-20">
         <div className="container mx-auto px-4 h-full flex items-center justify-between overflow-visible">
           <div className="flex items-center">
-            <img 
-              src="/images/foresum_logo.png" 
-              alt="Foresum Logo" 
-              className="w-[150px] h-[150px] object-contain"
+            <img
+              src="/images/foresum_logo.png"
+              alt="Foresum Logo"
+              className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] object-contain"
             />
           </div>
           <Button 
@@ -180,27 +186,18 @@ export default function CreateRoundPage() {
         </div>
       </nav>
 
-      <div className="container mx-auto px-4 py-8 max-w-2xl relative">
-        {/* Header Section */}
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-2xl animate-pulse">
-            <FontAwesomeIcon icon={faBullseye} className="h-10 w-10 text-white" />
-          </div>
-          <h2 className="text-4xl font-bold text-gray-800 mb-2">Create New Round</h2>
-          <p className="text-gray-600 text-lg">Set up your perfect golf round and find fellow players</p>
-        </div>
-        
-        <Card className="bg-white/80 backdrop-blur-sm shadow-2xl border-0 hover:shadow-3xl transition-all duration-300">
-          <CardHeader className="bg-gradient-to-r from-green-50 to-green-100/50 border-b border-green-200">
+      <div className="container mx-auto px-4 py-4 md:py-8 max-w-4xl relative">
+        <Card className="bg-white/90 backdrop-blur-md shadow-2xl border-0 hover:shadow-3xl transition-all duration-300 rounded-3xl overflow-hidden">
+          <CardHeader className="bg-gradient-to-r from-green-50 via-green-50/80 to-green-100/50 border-b border-green-200/50 py-4 md:py-6">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
                 <FontAwesomeIcon icon={faBullseye} className="h-5 w-5 text-white" />
               </div>
-              <CardTitle className="text-2xl text-gray-800">Round Details</CardTitle>
+              <CardTitle className="text-xl md:text-2xl text-gray-800 font-bold">Create New Round</CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-8">
+          <CardContent className="p-4 md:p-8">
+            <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
               {errors.general && (
                 <div className="p-4 text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2 animate-in slide-in-from-top-2 duration-300">
                   <div className="w-4 h-4 bg-red-500 rounded-full flex-shrink-0"></div>
@@ -219,7 +216,7 @@ export default function CreateRoundPage() {
                   value={formData.title}
                   onChange={handleInputChange}
                   placeholder="e.g., Saturday Morning Round"
-                  className={`h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 ${errors.title ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                  className={`h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl ${errors.title ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 />
                 {errors.title && <p className="text-sm text-red-600 flex items-center mt-1"><span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>{errors.title}</p>}
               </div>
@@ -233,11 +230,11 @@ export default function CreateRoundPage() {
                   onChange={handleInputChange}
                   placeholder="Tell players what to expect from this round..."
                   rows={4}
-                  className="border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200"
+                  className="border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl"
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-3">
                   <Label htmlFor="course" className="text-sm font-semibold text-gray-700 flex items-center">
                     <FontAwesomeIcon icon={faBullseye} className="h-4 w-4 mr-2 text-green-600" />
@@ -263,7 +260,7 @@ export default function CreateRoundPage() {
                     value={formData.zipCode}
                     onChange={handleInputChange}
                     placeholder="e.g., 90210"
-                    className={`h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 ${errors.zipCode ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl ${errors.zipCode ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                   />
                   {errors.zipCode && <p className="text-sm text-red-600 flex items-center mt-1"><span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>{errors.zipCode}</p>}
                 </div>
@@ -280,12 +277,12 @@ export default function CreateRoundPage() {
                   value={formData.address}
                   onChange={handleInputChange}
                   placeholder="e.g., 1700 17-Mile Drive, Pebble Beach, CA"
-                  className={`h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 ${errors.address ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                  className={`h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl ${errors.address ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                 />
                 {errors.address && <p className="text-sm text-red-600 flex items-center mt-1"><span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>{errors.address}</p>}
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-3">
                   <Label htmlFor="date" className="text-sm font-semibold text-gray-700 flex items-center">
                     <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-4 w-4 mr-2" />
@@ -298,7 +295,7 @@ export default function CreateRoundPage() {
                     value={formData.date}
                     onChange={handleInputChange}
                     min={new Date().toISOString().split('T')[0]}
-                    className={`h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 ${errors.date ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl ${errors.date ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                   />
                   {errors.date && <p className="text-sm text-red-600 flex items-center mt-1"><span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>{errors.date}</p>}
                 </div>
@@ -314,13 +311,13 @@ export default function CreateRoundPage() {
                     type="time"
                     value={formData.time}
                     onChange={handleInputChange}
-                    className={`h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 ${errors.time ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                    className={`h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl ${errors.time ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
                   />
                   {errors.time && <p className="text-sm text-red-600 flex items-center mt-1"><span className="w-2 h-2 bg-red-500 rounded-full mr-2"></span>{errors.time}</p>}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
                 <div className="space-y-3">
                   <Label htmlFor="maxPlayers" className="text-sm font-semibold text-gray-700 flex items-center">
                     <FontAwesomeIcon icon={faUsers} className="h-4 w-4 mr-2 text-green-600" />
@@ -330,7 +327,7 @@ export default function CreateRoundPage() {
                     value={formData.maxPlayers}
                     onValueChange={(value) => handleSelectChange('maxPlayers', value)}
                   >
-                    <SelectTrigger className="h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200">
+                    <SelectTrigger className="h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -352,7 +349,7 @@ export default function CreateRoundPage() {
                     value={formData.isPublic}
                     onValueChange={(value) => handleSelectChange('isPublic', value)}
                   >
-                    <SelectTrigger className="h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200">
+                    <SelectTrigger className="h-12 md:h-14 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -364,7 +361,7 @@ export default function CreateRoundPage() {
 
                 {/* Group Selection - Only show for private rounds */}
                 {formData.isPublic === 'false' && (
-                  <div className="space-y-3 mt-4 p-4 bg-orange-50 rounded-lg border border-orange-200">
+                  <div className="lg:col-span-2 space-y-3 mt-4 p-4 md:p-6 bg-gradient-to-r from-orange-50 to-orange-50/80 rounded-xl border border-orange-200/50 shadow-sm">
                     <Label className="text-sm font-semibold text-gray-700 flex items-center">
                       <FontAwesomeIcon icon={faUsers} className="h-4 w-4 mr-2 text-orange-600" />
                       Select Groups (Private Round)
@@ -434,19 +431,19 @@ export default function CreateRoundPage() {
                 )}
               </div>
 
-              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-6">
+              <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 pt-6 border-t border-gray-200/50">
                 <Button
                   type="button"
                   variant="outline"
                   onClick={() => router.back()}
-                  className="flex-1 h-12 border-gray-300 text-gray-700 hover:bg-gray-50 transition-all duration-200"
+                  className="flex-1 h-12 md:h-14 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 rounded-xl font-medium"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
                   disabled={createRound.isPending}
-                  className="flex-1 h-12 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:transform-none"
+                  className="flex-1 h-12 md:h-14 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:transform-none rounded-xl"
                 >
                   {createRound.isPending ? (
                     <div className="flex items-center space-x-2">

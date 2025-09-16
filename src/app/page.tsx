@@ -111,9 +111,10 @@ export default function HomePage() {
       return rounds
     },
     enabled: !!session,
-    staleTime: 30000, // 30 seconds
+    staleTime: 5000, // 5 seconds for faster updates
     gcTime: 300000, // 5 minutes
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchInterval: 10000 // Auto-refresh every 10 seconds
   })
 
   const { data: myGroups } = useQuery<Group[]>({
@@ -674,7 +675,7 @@ export default function HomePage() {
                         })()}
                       </div>
                     </CardTitle>
-                    <CardDescription className="text-gray-600 ml-11">
+                    <CardDescription className="text-gray-600 ml-16">
                       Rounds you've created or joined
                       {recentRounds && (() => {
                         const totalPending = recentRounds.reduce((sum, match) => sum + (match.pendingRequestsCount || 0), 0);
@@ -817,13 +818,13 @@ export default function HomePage() {
                               {match.isPublic && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                                   <FontAwesomeIcon icon={faGlobe} className="h-1.5 w-1.5 mr-0.5" />
-                                  Public
+                                  Public Round
                                 </span>
                               )}
                               {!match.isPublic && (
                                 <span className="inline-flex items-center px-1.5 py-0.5 rounded-full text-xs font-medium bg-orange-100 text-orange-800">
                                   <FontAwesomeIcon icon={faLock} className="h-1.5 w-1.5 mr-0.5" />
-                                  Private
+                                  Private Round
                                 </span>
                               )}
                             </div>
@@ -861,6 +862,11 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
+            {/* Golf Rounds Calendar */}
+            <GolfRoundsCalendar
+              matches={calendarMatches || []}
+              userId={session?.user?.id || ''}
+            />
 
           </div>
 
@@ -868,12 +874,6 @@ export default function HomePage() {
           <div className="space-y-4 sm:space-y-6">
             {/* Stats & Leaderboard Toggle */}
             <StatsLeaderboardToggle />
-
-            {/* Golf Rounds Calendar */}
-            <GolfRoundsCalendar 
-              matches={calendarMatches || []} 
-              userId={session?.user?.id || ''}
-            />
 
             {/* My Groups */}
             <Card className="bg-gradient-to-br from-white/95 to-purple-50/80 backdrop-blur-md shadow-xl border border-purple-200/30 hover:shadow-2xl transition-all duration-300 rounded-2xl">

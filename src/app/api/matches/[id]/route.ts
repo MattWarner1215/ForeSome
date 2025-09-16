@@ -164,10 +164,10 @@ export async function PUT(
       }, { status: 403 })
     }
 
-    // Check if match is not completed
-    if (existingMatch.status === 'completed') {
+    // Check if match is not completed or cancelled
+    if (existingMatch.status === 'completed' || existingMatch.status === 'cancelled') {
       return NextResponse.json({
-        message: 'Cannot edit completed matches'
+        message: 'Cannot edit completed or cancelled matches'
       }, { status: 400 })
     }
 

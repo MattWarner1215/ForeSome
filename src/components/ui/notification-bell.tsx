@@ -61,8 +61,10 @@ export function NotificationBell() {
       if (!response.ok) throw new Error('Failed to fetch notifications')
       return response.json()
     },
-    staleTime: 30000, // 30 seconds
+    staleTime: 5000, // 5 seconds for faster updates
     gcTime: 300000, // 5 minutes
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchInterval: 15000 // Auto-refresh every 15 seconds
   })
 
   // Mark notifications as read mutation

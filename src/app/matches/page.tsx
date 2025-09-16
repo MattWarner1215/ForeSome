@@ -116,7 +116,7 @@ function RoundesPageContent() {
   const leaveRound = useMutation({
     mutationFn: async (matchId: string) => {
       const response = await fetch(`/api/matches/${matchId}/leave`, {
-        method: 'POST'
+        method: 'DELETE'
       })
       if (!response.ok) {
         const error = await response.json()

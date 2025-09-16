@@ -20,13 +20,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
-    // Helper function to add active match filters (non-completed, future matches)
+    // Helper function to add active match filters (non-completed, non-cancelled, future matches)
     const addActiveMatchFilters = (clause: any) => {
       if (!showCompleted) {
         // Add both status and date filters
         return {
           ...clause,
-          status: { not: 'completed' },
+          status: { notIn: ['completed', 'cancelled'] },
           date: { gte: new Date() }
         }
       }

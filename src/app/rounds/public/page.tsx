@@ -45,15 +45,30 @@ export default function PublicRoundsPage() {
   const { data: session, status } = useSession()
   const [showPublicRounds, setShowPublicRounds] = useState(true)
 
-  // Redirect to signin if not authenticated
+  // Move useQuery to the top to fix hook order issue
+  const { data: rounds, isLoading } = useQuery<Match[]>({
+    queryKey: ['public-rounds', showPublicRounds],
+    queryFn: async () => {
+      const publicParam = showPublicRounds ? 'true' : 'false'
+      const response = await fetch(`/api/matches?public=${publicParam}`)
+      if (!response.ok) throw new Error(`Failed to fetch ${showPublicRounds ? 'public' : 'private'} rounds`)
+      const rounds = await response.json()
+      return rounds
+    },
+    staleTime: 20000, // 20 seconds
+    gcTime: 180000, // 3 minutes
+    refetchOnWindowFocus: false
+  })
+
+  // Handle authentication states after all hooks are defined
   if (status === 'loading') {
     return (
       <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4">
         <div className="text-center">
           <div className="flex justify-center mb-6">
-            <img 
-              src="/images/foresum_logo.png" 
-              alt="ForeSum Logo" 
+            <img
+              src="/images/foresum_logo.png"
+              alt="ForeSum Logo"
               className="h-[120px] w-[120px] object-contain animate-pulse"
             />
           </div>
@@ -70,20 +85,6 @@ export default function PublicRoundsPage() {
     router.push('/auth/signin')
     return null
   }
-
-  const { data: rounds, isLoading } = useQuery<Match[]>({
-    queryKey: ['public-rounds', showPublicRounds],
-    queryFn: async () => {
-      const publicParam = showPublicRounds ? 'true' : 'false'
-      const response = await fetch(`/api/matches?public=${publicParam}`)
-      if (!response.ok) throw new Error(`Failed to fetch ${showPublicRounds ? 'public' : 'private'} rounds`)
-      const rounds = await response.json()
-      return rounds
-    },
-    staleTime: 20000, // 20 seconds
-    gcTime: 180000, // 3 minutes
-    refetchOnWindowFocus: false
-  })
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -269,7 +270,7 @@ export default function PublicRoundsPage() {
                                 icon={showPublicRounds ? faGlobe : faLock} 
                                 className="h-1.5 w-1.5 mr-0.5" 
                               />
-                              {showPublicRounds ? 'Public Course' : 'Private Course'}
+                              {showPublicRounds ? 'Public Round' : 'Private Round'}
                             </span>
                           </div>
                         </div>

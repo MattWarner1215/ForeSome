@@ -6,9 +6,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { 
-  faChevronLeft, 
-  faChevronRight, 
+import {
+  faChevronLeft,
+  faChevronRight,
   faClock,
   faUsers,
   faMapMarkerAlt,
@@ -19,7 +19,8 @@ import {
   faFlag,
   faUserCheck,
   faHourglass,
-  faUserPlus
+  faUserPlus,
+  faCalendar
 } from '@fortawesome/free-solid-svg-icons'
 import { cn } from '@/lib/utils'
 import { LOGO_IMAGES } from '@/lib/images'
@@ -89,10 +90,14 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
 
   // Get matches for a specific date
   const getMatchesForDate = (day: number) => {
-    const dateString = new Date(currentYear, currentMonth, day).toISOString().split('T')[0]
+    const calendarDate = new Date(currentYear, currentMonth, day)
     return matches.filter(match => {
-      const matchDate = new Date(match.date).toISOString().split('T')[0]
-      return matchDate === dateString
+      const matchDate = new Date(match.date)
+      return (
+        matchDate.getFullYear() === calendarDate.getFullYear() &&
+        matchDate.getMonth() === calendarDate.getMonth() &&
+        matchDate.getDate() === calendarDate.getDate()
+      )
     })
   }
 
@@ -165,8 +170,8 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
-            <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm">
-              <img src={LOGO_IMAGES.myrounds_icon} alt="Calendar" className="h-4 w-4" />
+            <div className="p-1.5 bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm">
+              <FontAwesomeIcon icon={faCalendar} className="h-4 w-4 text-white" />
             </div>
             <span className="text-green-800 font-bold">Golf Calendar</span>
           </CardTitle>

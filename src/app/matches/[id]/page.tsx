@@ -438,7 +438,7 @@ export default function RoundDetailsPage() {
                         <FontAwesomeIcon icon={round.isPublic ? faGlobe : faLock} className="h-5 w-5 text-orange-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-800">{round.isPublic ? 'Public Course' : 'Private Course'}</p>
+                        <p className="font-semibold text-gray-800">{round.isPublic ? 'Public Round' : 'Private Round'}</p>
                         <p className="text-sm text-gray-600">Requires creator approval</p>
                       </div>
                     </div>
