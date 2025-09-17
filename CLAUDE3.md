@@ -1,11 +1,11 @@
 # CLAUDE3.md
 
-This file contains the real-time chat system implementation, latest major features, and deployment status for the ForeSome golf application.
+This file contains the real-time chat system implementation, latest major features, and deployment status for the ForeSum golf application.
 
 ## Real-Time Chat System
 
 ### Overview
-ForeSome includes a comprehensive real-time chat system that allows players to communicate within their golf matches using WebSocket technology.
+ForeSum includes a comprehensive real-time chat system that allows players to communicate within their golf matches using WebSocket technology.
 
 ### Core Architecture
 - **Server**: Custom Node.js server (`server.js`) integrating Next.js with Socket.IO
@@ -313,7 +313,7 @@ cloudflared tunnel --url http://localhost:3000
 5. **External Testing**: Set up Cloudflare tunnel for mobile device testing
 
 ### Repository Status
-- **GitHub**: https://github.com/MattWarner1215/ForeSome.git
+- **GitHub**: https://github.com/MattWarner1215/ForeSum.git
 - **Main Branch**: Clean history with LFS-tracked assets
 - **Local Development**: Ready for immediate development
 - **Production Ready**: All build optimizations and TypeScript fixes applied
@@ -375,7 +375,7 @@ cloudflared tunnel --url http://localhost:3000
 ## Azure Production Deployment (Latest Update - September 2025)
 
 ### Successful Azure Container Deployment
-The ForeSome golf application has been successfully deployed to Microsoft Azure using Azure Container Instances with full production configuration.
+The ForeSum golf application has been successfully deployed to Microsoft Azure using Azure Container Instances with full production configuration.
 
 ### Deployment Architecture
 - **Platform**: Azure Container Instances (ACI)
@@ -498,7 +498,7 @@ Also configured for deployment to:
 - **Manual Docker**: Standard Dockerfile for any Docker host
 
 ### Git Repository Status
-- **Repository**: https://github.com/MattWarner1215/ForeSome.git
+- **Repository**: https://github.com/MattWarner1215/ForeSum.git
 - **Latest Commit**: `00a1c84e` - Azure deployment setup and TypeScript fixes
 - **Branch**: `main` (production-ready)
 - **Documentation**: Organized in `/docs` directory
@@ -520,4 +520,4 @@ Also configured for deployment to:
 - **Features**: All application features functional
 - **Ready for Users**: Complete golf match-making platform deployed
 
-The ForeSome golf application is now successfully running in production on Microsoft Azure, ready to serve users for golf round coordination, group management, and social golf experiences.
+The ForeSum golf application is now successfully running in production on Microsoft Azure, ready to serve users for golf round coordination, group management, and social golf experiences.

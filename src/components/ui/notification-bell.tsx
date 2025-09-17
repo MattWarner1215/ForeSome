@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faBell, faTimes, faCheck, faCheckDouble, faUsers, faInfoCircle, faCommentDots } from '@fortawesome/free-solid-svg-icons'
+import { faBell, faTimes, faCheck, faCheckDouble, faUsers, faInfoCircle, faCommentDots, faTrash } from '@fortawesome/free-solid-svg-icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { LOGO_IMAGES } from '@/lib/images'
@@ -61,10 +61,11 @@ export function NotificationBell() {
       if (!response.ok) throw new Error('Failed to fetch notifications')
       return response.json()
     },
-    staleTime: 5000, // 5 seconds for faster updates
+    staleTime: 0, // Always fetch fresh notification data
     gcTime: 300000, // 5 minutes
     refetchOnWindowFocus: true, // Refresh when user returns to tab
-    refetchInterval: 15000 // Auto-refresh every 15 seconds
+    refetchInterval: 2000, // Auto-refresh every 2 seconds for notifications
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
   // Mark notifications as read mutation
@@ -99,6 +100,22 @@ export function NotificationBell() {
     }
   })
 
+  // Delete notification mutation
+  const deleteNotificationMutation = useMutation({
+    mutationFn: async (notificationId: string) => {
+      const response = await fetch('/api/notifications', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ notificationIds: [notificationId] })
+      })
+      if (!response.ok) throw new Error('Failed to delete notification')
+      return response.json()
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['notifications'] })
+    }
+  })
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -122,6 +139,10 @@ export function NotificationBell() {
 
   const handleMarkAllAsRead = () => {
     markAllAsReadMutation.mutate()
+  }
+
+  const handleDeleteNotification = (notificationId: string) => {
+    deleteNotificationMutation.mutate(notificationId)
   }
 
   const handleNotificationClick = (notification: Notification) => {
@@ -226,10 +247,18 @@ export function NotificationBell() {
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
-          <Card className="absolute right-0 top-12 w-96 max-h-96 overflow-hidden bg-white shadow-2xl border-0 rounded-2xl z-50 animate-in slide-in-from-top-2 duration-200">
-            <CardHeader className="pb-3 border-b border-gray-100">
+          <Card className="absolute right-0 top-12 w-[420px] max-h-[500px] overflow-hidden bg-white/95 backdrop-blur-md shadow-2xl border border-gray-200/50 rounded-3xl z-50 animate-in slide-in-from-top-2 duration-300">
+            <CardHeader className="pb-4 border-b border-gray-200/70 bg-gradient-to-r from-green-50/50 to-blue-50/50">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-lg text-gray-900">Notifications</CardTitle>
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-full shadow-sm">
+                    <FontAwesomeIcon icon={faBell} className="h-4 w-4 text-white" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-xl font-bold text-gray-900">Notifications</CardTitle>
+                    <p className="text-sm text-gray-600">{unreadCount} unread</p>
+                  </div>
+                </div>
                 <div className="flex items-center space-x-2">
                   {unreadCount > 0 && (
                     <Button
@@ -237,9 +266,9 @@ export function NotificationBell() {
                       variant="ghost"
                       onClick={handleMarkAllAsRead}
                       disabled={markAllAsReadMutation.isPending}
-                      className="text-xs text-green-600 hover:text-green-700 hover:bg-green-50"
+                      className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100/80 rounded-xl px-3 py-2 font-medium transition-all duration-200"
                     >
-                      <FontAwesomeIcon icon={faCheckDouble} className="h-3 w-3 mr-1" />
+                      <FontAwesomeIcon icon={faCheckDouble} className="h-4 w-4 mr-2" />
                       Mark all read
                     </Button>
                   )}
@@ -247,14 +276,14 @@ export function NotificationBell() {
                     size="sm"
                     variant="ghost"
                     onClick={() => setIsOpen(false)}
-                    className="text-gray-500 hover:text-gray-700"
+                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-xl p-2 transition-all duration-200"
                   >
-                    <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
+                    <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="p-0 max-h-80 overflow-y-auto">
+            <CardContent className="p-0 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
               {isLoading ? (
                 <div className="p-6 text-center">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
@@ -266,61 +295,84 @@ export function NotificationBell() {
                   <p className="text-sm text-gray-500">No notifications yet</p>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-100">
+                <div className="divide-y divide-gray-100/70">
                   {notifications.map((notification) => (
                     <div
                       key={notification.id}
-                      className={`p-4 hover:bg-green-50 hover:border-l-4 hover:border-green-500 transition-all duration-200 cursor-pointer ${
-                        !notification.isRead ? 'bg-blue-50/30 border-l-4 border-blue-500' : ''
+                      className={`group relative p-5 hover:bg-gradient-to-r hover:from-green-50/50 hover:to-blue-50/50 transition-all duration-300 cursor-pointer ${
+                        !notification.isRead
+                          ? 'bg-gradient-to-r from-blue-50/40 to-indigo-50/40 border-l-4 border-blue-500 shadow-sm'
+                          : 'hover:shadow-sm'
                       }`}
                       onClick={() => handleNotificationClick(notification)}
                       title="Click to view"
                     >
-                      <div className="flex items-start space-x-3">
-                        <div className={`p-2 rounded-full ${getNotificationColor(notification.type)}`}>
+                      <div className="flex items-start space-x-4">
+                        <div className={`p-3 rounded-xl shadow-sm ${getNotificationColor(notification.type)}`}>
                           {notification.type === 'match_update' ? (
-                            <img src={LOGO_IMAGES.myrounds_icon} alt="Match Update" className="h-3 w-3" />
+                            <img src={LOGO_IMAGES.myrounds_icon} alt="Match Update" className="h-4 w-4" />
                           ) : (
                             <FontAwesomeIcon
                               icon={getNotificationIcon(notification.type)}
-                              className="h-3 w-3"
+                              className="h-4 w-4"
                             />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between">
-                            <div className="flex-1">
-                              <p className={`text-sm font-medium ${
+                            <div className="flex-1 pr-3">
+                              <p className={`text-sm font-semibold leading-5 ${
                                 !notification.isRead ? 'text-gray-900' : 'text-gray-700'
                               }`}>
                                 {notification.title}
                               </p>
-                              <p className="text-sm text-gray-600 mt-1">
+                              <p className="text-sm text-gray-600 mt-1 leading-5">
                                 {notification.message}
                               </p>
                               {notification.match && (
-                                <p className="text-xs text-gray-500 mt-1">
-                                  {notification.match.course} • {new Date(notification.match.date).toLocaleDateString()}
-                                </p>
+                                <div className="mt-2 p-2 bg-gray-50/80 rounded-lg border border-gray-200/50">
+                                  <p className="text-xs text-gray-700 font-medium">
+                                    📍 {notification.match.course}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    📅 {new Date(notification.match.date).toLocaleDateString()}
+                                  </p>
+                                </div>
                               )}
-                              <p className="text-xs text-gray-400 mt-1">
+                              <p className="text-xs text-gray-400 mt-2 font-medium">
                                 {formatRelativeTime(notification.createdAt)}
                               </p>
                             </div>
-                            {!notification.isRead && (
+                            <div className="flex flex-col items-center space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                              {!notification.isRead && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    handleMarkAsRead(notification.id)
+                                  }}
+                                  disabled={markAsReadMutation.isPending}
+                                  className="text-green-600 hover:text-white hover:bg-green-500 w-10 h-10 rounded-full shadow-md border border-green-200 bg-white transition-all duration-200 hover:scale-105"
+                                  title="Mark as read"
+                                >
+                                  <FontAwesomeIcon icon={faCheck} className="h-5 w-5" />
+                                </Button>
+                              )}
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  handleMarkAsRead(notification.id)
+                                  handleDeleteNotification(notification.id)
                                 }}
-                                disabled={markAsReadMutation.isPending}
-                                className="text-green-600 hover:text-green-700 hover:bg-green-50 ml-2"
+                                disabled={deleteNotificationMutation.isPending}
+                                className="text-red-500 hover:text-white hover:bg-red-500 w-10 h-10 rounded-full shadow-md border border-red-200 bg-white transition-all duration-200 hover:scale-105"
+                                title="Delete notification"
                               >
-                                <FontAwesomeIcon icon={faCheck} className="h-3 w-3" />
+                                <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
                               </Button>
-                            )}
+                            </div>
                           </div>
                         </div>
                       </div>

@@ -12,8 +12,12 @@ export function Providers({
   const [queryClient] = useState(() => new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 5 * 60 * 1000,
-        refetchOnWindowFocus: false,
+        staleTime: 2000, // 2 seconds for faster global updates
+        refetchOnWindowFocus: true, // Enable window focus refetch globally
+        refetchOnReconnect: true, // Refetch when connection is restored
+        refetchOnMount: true, // Always refetch on component mount
+        retry: 3, // Retry failed requests 3 times
+        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
       },
     },
   }))

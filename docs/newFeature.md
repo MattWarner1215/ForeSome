@@ -1,10 +1,10 @@
-# ForeSome - New Feature Recommendations
+# ForeSum - New Feature Recommendations
 
 Based on analysis of the current website, here's what I've found and my recommendations for new features:
 
 ## Current Features Analysis
 
-**ForeSome** is a comprehensive golf round-making application with these existing features:
+**ForeSum** is a comprehensive golf round-making application with these existing features:
 
 ### ✅ **Current Features:**
 1. **Authentication System** - Sign in/up with credentials

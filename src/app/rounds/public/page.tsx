@@ -55,9 +55,11 @@ export default function PublicRoundsPage() {
       const rounds = await response.json()
       return rounds
     },
-    staleTime: 20000, // 20 seconds
+    staleTime: 3000, // 3 seconds for faster public rounds updates
     gcTime: 180000, // 3 minutes
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchInterval: 5000, // Auto-refresh every 5 seconds
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
   // Handle authentication states after all hooks are defined

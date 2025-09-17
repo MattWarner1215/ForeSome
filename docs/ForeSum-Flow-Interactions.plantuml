@@ -1,4 +1,4 @@
-@startuml ForeSome User Flow Interactions
+@startuml ForeSum User Flow Interactions
 
 !define RECTANGLE class
 
@@ -9,7 +9,7 @@
 !define SOCIAL_COLOR #F3E5F5
 !define SYSTEM_COLOR #FAFAFA
 
-title ForeSome Golf App - User Flow Interactions
+title ForeSum Golf App - User Flow Interactions
 
 ' Authentication & User Management Flows
 package "Authentication System" AUTH_COLOR {

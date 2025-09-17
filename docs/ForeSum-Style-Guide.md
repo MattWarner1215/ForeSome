@@ -1,7 +1,7 @@
-# ForeSome Style Guide
+# ForeSum Style Guide
 
 ## Overview
-This comprehensive style guide defines the design system, UI patterns, and technical specifications for ForeSome, the premier golf round-making application. This guide ensures consistency across all interfaces and provides clear implementation guidelines for developers and designers.
+This comprehensive style guide defines the design system, UI patterns, and technical specifications for ForeSum, the premier golf round-making application. This guide ensures consistency across all interfaces and provides clear implementation guidelines for developers and designers.
 
 ## Brand Colors & Palette
 
@@ -329,4 +329,4 @@ bg-gradient-to-br from-black/50 via-black/30 to-black/50
 
 **Last Updated**: December 2024  
 **Version**: 1.0  
-**Maintained by**: ForeSome Development Team
+**Maintained by**: ForeSum Development Team

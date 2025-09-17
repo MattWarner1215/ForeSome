@@ -99,7 +99,7 @@ export default function SignUpPage() {
               />
             </div>
             <CardTitle className="text-2xl font-bold text-green-700">
-              Join ForeSome
+              Join ForeSum
             </CardTitle>
             <CardDescription className="text-gray-600 mt-2">
               Start your golf journey with our community

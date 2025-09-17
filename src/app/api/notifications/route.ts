@@ -232,3 +232,43 @@ export async function PATCH(request: NextRequest) {
     )
   }
 }
+
+// DELETE - Delete specific notifications
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+    const { notificationIds } = body
+
+    if (!notificationIds || !Array.isArray(notificationIds) || notificationIds.length === 0) {
+      return NextResponse.json(
+        { error: 'notificationIds must be a non-empty array' },
+        { status: 400 }
+      )
+    }
+
+    // Delete specific notifications (ensure user owns them)
+    const result = await prisma.notification.deleteMany({
+      where: {
+        id: { in: notificationIds },
+        userId: session.user.id // Ensure user owns these notifications
+      }
+    })
+
+    return NextResponse.json({
+      message: `${result.count} notification(s) deleted successfully`,
+      deletedCount: result.count
+    })
+
+  } catch (error) {
+    console.error('Notification deletion error:', error)
+    return NextResponse.json(
+      { error: 'Failed to delete notifications' },
+      { status: 500 }
+    )
+  }
+}

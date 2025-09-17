@@ -1,5 +1,5 @@
 /**
- * Centralized image URLs for ForeSome app
+ * Centralized image URLs for ForeSum app
  * All images are now served from Supabase Storage CDN for better performance
  */
 

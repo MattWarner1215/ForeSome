@@ -6,7 +6,7 @@ Since the automated script can't create buckets due to RLS policies, follow thes
 
 1. **Go to your Supabase Dashboard**
    - Visit https://supabase.com/dashboard
-   - Select your ForeSome project
+   - Select your ForeSum project
 
 2. **Navigate to Storage**
    - Click on **Storage** in the left sidebar

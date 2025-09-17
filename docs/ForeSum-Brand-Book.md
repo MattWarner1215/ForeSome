@@ -1,9 +1,9 @@
-# ForeSome Brand Book
+# ForeSum Brand Book
 
 ## Brand Overview
 
 ### Mission Statement
-ForeSome connects golfers through seamless round-making experiences, fostering community and enhancing the joy of golf by making it easier to find playing partners and discover great courses.
+ForeSum connects golfers through seamless round-making experiences, fostering community and enhancing the joy of golf by making it easier to find playing partners and discover great courses.
 
 ### Vision
 To become the premier platform where golfers worldwide connect, play, and build lasting friendships through their shared love of the game.
@@ -17,7 +17,7 @@ To become the premier platform where golfers worldwide connect, play, and build 
 
 ## Brand Identity
 
-### Brand Name: ForeSome
+### Brand Name: ForeSum
 **Pronunciation**: /ˈfɔːrsʌm/ (FORE-some)
 
 **Etymology**: A clever play on "foursome" (traditional golf group) with "fore" (golf warning call), representing the bringing together of golfers while maintaining golf authenticity.
@@ -172,10 +172,10 @@ Caption: Inter Medium, 12px, line-height: 1.4
 #### Social Media
 - **Profile aesthetics**: Golf course imagery with brand colors
 - **Content style**: Mix of user-generated content and professional golf photography
-- **Hashtags**: #ForeSome #GolfCommunity #PlayTogether #FindYourFoursome
+- **Hashtags**: #ForeSum #GolfCommunity #PlayTogether #FindYourFoursome
 
 #### Email Communications
-- **Header**: ForeSome logo with golf green accent
+- **Header**: ForeSum logo with golf green accent
 - **Layout**: Clean, mobile-first design with clear CTAs
 - **Imagery**: Golf courses, happy golfers, community moments
 
@@ -261,7 +261,7 @@ Caption: Inter Medium, 12px, line-height: 1.4
 ## Competitive Positioning
 
 ### Market Position
-ForeSome positions itself as the **community-first golf connection platform**, differentiating from:
+ForeSum positions itself as the **community-first golf connection platform**, differentiating from:
 
 - **Tee time booking apps**: We focus on people, not just tee times
 - **General sports social networks**: Golf-specific expertise and culture
@@ -320,7 +320,7 @@ ForeSome positions itself as the **community-first golf connection platform**, d
 **Document Version**: 1.0  
 **Last Updated**: December 2024  
 **Next Review**: March 2025  
-**Maintained by**: ForeSome Brand Team
+**Maintained by**: ForeSum Brand Team
 
 ---
 

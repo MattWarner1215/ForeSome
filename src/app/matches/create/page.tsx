@@ -175,13 +175,13 @@ export default function CreateRoundPage() {
               className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] object-contain"
             />
           </div>
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             onClick={() => router.back()}
-            className="border-green-300 text-green-700 hover:bg-green-50 transition-all duration-200"
+            className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-medium px-6 py-2 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-200"
           >
             <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
-            Back
+            Back to Dashboard
           </Button>
         </div>
       </nav>
@@ -436,8 +436,9 @@ export default function CreateRoundPage() {
                   type="button"
                   variant="outline"
                   onClick={() => router.back()}
-                  className="flex-1 h-12 md:h-14 border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 rounded-xl font-medium"
+                  className="flex-1 h-12 md:h-14 border-green-300 text-green-700 hover:bg-green-50 hover:border-green-400 transition-all duration-200 rounded-xl font-medium"
                 >
+                  <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
                   Cancel
                 </Button>
                 <Button

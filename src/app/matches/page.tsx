@@ -13,6 +13,7 @@ import { faLocationDot, faUsers, faClock, faArrowLeft } from '@fortawesome/free-
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
 import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
+import { invalidateMatchQueries } from '@/lib/query-invalidation'
 
 interface Round {
   id: string
@@ -86,12 +87,17 @@ function RoundesPageContent() {
       } else if (zipCodeFilter) {
         params.set('zipCode', zipCodeFilter)
       }
-      
+
       const response = await fetch(`/api/matches?${params}`)
       if (!response.ok) throw new Error('Failed to fetch rounds')
       return response.json()
     },
-    enabled: !!session
+    enabled: !!session,
+    staleTime: 2000, // 2 seconds for faster matches updates
+    gcTime: 300000, // 5 minutes
+    refetchOnWindowFocus: true, // Refresh when user returns to tab
+    refetchInterval: 4000, // Auto-refresh every 4 seconds
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
   const joinRound = useMutation({
@@ -106,10 +112,10 @@ function RoundesPageContent() {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['rounds'] })
-      queryClient.invalidateQueries({ queryKey: ['recent-rounds'] })
-      queryClient.invalidateQueries({ queryKey: ['public-rounds'] })
-      queryClient.invalidateQueries({ queryKey: ['nearby-rounds'] })
+      // Immediately invalidate all match-related queries for instant updates
+      invalidateMatchQueries(queryClient)
+      // Also trigger a fresh fetch of the current data
+      queryClient.refetchQueries({ queryKey: ['rounds', activeTab, zipCodeFilter] })
     }
   })
 
@@ -125,10 +131,10 @@ function RoundesPageContent() {
       return response.json()
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['rounds'] })
-      queryClient.invalidateQueries({ queryKey: ['recent-rounds'] })
-      queryClient.invalidateQueries({ queryKey: ['public-rounds'] })
-      queryClient.invalidateQueries({ queryKey: ['nearby-rounds'] })
+      // Immediately invalidate all match-related queries for instant updates
+      invalidateMatchQueries(queryClient)
+      // Also trigger a fresh fetch of the current data
+      queryClient.refetchQueries({ queryKey: ['rounds', activeTab, zipCodeFilter] })
     }
   })
 

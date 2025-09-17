@@ -1,4 +1,4 @@
-# ForeSome Golf App - User Flows Documentation
+# ForeSum Golf App - User Flows Documentation
 
 ## Table of Contents
 1. [User Personas](#user-personas)
@@ -648,4 +648,4 @@ Protected Action → Auth Error
 **Last Updated**: December 2024  
 **Next Review**: March 2025
 
-*This user flow documentation serves as the definitive guide for understanding user journeys in the ForeSome golf application. Regular updates ensure alignment with product development and user feedback.*
+*This user flow documentation serves as the definitive guide for understanding user journeys in the ForeSum golf application. Regular updates ensure alignment with product development and user feedback.*

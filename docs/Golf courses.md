@@ -1259,7 +1259,7 @@
 
 ---
 
-## Logo Implementation Guide for ForeSome App
+## Logo Implementation Guide for ForeSum App
 
 ### Successfully Identified Logos:
 1. **CRPD Golf Courses** (Columbus Municipal - 6 courses): Unified Columbus Recreation and Parks Department golf logo

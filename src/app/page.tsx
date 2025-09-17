@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -16,6 +16,7 @@ import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
 import { GolfRoundsCalendar } from '@/components/ui/golf-rounds-calendar'
 import { NotificationBell } from '@/components/ui/notification-bell'
 import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
+import { prefetchCommonQueries } from '@/lib/query-invalidation'
 
 interface Match {
   id: string
@@ -49,6 +50,7 @@ interface Group {
 
 export default function HomePage() {
   const router = useRouter()
+  const queryClient = useQueryClient()
   const { data: session, status } = useSession({
     required: false,
   })
@@ -111,10 +113,11 @@ export default function HomePage() {
       return rounds
     },
     enabled: !!session,
-    staleTime: 5000, // 5 seconds for faster updates
+    staleTime: 1000, // 1 second for immediate updates
     gcTime: 300000, // 5 minutes
     refetchOnWindowFocus: true, // Refresh when user returns to tab
-    refetchInterval: 10000 // Auto-refresh every 10 seconds
+    refetchInterval: 3000, // Auto-refresh every 3 seconds
+    refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
   const { data: myGroups } = useQuery<Group[]>({
@@ -141,9 +144,10 @@ export default function HomePage() {
       return rounds.slice(0, 3)
     },
     enabled: !!session && !!zipCodeSearch,
-    staleTime: 30000, // 30 seconds
+    staleTime: 5000, // 5 seconds for nearby rounds
     gcTime: 180000, // 3 minutes
-    refetchOnWindowFocus: false
+    refetchOnWindowFocus: true, // Refresh when switching back to tab
+    refetchInterval: 8000 // Auto-refresh every 8 seconds
   })
 
 
@@ -286,6 +290,13 @@ export default function HomePage() {
 
     return () => clearTimeout(timeout)
   }, [status])
+
+  // Prefetch common queries for faster navigation
+  useEffect(() => {
+    if (session?.user?.id) {
+      prefetchCommonQueries(queryClient, session.user.id)
+    }
+  }, [session?.user?.id, queryClient])
 
   // Auto-rotate each golf image independently every 20 seconds with staggered timing
   useEffect(() => {
@@ -479,7 +490,7 @@ export default function HomePage() {
               {/* Footer Text */}
               <div className="mt-6 sm:mt-8 text-center border-t border-gray-200 pt-4 sm:pt-6">
                 <p className="text-xs sm:text-sm text-gray-600">
-                  Join thousands of golfers connecting through ForeSome
+                  Join thousands of golfers connecting through ForeSum
                 </p>
               </div>
             </CardContent>

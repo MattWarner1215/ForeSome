@@ -1,7 +1,7 @@
 /**
  * Setup script for Supabase Storage buckets
  * 
- * This script creates the necessary storage buckets for ForeSome app.
+ * This script creates the necessary storage buckets for ForeSum app.
  * Run this after setting up your Supabase project and configuring environment variables.
  * 
  * To run: npx tsx scripts/setup-supabase-storage.ts
@@ -54,7 +54,7 @@ async function createBucket(name: string, isPublic = true) {
 }
 
 async function setupStorage() {
-  console.log('🚀 Setting up Supabase Storage buckets for ForeSome...\n')
+  console.log('🚀 Setting up Supabase Storage buckets for ForeSum...\n')
 
   // Create all storage buckets
   await createBucket(STORAGE_BUCKETS.AVATARS)
