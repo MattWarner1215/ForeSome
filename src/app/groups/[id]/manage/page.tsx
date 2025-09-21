@@ -28,6 +28,7 @@ interface Group {
   id: string
   name: string
   description: string | null
+  icon: string | null
   isPrivate: boolean
   creatorId: string
   creator: {
