@@ -116,7 +116,18 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    let body
+    try {
+      const text = await request.text()
+      if (!text.trim()) {
+        return NextResponse.json({ error: 'Request body is empty' }, { status: 400 })
+      }
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error('Failed to parse request JSON:', parseError)
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    }
+
     const validatedData = createNotificationSchema.parse(body)
 
     // Convert metadata to JSON string if provided
@@ -186,7 +197,18 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    let body
+    try {
+      const text = await request.text()
+      if (!text.trim()) {
+        return NextResponse.json({ error: 'Request body is empty' }, { status: 400 })
+      }
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error('Failed to parse request JSON:', parseError)
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    }
+
     const { notificationIds, markAllAsRead } = body
 
     if (markAllAsRead) {
@@ -241,7 +263,18 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const body = await request.json()
+    let body
+    try {
+      const text = await request.text()
+      if (!text.trim()) {
+        return NextResponse.json({ error: 'Request body is empty' }, { status: 400 })
+      }
+      body = JSON.parse(text)
+    } catch (parseError) {
+      console.error('Failed to parse request JSON:', parseError)
+      return NextResponse.json({ error: 'Invalid JSON in request body' }, { status: 400 })
+    }
+
     const { notificationIds } = body
 
     if (!notificationIds || !Array.isArray(notificationIds) || notificationIds.length === 0) {
