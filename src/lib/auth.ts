@@ -1,14 +1,33 @@
 import { NextAuthOptions } from "next-auth"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import CredentialsProvider from "next-auth/providers/credentials"
+import GoogleProvider from "next-auth/providers/google"
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs"
 
+// Utility function to check if Google OAuth is enabled
+export const isGoogleOAuthEnabled = () => {
+  return Boolean(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET)
+}
+
 const isProduction = process.env.NODE_ENV === 'production'
 
-export const authOptions: NextAuthOptions = {
-  providers: [
-    CredentialsProvider({
+// Create providers array conditionally
+const providers = []
+
+// Only add Google provider if credentials are available
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  providers.push(
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+    })
+  )
+}
+
+// Always add credentials provider
+providers.push(
+  CredentialsProvider({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
@@ -51,7 +70,11 @@ export const authOptions: NextAuthOptions = {
         }
       }
     })
-  ],
+)
+
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma),
+  providers,
   session: {
     strategy: "jwt",
     maxAge: 30 * 24 * 60 * 60, // 30 days
@@ -60,16 +83,77 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async jwt({ token, user }) {
+    async signIn({ user, account, profile, email }) {
+      // Allow all credentials sign-ins (handled by the authorize function)
+      if (account?.provider === 'credentials') {
+        return true
+      }
+
+      // Handle OAuth providers (Google)
+      if (account?.provider === 'google') {
+        // If user exists with this email, automatically link accounts
+        if (user?.email) {
+          try {
+            // Check if user already exists with this email
+            const existingUser = await prisma.user.findUnique({
+              where: { email: user.email },
+              include: { accounts: true }
+            })
+
+            if (existingUser) {
+              // Check if Google account is already linked
+              const existingGoogleAccount = existingUser.accounts.find(
+                acc => acc.provider === 'google' && acc.providerAccountId === account.providerAccountId
+              )
+
+              if (!existingGoogleAccount) {
+                // Link Google account to existing user
+                await prisma.account.create({
+                  data: {
+                    userId: existingUser.id,
+                    type: account.type,
+                    provider: account.provider,
+                    providerAccountId: account.providerAccountId,
+                    access_token: account.access_token,
+                    expires_at: account.expires_at,
+                    token_type: account.token_type,
+                    scope: account.scope,
+                    id_token: account.id_token,
+                  }
+                })
+
+                // Update user with Google profile image if not set
+                if (!existingUser.image && user.image) {
+                  await prisma.user.update({
+                    where: { id: existingUser.id },
+                    data: { image: user.image }
+                  })
+                }
+              }
+            }
+          } catch (error) {
+            console.error('Error linking Google account:', error)
+            // Continue with sign-in even if linking fails
+          }
+        }
+        return true
+      }
+
+      return false
+    },
+    async jwt({ token, user, account }) {
       if (user) {
         token.id = user.id
+      }
+      if (account?.provider === 'google') {
+        token.provider = 'google'
       }
       return token
     },
     async session({ session, token }) {
       if (token.id) {
         session.user.id = token.id as string
-        
+
         // Fetch fresh user data including image with enhanced error handling
         try {
           // Add timeout wrapper for database query
@@ -78,11 +162,11 @@ export const authOptions: NextAuthOptions = {
               where: { id: token.id as string },
               select: { image: true, name: true }
             }),
-            new Promise((_, reject) => 
+            new Promise((_, reject) =>
               setTimeout(() => reject(new Error('Database query timeout')), 3000)
             )
           ])
-          
+
           if (user && typeof user === 'object' && 'image' in user && 'name' in user) {
             session.user.image = user.image as string | null | undefined
             session.user.name = user.name as string | null | undefined

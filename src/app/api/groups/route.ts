@@ -19,7 +19,15 @@ export async function GET() {
           { members: { some: { userId: session.user.id } } }
         ]
       },
-      include: {
+      select: {
+        id: true,
+        name: true,
+        description: true,
+        icon: true,
+        isPrivate: true,
+        creatorId: true,
+        createdAt: true,
+        updatedAt: true,
         creator: {
           select: {
             id: true,

@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLocationDot, faUsers, faStar, faSearch, faPlus, faUser, faGlobe, faLock, faChevronUp, faChevronDown, faBars, faTimes, faHistory, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faUsers, faStar, faSearch, faPlus, faUser, faGlobe, faLock, faChevronUp, faChevronDown, faBars, faTimes, faHistory, faArrowRight, faUserCircle, faUsersRectangle, faClockRotateLeft, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import StatsLeaderboardToggle from '@/components/ui/stats-leaderboard-toggle'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
@@ -40,6 +40,7 @@ interface Match {
 interface Group {
   id: string
   name: string
+  icon: string | null
   creator: {
     id: string
     name: string
@@ -56,6 +57,8 @@ export default function HomePage() {
   })
   const [zipCodeSearch, setZipCodeSearch] = useState('')
   const [myRoundsCarouselIndex, setMyRoundsCarouselIndex] = useState(0)
+  const [ownedGroupsIndex, setOwnedGroupsIndex] = useState(0)
+  const [memberGroupsIndex, setMemberGroupsIndex] = useState(0)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [golfCarouselIndex, setGolfCarouselIndex] = useState(0)
   const [golfImage1Index, setGolfImage1Index] = useState(0)
@@ -63,6 +66,7 @@ export default function HomePage() {
   const [golfImage3Index, setGolfImage3Index] = useState(2)
   const [locationLoading, setLocationLoading] = useState(false)
   const [forceShowPage, setForceShowPage] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Golf images and quotes
@@ -126,7 +130,19 @@ export default function HomePage() {
       const response = await fetch('/api/groups')
       if (!response.ok) throw new Error('Failed to fetch groups')
       const groups = await response.json()
-      return groups.slice(0, 3)
+
+      // Ensure balanced representation for dashboard display
+      const owned = groups.filter((g: Group) => g.creator.id === session?.user?.id)
+      const member = groups.filter((g: Group) => g.creator.id !== session?.user?.id)
+
+      // Strategy: Ensure both categories are represented when possible
+      // Take up to 6 of each type to allow pagination while ensuring visibility
+      const balancedGroups = [
+        ...owned.slice(0, 6), // Allow more for pagination
+        ...member.slice(0, 6)  // Allow more for pagination
+      ]
+
+      return balancedGroups
     },
     enabled: !!session,
     staleTime: 60000, // 1 minute
@@ -185,6 +201,7 @@ export default function HomePage() {
   })
 
   const formatDate = (dateString: string) => {
+    if (!isMounted) return dateString // Return raw string on server
     return new Date(dateString).toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric'
@@ -192,6 +209,7 @@ export default function HomePage() {
   }
 
   const formatTime = (time: string) => {
+    if (!isMounted) return time // Return raw time on server
     return new Date(`2000-01-01T${time}`).toLocaleTimeString('en-US', {
       hour: 'numeric',
       minute: '2-digit'
@@ -212,6 +230,41 @@ export default function HomePage() {
   }
 
   const visibleMyRounds = recentRounds?.slice(myRoundsCarouselIndex, myRoundsCarouselIndex + itemsPerPage) || []
+
+  // Groups pagination logic
+  const groupsPerPage = 2 // Show 2 groups per page to ensure both sections visible
+
+  // Separate owned and member groups
+  const ownedGroups = myGroups?.filter(group => group.creator.id === session?.user?.id) || []
+  const memberGroups = myGroups?.filter(group => group.creator.id !== session?.user?.id) || []
+
+  // Pagination controls for owned groups
+  const totalOwnedGroups = ownedGroups.length
+  const maxOwnedIndex = Math.max(0, totalOwnedGroups - groupsPerPage)
+
+  const nextOwnedGroups = () => {
+    setOwnedGroupsIndex(prev => Math.min(prev + 1, maxOwnedIndex))
+  }
+
+  const prevOwnedGroups = () => {
+    setOwnedGroupsIndex(prev => Math.max(prev - 1, 0))
+  }
+
+  // Pagination controls for member groups
+  const totalMemberGroups = memberGroups.length
+  const maxMemberIndex = Math.max(0, totalMemberGroups - groupsPerPage)
+
+  const nextMemberGroups = () => {
+    setMemberGroupsIndex(prev => Math.min(prev + 1, maxMemberIndex))
+  }
+
+  const prevMemberGroups = () => {
+    setMemberGroupsIndex(prev => Math.max(prev - 1, 0))
+  }
+
+  // Get visible groups for display
+  const visibleOwnedGroups = ownedGroups.slice(ownedGroupsIndex, ownedGroupsIndex + groupsPerPage)
+  const visibleMemberGroups = memberGroups.slice(memberGroupsIndex, memberGroupsIndex + groupsPerPage)
 
   // Get user's current location and set default zip code
   const getCurrentLocationZip = async () => {
@@ -261,7 +314,15 @@ export default function HomePage() {
     }
 
     if (isMenuOpen) {
-      document.addEventListener('mousedown', handleClickOutside)
+      // Add a small delay to prevent immediate closing
+      const timer = setTimeout(() => {
+        document.addEventListener('mousedown', handleClickOutside)
+      }, 100)
+
+      return () => {
+        clearTimeout(timer)
+        document.removeEventListener('mousedown', handleClickOutside)
+      }
     }
 
     return () => {
@@ -271,14 +332,21 @@ export default function HomePage() {
 
   // Auto-rotate golf carousel
   useEffect(() => {
+    if (!isMounted) return
+
     const interval = setInterval(() => {
-      setGolfCarouselIndex((current) => 
+      setGolfCarouselIndex((current) =>
         current === golfCarouselData.length - 1 ? 0 : current + 1
       )
     }, 30000) // Change every 30 seconds
 
     return () => clearInterval(interval)
-  }, [golfCarouselData.length])
+  }, [golfCarouselData.length, isMounted])
+
+  // Set mounted state to prevent hydration mismatch
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Timeout to force show page if session loading takes too long
   useEffect(() => {
@@ -300,6 +368,7 @@ export default function HomePage() {
 
   // Auto-rotate each golf image independently every 20 seconds with staggered timing
   useEffect(() => {
+    if (!isMounted) return
     // Image 1 - starts immediately
     const interval1 = setInterval(() => {
       setGolfImage1Index((current) => 
@@ -334,16 +403,37 @@ export default function HomePage() {
       clearTimeout(timer2)
       clearTimeout(timer3)
     }
-  }, [golfCarouselData.length])
+  }, [golfCarouselData.length, isMounted])
 
-  if (status === 'loading' && !forceShowPage) {
+  if (status === 'loading' && !forceShowPage && isMounted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4 relative">
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4 relative overflow-hidden">
         <div className="text-center">
           <div className="flex justify-center mb-6">
             <img 
               src={LOGO_IMAGES.foresum_logo} 
               alt="ForeSum Logo" 
+              className="h-[120px] w-[120px] object-contain animate-pulse"
+            />
+          </div>
+          <div className="flex items-center space-x-2 text-green-700">
+            <div className="w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+            <span className="text-lg font-medium">Loading your golf community...</span>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading until mounted to prevent hydration mismatch
+  if (!isMounted) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4 relative overflow-hidden">
+        <div className="text-center">
+          <div className="flex justify-center mb-6">
+            <img
+              src={LOGO_IMAGES.foresum_logo}
+              alt="ForeSum Logo"
               className="h-[120px] w-[120px] object-contain animate-pulse"
             />
           </div>
@@ -363,7 +453,7 @@ export default function HomePage() {
         <div className="absolute inset-0">
           <div className="relative w-full h-full">
             <img
-              src={golfCarouselData[golfCarouselIndex].image}
+              src={golfCarouselData[isMounted ? golfCarouselIndex : 0].image}
               alt="Golf background"
               className="w-full h-full object-cover transition-opacity duration-1000 ease-in-out"
             />
@@ -392,10 +482,10 @@ export default function HomePage() {
               {/* Inspirational Quote */}
               <div className="text-center mb-6 sm:mb-8 p-4 sm:p-6 bg-gradient-to-r from-green-50 to-blue-50 rounded-xl sm:rounded-2xl border border-green-200/50">
                 <p className="text-sm sm:text-base md:text-lg lg:text-xl font-bold italic text-gray-800 leading-relaxed mb-2 sm:mb-3">
-                  "{golfCarouselData[golfCarouselIndex].quote}"
+                  "{golfCarouselData[isMounted ? golfCarouselIndex : 0].quote}"
                 </p>
                 <p className="text-xs sm:text-sm md:text-base font-semibold text-green-700">
-                  — {golfCarouselData[golfCarouselIndex].author}
+                  — {golfCarouselData[isMounted ? golfCarouselIndex : 0].author}
                 </p>
               </div>
               
@@ -516,23 +606,23 @@ export default function HomePage() {
       
 
       <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-green-100 sticky top-0 z-50 min-h-16 md:h-20 relative">
-        <div className="container mx-auto px-2 sm:px-4 h-full flex flex-col md:flex-row items-center justify-between py-2 md:py-0 gap-2 md:gap-0 overflow-visible">
+        <div className="container mx-auto px-2 sm:px-4 h-full flex flex-col md:flex-row items-center justify-between py-2 md:py-0 gap-2 md:gap-0 overflow-hidden min-w-0">
           {/* Left Section - Logo + Search */}
-          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-6 w-full md:w-auto">
-            <img 
-              src={LOGO_IMAGES.foresum_logo} 
-              alt="ForeSum Logo" 
+          <div className="flex flex-col sm:flex-row items-center space-y-2 sm:space-y-0 sm:space-x-4 lg:space-x-6 w-full md:w-auto md:flex-shrink-0 min-w-0">
+            <img
+              src={LOGO_IMAGES.foresum_logo}
+              alt="ForeSum Logo"
               className="h-12 w-12 sm:h-16 sm:w-16 md:h-20 md:w-20 lg:h-[150px] lg:w-[150px] object-contain flex-shrink-0"
             />
             {/* Search functionality */}
-            <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 w-full sm:w-auto">
-              <span className="text-xs sm:text-sm text-gray-700 font-medium hidden lg:block">Search for Rounds:</span>
-              <div className="flex items-center space-x-2 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center space-y-1 sm:space-y-0 sm:space-x-2 w-full sm:w-auto min-w-0">
+              <span className="text-xs sm:text-sm text-gray-700 font-medium hidden xl:block flex-shrink-0">Search for Rounds:</span>
+              <div className="flex items-center space-x-2 w-full sm:w-auto min-w-0">
                 <Input
                   placeholder="Enter zip code"
                   value={zipCodeSearch}
                   onChange={(e) => setZipCodeSearch(e.target.value)}
-                  className="w-full sm:w-48 md:w-64 lg:w-80 xl:w-96 h-8 text-sm border-green-200 focus:border-green-500 focus:ring-green-500"
+                  className="w-full sm:w-48 md:w-52 lg:w-60 xl:w-80 h-8 text-sm border-green-200 focus:border-green-500 focus:ring-green-500 min-w-0"
                   autoComplete="off"
                   autoCorrect="off"
                   autoCapitalize="off"
@@ -556,25 +646,25 @@ export default function HomePage() {
           </div>
           
           {/* Center Section - Welcome Message */}
-          <div className="hidden lg:flex items-center justify-center flex-1 mx-4 lg:mx-8">
-            <div className="px-3 py-1.5 lg:px-4 lg:py-2 bg-green-50/80 rounded-lg border border-green-200/50">
-              <span className="text-sm lg:text-base text-green-800 font-semibold">
+          <div className="hidden lg:flex items-center justify-center flex-1 mx-4 lg:mx-8 min-w-0">
+            <div className="px-3 py-1.5 lg:px-4 lg:py-2 bg-green-50/80 rounded-lg border border-green-200/50 max-w-full">
+              <span className="text-sm lg:text-base text-green-800 font-semibold truncate block">
                 Welcome, {session?.user?.name || session?.user?.email}!
               </span>
             </div>
           </div>
-          
+
           {/* Mobile Welcome Message */}
-          <div className="flex lg:hidden items-center justify-center w-full md:hidden">
-            <div className="px-2 py-1 bg-green-50/80 rounded-lg border border-green-200/50">
-              <span className="text-xs text-green-800 font-semibold">
+          <div className="flex lg:hidden items-center justify-center w-full md:hidden min-w-0">
+            <div className="px-2 py-1 bg-green-50/80 rounded-lg border border-green-200/50 max-w-full">
+              <span className="text-xs text-green-800 font-semibold truncate block">
                 Welcome, {session?.user?.name?.split(' ')[0] || session?.user?.email?.split('@')[0]}!
               </span>
             </div>
           </div>
           
           {/* Right Section - Public Rounds + Create Round + Actions */}
-          <div className="flex items-center space-x-2 sm:space-x-4 w-full md:w-auto justify-end">
+          <div className="flex items-center space-x-2 sm:space-x-4 w-full md:w-auto md:flex-shrink-0 justify-end min-w-0">
               <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm">
                 <Link href="/rounds/public">
                   <span className="hidden sm:inline">Public Rounds</span>
@@ -588,72 +678,126 @@ export default function HomePage() {
                 </Link>
               </Button>
               <NotificationBell />
-              <div className="relative" ref={menuRef}>
-                <Button 
-                  size="sm" 
-                  onClick={() => setIsMenuOpen(!isMenuOpen)}
-                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+              <div className="relative z-[60]">
+                <Button
+                  size="sm"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setIsMenuOpen(prev => !prev);
+                  }}
+                  className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 relative z-[61]"
+                  type="button"
                 >
                   <FontAwesomeIcon icon={isMenuOpen ? faTimes : faBars} className="h-4 w-4" />
                 </Button>
-                {isMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsMenuOpen(false)}></div>
-                    <div className="absolute right-0 top-12 bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl border-0 py-3 min-w-[180px] z-50 animate-in slide-in-from-top-2 duration-200">
-                      <div className="absolute -top-2 right-4 w-4 h-4 bg-white/95 backdrop-blur-md rotate-45 border-l border-t border-green-100"></div>
-                    <div className="px-2">
-                      <Link 
-                        href="/profile" 
-                        className="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:text-green-700 transition-all duration-200 rounded-xl border-b border-gray-100/50"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                          <FontAwesomeIcon icon={faUser} className="h-4 w-4 text-green-600" />
-                        </div>
-                        <span>Profile</span>
-                      </Link>
-                      <Link 
-                        href="/groups" 
-                        className="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:text-green-700 transition-all duration-200 rounded-xl border-b border-gray-100/50"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                          <FontAwesomeIcon icon={faUsers} className="h-4 w-4 text-green-600" />
-                        </div>
-                        <span>Groups</span>
-                      </Link>
-                      <Link 
-                        href="/matches/completed" 
-                        className="flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-green-50 hover:to-green-100 hover:text-green-700 transition-all duration-200 rounded-xl border-b border-gray-100/50"
-                        onClick={() => setIsMenuOpen(false)}
-                      >
-                        <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                          <FontAwesomeIcon icon={faHistory} className="h-4 w-4 text-green-600" />
-                        </div>
-                        <span>Completed Matches</span>
-                      </Link>
-                      <div className="my-2 border-t border-gray-200/50"></div>
-                      <button 
-                        onClick={() => {
-                          setIsMenuOpen(false)
-                          signOut()
-                        }}
-                        className="flex items-center space-x-3 w-full text-left px-4 py-3 text-sm font-medium text-red-600 hover:bg-gradient-to-r hover:from-red-50 hover:to-red-100 transition-all duration-200 rounded-xl"
-                      >
-                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center">
-                          <FontAwesomeIcon icon={faTimes} className="h-4 w-4 text-red-600" />
-                        </div>
-                        <span>Sign Out</span>
-                      </button>
-                    </div>
-                  </div>
-                  </>
-                )}
               </div>
             </div>
         </div>
       </nav>
-      
+
+      {/* Mobile Menu Dropdown - Outside nav to avoid overflow clipping */}
+      {isMenuOpen && (
+        <div
+          ref={menuRef}
+          className="fixed top-16 right-4 bg-white/98 backdrop-blur-xl shadow-2xl border border-gray-200/20 rounded-3xl py-2 min-w-[220px] z-[9999] overflow-hidden"
+        >
+            {/* Modern arrow pointer */}
+            <div className="absolute -top-2 right-6 w-4 h-4 bg-white/98 backdrop-blur-xl rotate-45 border-l border-t border-gray-200/20"></div>
+
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-gray-100/60">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="font-bold text-white text-sm">
+                    {(session?.user?.name || session?.user?.email)?.charAt(0).toUpperCase()}
+                  </span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">
+                    {session?.user?.name || 'User'}
+                  </p>
+                  <p className="text-xs text-gray-500 truncate">
+                    {session?.user?.email}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Menu Items */}
+            <div className="py-1">
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/profile');
+                  }}
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-green-50/80 hover:to-emerald-50/80 hover:text-green-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-green-300/60"
+                  type="button"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-blue-50 to-blue-100 group-hover:from-blue-100 group-hover:to-blue-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faUserCircle} className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+                  </div>
+                  <span className="font-medium">Profile Settings</span>
+                </button>
+              </div>
+
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/groups');
+                  }}
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-purple-50/80 hover:text-purple-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-purple-300/60"
+                  type="button"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-purple-50 to-purple-100 group-hover:from-purple-100 group-hover:to-purple-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faUsersRectangle} className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
+                  </div>
+                  <span className="font-medium">My Groups</span>
+                </button>
+              </div>
+
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/matches/completed');
+                  }}
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-orange-50/80 hover:to-orange-50/80 hover:text-orange-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-orange-300/60"
+                  type="button"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-orange-50 to-orange-100 group-hover:from-orange-100 group-hover:to-orange-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faClockRotateLeft} className="h-4 w-4 text-orange-600 group-hover:text-orange-700" />
+                  </div>
+                  <span className="font-medium">Match History</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="mx-4 border-t border-gray-100/80"></div>
+
+            {/* Sign Out */}
+            <div className="py-1">
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    signOut();
+                  }}
+                  className="group flex items-center space-x-3 w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-red-50/80 hover:to-red-50/80 hover:text-red-700 transition-all duration-300 ease-out cursor-pointer rounded-xl border border-gray-200/60 hover:border-red-300/60"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-red-50 to-red-100 group-hover:from-red-100 group-hover:to-red-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faRightFromBracket} className="h-4 w-4 text-red-600 group-hover:text-red-700" />
+                  </div>
+                  <span className="font-medium">Sign Out</span>
+                </button>
+              </div>
+            </div>
+        </div>
+      )}
+
       {/* Main Content Card Container */}
       <div className="container mx-auto px-2 sm:px-4 py-4 sm:py-6 md:py-8 relative z-20">
         <Card className="bg-white/80 backdrop-blur-xl shadow-2xl border-0 rounded-2xl sm:rounded-3xl overflow-hidden">
@@ -669,34 +813,36 @@ export default function HomePage() {
                   <div className="flex-1">
                     <CardTitle className="flex items-center space-x-2 text-green-800">
                       <div className="relative">
-                        <img src={LOGO_IMAGES.myrounds_icon} alt="My Rounds" className="h-[50px] w-[50px]" />
+                        <img src="/images/myRoundsNew_icon.png?v=1" alt="My Rounds" className="h-[60px] w-[60px]" style={{filter: 'brightness(0.8)'}} />
                         {recentRounds && recentRounds.some(match => match.pendingRequestsCount && match.pendingRequestsCount > 0) && (
                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                         )}
                       </div>
-                      <div className="flex items-center space-x-2">
-                        <span>My Rounds</span>
-                        {recentRounds && (() => {
-                          const totalPending = recentRounds.reduce((sum, match) => sum + (match.pendingRequestsCount || 0), 0);
-                          return totalPending > 0 ? (
-                            <div className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-                              {totalPending}
-                            </div>
-                          ) : null;
-                        })()}
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <span>My Rounds</span>
+                          {recentRounds && (() => {
+                            const totalPending = recentRounds.reduce((sum, match) => sum + (match.pendingRequestsCount || 0), 0);
+                            return totalPending > 0 ? (
+                              <div className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
+                                {totalPending}
+                              </div>
+                            ) : null;
+                          })()}
+                        </div>
+                        <CardDescription className="text-gray-600 mt-1">
+                          Rounds you've created or joined
+                          {recentRounds && (() => {
+                            const totalPending = recentRounds.reduce((sum, match) => sum + (match.pendingRequestsCount || 0), 0);
+                            return totalPending > 0 && (
+                              <span className="block text-red-600 font-medium mt-1">
+                                {totalPending} pending join request{totalPending !== 1 ? 's' : ''} need your attention
+                              </span>
+                            );
+                          })()}
+                        </CardDescription>
                       </div>
                     </CardTitle>
-                    <CardDescription className="text-gray-600 ml-16">
-                      Rounds you've created or joined
-                      {recentRounds && (() => {
-                        const totalPending = recentRounds.reduce((sum, match) => sum + (match.pendingRequestsCount || 0), 0);
-                        return totalPending > 0 && (
-                          <span className="block text-red-600 font-medium mt-1">
-                            {totalPending} pending join request{totalPending !== 1 ? 's' : ''} need your attention
-                          </span>
-                        );
-                      })()}
-                    </CardDescription>
                   </div>
                   
                   {/* Centered Pagination */}
@@ -862,7 +1008,7 @@ export default function HomePage() {
                 ) : (
                   <div className="text-center py-12 bg-gradient-to-br from-green-50 to-white rounded-xl border border-green-200/50 shadow-sm mx-2">
                     <div className="w-fit mx-auto mb-4">
-                      <img src={LOGO_IMAGES.myrounds_icon} alt="My Rounds" className="h-[50px] w-[50px]" />
+                      <img src="/images/myRoundsNew_icon.png?v=1" alt="My Rounds" className="h-[50px] w-[50px]" style={{filter: 'brightness(0.8)'}} />
                     </div>
                     <p className="text-green-800 font-medium mb-4">No rounds yet</p>
                     <Button asChild size="sm" className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800">
@@ -891,9 +1037,7 @@ export default function HomePage() {
               <CardHeader>
                 <div className="flex justify-between items-center">
                   <CardTitle className="text-green-800 flex items-center space-x-2">
-                    <div className="p-2 bg-green-100 rounded-lg">
-                      <FontAwesomeIcon icon={faUsers} className="h-5 w-5 text-green-600" />
-                    </div>
+                    <img src="/images/myGroups_icon.png" alt="My Groups" className="h-12 w-12" style={{filter: 'brightness(0.8)'}} />
                     <span>My Groups</span>
                   </CardTitle>
                   <Button asChild variant="outline" size="sm" className="border-green-200 hover:bg-green-50">
@@ -905,41 +1049,77 @@ export default function HomePage() {
                 {myGroups && myGroups.length > 0 ? (
                   <div className="space-y-4">
                     {(() => {
-                      // Separate owned and member groups for visual separation
-                      const ownedGroups = myGroups.filter(group => group.creator.id === session?.user?.id)
-                      const memberGroups = myGroups.filter(group => group.creator.id !== session?.user?.id)
+                      // Use the paginated groups defined earlier
                       
                       return (
                         <>
                           {/* Owned Groups Section */}
                           {ownedGroups.length > 0 && (
                             <div>
-                              <div className="flex items-center mb-3">
+                              <div className="flex items-center justify-between mb-3">
                                 <div className="flex items-center space-x-2">
-                                  <div className="w-2 h-2 bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full"></div>
-                                  <h4 className="text-sm font-semibold text-yellow-800 uppercase tracking-wide">My Groups</h4>
+                                  <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-green-500 rounded-full"></div>
+                                  <h4 className="text-sm font-semibold text-green-800 uppercase tracking-wide">My Groups</h4>
+                                  <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
+                                    {totalOwnedGroups}
+                                  </div>
                                 </div>
-                                <div className="ml-2 bg-yellow-100 text-yellow-800 text-xs font-bold px-2 py-1 rounded-full">
-                                  {ownedGroups.length}
-                                </div>
+                                {/* Pagination controls for owned groups */}
+                                {totalOwnedGroups > groupsPerPage && (
+                                  <div className="flex items-center space-x-2">
+                                    <button
+                                      onClick={prevOwnedGroups}
+                                      disabled={ownedGroupsIndex === 0}
+                                      className="w-6 h-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                                    >
+                                      <FontAwesomeIcon icon={faChevronUp} className="h-3 w-3 text-white" />
+                                    </button>
+                                    <span className="text-xs text-green-700 font-medium">
+                                      {Math.floor(ownedGroupsIndex / groupsPerPage) + 1}/{Math.ceil(totalOwnedGroups / groupsPerPage)}
+                                    </span>
+                                    <button
+                                      onClick={nextOwnedGroups}
+                                      disabled={ownedGroupsIndex >= maxOwnedIndex}
+                                      className="w-6 h-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                                    >
+                                      <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 text-white" />
+                                    </button>
+                                  </div>
+                                )}
                               </div>
                               <div className="space-y-3">
-                                {ownedGroups.map((group) => (
+                                {visibleOwnedGroups.map((group) => (
                                   <div 
                                     key={group.id} 
-                                    className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-white/90 backdrop-blur-sm border border-yellow-200/70 rounded-2xl hover:shadow-lg hover:shadow-yellow-100/30 transition-all duration-300 cursor-pointer hover:bg-white sm:hover:scale-[1.02] space-y-2 sm:space-y-0"
+                                    className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-white/90 backdrop-blur-sm border border-green-200/70 rounded-2xl hover:shadow-lg hover:shadow-green-100/30 transition-all duration-300 cursor-pointer hover:bg-white sm:hover:scale-[1.02] space-y-2 sm:space-y-0"
                                     onClick={() => router.push('/groups')}
                                   >
                                     <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-                                      <div className="p-2 sm:p-3 rounded-2xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300 bg-gradient-to-br from-yellow-400 to-yellow-500">
-                                        <FontAwesomeIcon 
-                                          icon={faUsers} 
-                                          className="h-4 w-4 text-white" 
-                                        />
+                                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300 flex items-center justify-center overflow-hidden">
+                                        {group.icon && group.icon.trim() !== '' ? (
+                                          <img
+                                            src={group.icon}
+                                            alt={`${group.name} icon`}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                              const img = e.target as HTMLImageElement
+                                              img.src = "/images/owner_icon.png?v=1"
+                                            }}
+                                          />
+                                        ) : (
+                                          <img
+                                            src="/images/owner_icon.png?v=1"
+                                            alt="Owner icon"
+                                            className="w-full h-full object-contain"
+                                            onError={(e) => {
+                                              console.error('Failed to load owner icon')
+                                            }}
+                                          />
+                                        )}
                                       </div>
                                       <div className="flex flex-col">
-                                        <span className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-yellow-700 transition-colors duration-200">{group.name}</span>
-                                        <span className="text-xs font-medium px-2 py-1 rounded-full inline-block w-fit bg-yellow-100 text-yellow-800">
+                                        <span className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-200">{group.name}</span>
+                                        <span className="text-xs font-medium px-2 py-1 rounded-full inline-block w-fit bg-green-100 text-green-800">
                                           Owner
                                         </span>
                                       </div>
@@ -975,29 +1155,92 @@ export default function HomePage() {
                           {memberGroups.length > 0 && (
                             <div>
                               {ownedGroups.length === 0 && (
-                                <div className="flex items-center mb-3">
+                                <div className="flex items-center justify-between mb-3">
                                   <div className="flex items-center space-x-2">
                                     <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-green-500 rounded-full"></div>
                                     <h4 className="text-sm font-semibold text-green-800 uppercase tracking-wide">Member Groups</h4>
+                                    <div className="bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
+                                      {totalMemberGroups}
+                                    </div>
                                   </div>
-                                  <div className="ml-2 bg-green-100 text-green-800 text-xs font-bold px-2 py-1 rounded-full">
-                                    {memberGroups.length}
+                                  {/* Pagination controls for member groups */}
+                                  {totalMemberGroups > groupsPerPage && (
+                                    <div className="flex items-center space-x-2">
+                                      <button
+                                        onClick={prevMemberGroups}
+                                        disabled={memberGroupsIndex === 0}
+                                        className="w-6 h-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                                      >
+                                        <FontAwesomeIcon icon={faChevronUp} className="h-3 w-3 text-white" />
+                                      </button>
+                                      <span className="text-xs text-green-700 font-medium">
+                                        {Math.floor(memberGroupsIndex / groupsPerPage) + 1}/{Math.ceil(totalMemberGroups / groupsPerPage)}
+                                      </span>
+                                      <button
+                                        onClick={nextMemberGroups}
+                                        disabled={memberGroupsIndex >= maxMemberIndex}
+                                        className="w-6 h-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                                      >
+                                        <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 text-white" />
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                              )}
+                              {/* Show pagination for member groups when there are owned groups too */}
+                              {ownedGroups.length > 0 && totalMemberGroups > groupsPerPage && (
+                                <div className="flex items-center justify-end mb-3">
+                                  <div className="flex items-center space-x-2">
+                                    <span className="text-xs text-green-700 font-medium">Member Groups:</span>
+                                    <button
+                                      onClick={prevMemberGroups}
+                                      disabled={memberGroupsIndex === 0}
+                                      className="w-6 h-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                                    >
+                                      <FontAwesomeIcon icon={faChevronUp} className="h-3 w-3 text-white" />
+                                    </button>
+                                    <span className="text-xs text-green-700 font-medium">
+                                      {Math.floor(memberGroupsIndex / groupsPerPage) + 1}/{Math.ceil(totalMemberGroups / groupsPerPage)}
+                                    </span>
+                                    <button
+                                      onClick={nextMemberGroups}
+                                      disabled={memberGroupsIndex >= maxMemberIndex}
+                                      className="w-6 h-6 bg-green-500 hover:bg-green-600 disabled:bg-gray-300 rounded-full flex items-center justify-center transition-colors"
+                                    >
+                                      <FontAwesomeIcon icon={faChevronDown} className="h-3 w-3 text-white" />
+                                    </button>
                                   </div>
                                 </div>
                               )}
                               <div className="space-y-3">
-                                {memberGroups.map((group) => (
+                                {visibleMemberGroups.map((group) => (
                                   <div 
                                     key={group.id} 
                                     className="group flex flex-col sm:flex-row items-start sm:items-center justify-between p-3 sm:p-4 bg-white/90 backdrop-blur-sm border border-green-100/50 rounded-2xl hover:shadow-lg hover:shadow-green-100/20 transition-all duration-300 cursor-pointer hover:bg-white sm:hover:scale-[1.02] space-y-2 sm:space-y-0"
                                     onClick={() => router.push('/groups')}
                                   >
                                     <div className="flex items-center space-x-3 sm:space-x-4 w-full sm:w-auto">
-                                      <div className="p-2 sm:p-3 rounded-2xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300 bg-gradient-to-br from-green-400 to-green-500">
-                                        <FontAwesomeIcon 
-                                          icon={faUsers} 
-                                          className="h-4 w-4 text-white" 
-                                        />
+                                      <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl shadow-sm group-hover:shadow-md group-hover:scale-110 transition-all duration-300 flex items-center justify-center overflow-hidden">
+                                        {group.icon && group.icon.trim() !== '' ? (
+                                          <img
+                                            src={group.icon}
+                                            alt={`${group.name} icon`}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                              const img = e.target as HTMLImageElement
+                                              img.src = "/images/member_icon.png?v=1"
+                                            }}
+                                          />
+                                        ) : (
+                                          <img
+                                            src="/images/member_icon.png?v=1"
+                                            alt="Member group icon"
+                                            className="w-full h-full object-contain"
+                                            onError={(e) => {
+                                              console.error('Failed to load member icon')
+                                            }}
+                                          />
+                                        )}
                                       </div>
                                       <div className="flex flex-col">
                                         <span className="text-sm sm:text-base font-bold text-gray-900 group-hover:text-green-700 transition-colors duration-200">{group.name}</span>

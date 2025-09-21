@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -51,14 +51,19 @@ interface GolfRoundsCalendarProps {
 
 export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps) {
   const router = useRouter()
-  const [currentDate, setCurrentDate] = useState(new Date())
+  const [currentDate, setCurrentDate] = useState<Date | null>(null)
   const [selectedDayMatches, setSelectedDayMatches] = useState<Match[]>([])
   const [selectedDate, setSelectedDate] = useState<string>('')
   const [isModalOpen, setIsModalOpen] = useState(false)
 
+  // Initialize date on client side only
+  useEffect(() => {
+    setCurrentDate(new Date())
+  }, [])
+
   // Get current month and year
-  const currentMonth = currentDate.getMonth()
-  const currentYear = currentDate.getFullYear()
+  const currentMonth = currentDate?.getMonth() ?? 0
+  const currentYear = currentDate?.getFullYear() ?? new Date().getFullYear()
 
   // Get first day of the month and number of days
   const firstDayOfMonth = new Date(currentYear, currentMonth, 1)
@@ -77,10 +82,12 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
 
   // Navigate months
   const goToPreviousMonth = () => {
+    if (!currentDate) return
     setCurrentDate(new Date(currentYear, currentMonth - 1, 1))
   }
 
   const goToNextMonth = () => {
+    if (!currentDate) return
     setCurrentDate(new Date(currentYear, currentMonth + 1, 1))
   }
 
@@ -165,14 +172,31 @@ export function GolfRoundsCalendar({ matches, userId }: GolfRoundsCalendarProps)
     setSelectedDate('')
   }
 
+  // Show loading state while initializing
+  if (!currentDate) {
+    return (
+      <Card className="bg-gradient-to-br from-white/95 to-green-50/80 backdrop-blur-md shadow-xl border border-green-200/30 hover:shadow-2xl transition-all duration-300 rounded-2xl">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center space-x-2">
+            <img src="/images/calendar_icon.png?v=1" alt="Calendar" className="h-14 w-14" style={{filter: 'brightness(0.8)'}} />
+            <span className="text-green-800 font-bold">Golf Calendar</span>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center justify-center py-8">
+            <div className="w-6 h-6 border-2 border-green-600 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="bg-gradient-to-br from-white/95 to-green-50/80 backdrop-blur-md shadow-xl border border-green-200/30 hover:shadow-2xl transition-all duration-300 rounded-2xl">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2">
-            <div className="p-1.5 bg-gradient-to-br from-green-500 to-green-600 rounded-lg shadow-sm">
-              <FontAwesomeIcon icon={faCalendar} className="h-4 w-4 text-white" />
-            </div>
+            <img src="/images/calendar_icon.png?v=1" alt="Calendar" className="h-14 w-14" style={{filter: 'brightness(0.8)'}} />
             <span className="text-green-800 font-bold">Golf Calendar</span>
           </CardTitle>
           <div className="flex items-center space-x-2">

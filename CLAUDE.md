@@ -47,13 +47,18 @@ ngrok http 3000
 ```
 
 **Current Deployment Status:**
-- Development server running on port 3000 with Socket.IO support
+- **Production**: Successfully deployed to Azure Container Instance
+  - URL: http://foresum-app.eastus.azurecontainer.io:3000
+  - Container IP: 20.75.179.214:3000
+  - Coming Soon page: `/coming-soon` with email collection
+  - Authentication: Fixed and functional (HTTP-based NEXTAUTH_URL)
+- **Development**: Local server running on port 3000 with Socket.IO support
 - Real-time chat system fully operational and production-ready
 - Chat performance optimized with 74+ messages/second throughput
 - Custom server handles both Next.js and WebSocket connections
 - Real-time chat functionality enabled
 - Fully accessible from mobile devices and external networks via tunnels
-- NEXTAUTH_URL defaults to localhost:3000 for development
+- NEXTAUTH_URL: HTTP-based for container compatibility
 
 ### Environment Setup
 1. Copy `.env.example` to `.env.local`
@@ -61,10 +66,17 @@ ngrok http 3000
 3. Set `NEXT_PUBLIC_SUPABASE_URL` to your Supabase project URL
 4. Set `NEXT_PUBLIC_SUPABASE_ANON_KEY` to your Supabase anon key
 5. Generate secure `NEXTAUTH_SECRET` with `openssl rand -base64 32`
-6. (Optional) Set `GOLF_COURSE_API_KEY` for enhanced course search - get free key at https://golfcourseapi.com/
-7. Run `npm run db:generate && npm run db:push` to initialize database
-8. Run `npx tsx scripts/setup-supabase-storage.ts` to create storage buckets
-9. Run `npx tsx scripts/seed-golf-courses.ts` to populate the golf course database with 171+ Ohio courses
+6. Set up Google OAuth (optional but recommended):
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Create a new project or select existing project
+   - Enable Google+ API
+   - Create OAuth 2.0 credentials
+   - Set authorized redirect URIs: `http://localhost:3000/api/auth/callback/google` (development), `https://your-domain.com/api/auth/callback/google` (production)
+   - Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in your environment
+7. (Optional) Set `GOLF_COURSE_API_KEY` for enhanced course search - get free key at https://golfcourseapi.com/
+8. Run `npm run db:generate && npm run db:push` to initialize database
+9. Run `npx tsx scripts/setup-supabase-storage.ts` to create storage buckets
+10. Run `npx tsx scripts/seed-golf-courses.ts` to populate the golf course database with 171+ Ohio courses
 
 ## Architecture Overview
 
@@ -95,10 +107,14 @@ The schema is designed around golf round-making with these core relationships:
 - Users can choose which groups see their private rounds during creation
 
 ### Authentication Flow
-- NextAuth.js with Prisma adapter
-- Custom credentials provider with bcrypt password hashing
+- NextAuth.js with Prisma adapter for database integration
+- **Multiple Authentication Providers**:
+  - Google OAuth provider for seamless social login
+  - Custom credentials provider with bcrypt password hashing for email/password login
 - JWT strategy with session callbacks extending user ID
+- Automatic account linking for users signing in with different providers
 - Protected routes check session in API routes with `getServerSession(authOptions)`
+- Custom sign-in and sign-up pages with Google integration
 
 ### State Management Patterns
 - **Server State**: TanStack Query for API data fetching and caching
@@ -215,3 +231,100 @@ The schema is designed around golf round-making with these core relationships:
 - **Management**: Automatic backups and redundancy
 - **Cost-Effective**: Pay-as-you-use pricing model
 - **Integration**: Seamless integration with existing Supabase database
+
+## Azure Container Instance Deployment
+
+### Production Deployment Overview
+ForeSum is successfully deployed on Azure Container Instance with the following configuration:
+
+- **Service**: Azure Container Instance (ACI)
+- **Resource Group**: `foresome-rg`
+- **Container Name**: `foresum-container`
+- **Registry**: Azure Container Registry (ACR) - `foresomeregistry.azurecr.io`
+- **Image**: `foresum:v2` (fixed hostname binding)
+- **Public URL**: http://foresum-app.eastus.azurecontainer.io:3000
+- **Current IP**: 20.75.179.214:3000
+
+### Docker Configuration
+```dockerfile
+# Multi-stage build optimized for production
+FROM node:18-alpine AS base
+# ... (see Dockerfile for complete configuration)
+CMD ["node", "server.js"]
+```
+
+### Environment Variables (Production)
+```bash
+NEXT_PUBLIC_SHOW_COMING_SOON=true          # Shows coming soon page by default
+NEXTAUTH_URL=http://foresum-app.eastus.azurecontainer.io:3000  # HTTP for container compatibility
+NEXTAUTH_SECRET=<generated-secret>          # Secure random secret
+NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
+NODE_ENV=production
+HOSTNAME=0.0.0.0                           # Essential for container external access
+PORT=3000
+DATABASE_URL=<supabase-postgres-url>       # Secure environment variable
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<supabase-key>  # Secure environment variable
+```
+
+### Deployment Commands
+```bash
+# Build and tag Docker image
+docker build -t foresomeregistry.azurecr.io/foresum:v2 .
+
+# Push to Azure Container Registry
+docker push foresomeregistry.azurecr.io/foresum:v2
+
+# Deploy to Azure Container Instance
+az container create \
+  --resource-group foresome-rg \
+  --name foresum-container \
+  --image foresomeregistry.azurecr.io/foresum:v2 \
+  --dns-name-label foresum-app \
+  --ports 3000 \
+  --cpu 1 \
+  --memory 2 \
+  --os-type Linux \
+  --environment-variables [vars] \
+  --secure-environment-variables [secure-vars]
+```
+
+### Key Deployment Fixes Applied
+1. **Hostname Binding**: Updated `server.js` from `localhost` to `0.0.0.0` for external container access
+2. **Authentication URL**: Fixed `NEXTAUTH_URL` to use HTTP instead of HTTPS to match container protocol
+3. **Container Configuration**: Optimized resource allocation (1 CPU, 2GB RAM)
+4. **Security**: Sensitive environment variables use `--secure-environment-variables`
+
+### Coming Soon Page Features
+- **URL**: `/coming-soon`
+- **Design**: Modern glassmorphism with dark theme and golf course background
+- **Email Collection**: Integrated form with database storage (`EmailRegistration` model)
+- **Responsive**: Mobile-optimized design with animations
+- **Branding**: ForeSum logo and consistent styling
+
+### Monitoring and Management
+```bash
+# Check container status
+az container show --resource-group foresome-rg --name foresum-container
+
+# View container logs
+az container logs --resource-group foresome-rg --name foresum-container
+
+# Get container IP address
+az container show --resource-group foresome-rg --name foresum-container --query "ipAddress.ip" --output tsv
+
+# Delete and redeploy container
+az container delete --resource-group foresome-rg --name foresum-container --yes
+```
+
+### Production Notes
+- **Database Schema**: Production database needs `EmailRegistration` table for coming soon page
+- **Node.js Version**: Currently using Node 18 (Supabase recommends upgrading to Node 20+)
+- **Next.js Build**: Uses standalone output for optimal container size
+- **Performance**: Container starts in ~30 seconds with image caching
+- **Scaling**: Can be easily scaled or upgraded through Azure portal or CLI
+
+### Troubleshooting
+- **Site unreachable**: Check hostname binding in `server.js` (should be `0.0.0.0`, not `localhost`)
+- **Login failures**: Verify `NEXTAUTH_URL` matches actual container protocol and port
+- **Database errors**: Ensure production database schema is up to date with Prisma migrations
+- **Image issues**: Verify Azure Container Registry credentials and image tags

@@ -106,7 +106,7 @@ export default function Leaderboard({ compact = false, limit = 5 }: LeaderboardP
       <CardHeader>
         <CardTitle className="flex items-center space-x-2 text-amber-800">
           <div className="p-2 bg-amber-100 rounded-lg">
-            <FontAwesomeIcon icon={faTrophy} className="h-5 w-5 text-amber-600" />
+            <img src="/images/topGolfer_Icon.png?v=2" alt="Top Golfer" className="h-5 w-5" />
           </div>
           <span>{compact ? 'Top Golfers' : 'Leaderboard'}</span>
         </CardTitle>

@@ -32,7 +32,8 @@ const STORAGE_BUCKETS = {
   AVATARS: 'avatars',
   GOLF_COURSES: 'golf-courses',
   BACKGROUNDS: 'backgrounds',
-  LOGOS: 'logos'
+  LOGOS: 'logos',
+  GROUP_ICONS: 'group-icons'
 } as const
 
 async function createBucket(name: string, isPublic = true) {
@@ -61,6 +62,7 @@ async function setupStorage() {
   await createBucket(STORAGE_BUCKETS.GOLF_COURSES)
   await createBucket(STORAGE_BUCKETS.BACKGROUNDS)
   await createBucket(STORAGE_BUCKETS.LOGOS)
+  await createBucket(STORAGE_BUCKETS.GROUP_ICONS)
 
   console.log('\n📋 Storage Setup Complete!')
   console.log('\nNext steps:')
@@ -70,6 +72,7 @@ async function setupStorage() {
   
   console.log('\n🔐 Recommended RLS Policies:')
   console.log('- avatars: Users can upload/update/delete their own avatars')
+  console.log('- group-icons: Group creators can upload/update/delete their group icons')
   console.log('- golf-courses: Public read, admin write')
   console.log('- backgrounds: Public read, admin write')
   console.log('- logos: Public read, admin write')

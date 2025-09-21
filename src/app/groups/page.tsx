@@ -9,14 +9,16 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUsers, faPlus, faCog, faEnvelope, faUser } from '@fortawesome/free-solid-svg-icons'
+import { faUsers, faPlus, faCog, faEnvelope, faUser, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import UserSearch from '@/components/ui/user-search'
+import { GroupIconUpload } from '@/components/ui/group-icon-upload'
 
 interface Group {
   id: string
   name: string
   description: string | null
+  icon: string | null
   isPrivate: boolean
   creatorId: string
   creator: {
@@ -57,6 +59,7 @@ export default function GroupsPage() {
     isPrivate: true
   })
   const [selectedMembers, setSelectedMembers] = useState<User[]>([])
+  const [groupIcons, setGroupIcons] = useState<Record<string, string | null>>({})
 
   const { data: groups, isLoading } = useQuery<Group[]>({
     queryKey: ['groups'],
@@ -131,6 +134,27 @@ export default function GroupsPage() {
     return membership?.role
   }
 
+  const handleIconChange = (groupId: string, iconUrl: string | null) => {
+    setGroupIcons(prev => ({ ...prev, [groupId]: iconUrl }))
+    // Invalidate queries to refresh the data
+    queryClient.invalidateQueries({ queryKey: ['groups'] })
+    queryClient.invalidateQueries({ queryKey: ['my-groups'] })
+  }
+
+  const getDefaultIcon = (group: Group) => {
+    // Return owner icon if user is the creator, otherwise member icon
+    return isUserCreator(group) ? "/images/owner_icon.png?v=1" : "/images/member_icon.png?v=1"
+  }
+
+  const getGroupIcon = (group: Group) => {
+    // Check if we have a locally updated icon first
+    if (groupIcons[group.id] !== undefined) {
+      return groupIcons[group.id]
+    }
+    // Return the group's icon if it exists and is not empty
+    return group.icon && group.icon.trim() !== '' ? group.icon : null
+  }
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -158,8 +182,11 @@ export default function GroupsPage() {
             />
           </div>
           <div className="flex items-center space-x-4">
-            <Button asChild className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white border-0">
-              <Link href="/">Dashboard</Link>
+            <Button asChild className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white">
+              <Link href="/" className="flex items-center space-x-2">
+                <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4" />
+                <span>Back to Dashboard</span>
+              </Link>
             </Button>
           </div>
         </div>
@@ -169,11 +196,14 @@ export default function GroupsPage() {
         <div className="max-w-6xl mx-auto">
           <div className="bg-white/90 backdrop-blur-md shadow-2xl border-0 rounded-2xl p-8 mb-8">
             <div className="flex justify-between items-center mb-8">
-              <div>
-                <h2 className="text-3xl font-bold text-green-800">My Groups</h2>
-                <p className="text-green-600 mt-2 font-medium">
-                  Create private groups to share rounds with your favorite golf buddies
-                </p>
+              <div className="flex items-center space-x-4">
+                <img src="/images/myGroups_icon.png?v=1" alt="My Groups" className="h-16 w-16" />
+                <div>
+                  <h2 className="text-3xl font-bold text-green-800">My Groups</h2>
+                  <p className="text-green-600 mt-2 font-medium">
+                    Create private groups to share rounds with your favorite golf buddies
+                  </p>
+                </div>
               </div>
               <Button
                 onClick={() => setShowCreateForm(!showCreateForm)}
@@ -271,17 +301,55 @@ export default function GroupsPage() {
                 <Card key={group.id} className="hover:shadow-lg transition-shadow">
                   <CardHeader>
                     <div className="flex justify-between items-start">
-                      <div>
-                        <CardTitle className="text-lg">{group.name}</CardTitle>
-                        <CardDescription>
-                          {group.isPrivate ? 'Private Group' : 'Public Group'}
-                        </CardDescription>
+                      <div className="flex items-start space-x-4">
+                        {/* Group Icon */}
+                        <div className="flex-shrink-0">
+                          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-200 shadow-md flex items-center justify-center">
+                            {getGroupIcon(group) ? (
+                              <img
+                                src={getGroupIcon(group)!}
+                                alt={`${group.name} icon`}
+                                className="w-full h-full object-contain"
+                                onError={(e) => {
+                                  const img = e.target as HTMLImageElement
+                                  const defaultIcon = getDefaultIcon(group)
+                                  img.src = defaultIcon
+                                }}
+                              />
+                            ) : (
+                              <img
+                                src={getDefaultIcon(group)}
+                                alt={isUserCreator(group) ? "Owner icon" : "Member group icon"}
+                                className="w-full h-full object-contain"
+                              />
+                            )}
+                          </div>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <CardTitle className="text-lg truncate">{group.name}</CardTitle>
+                          <CardDescription>
+                            {group.isPrivate ? 'Private Group' : 'Public Group'}
+                          </CardDescription>
+                        </div>
                       </div>
                       <div className="flex items-center space-x-2 text-sm text-gray-500">
                         <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
                         <span>{group._count.members} members</span>
                       </div>
                     </div>
+
+                    {/* Icon Upload for Group Creators */}
+                    {isUserCreator(group) && (
+                      <div className="mt-4 pt-4 border-t border-gray-100">
+                        <div className="text-sm font-medium text-gray-700 mb-2">Group Icon</div>
+                        <GroupIconUpload
+                          groupId={group.id}
+                          currentIcon={getGroupIcon(group)}
+                          onIconChange={(iconUrl) => handleIconChange(group.id, iconUrl)}
+                          defaultIcon={getDefaultIcon(group)}
+                        />
+                      </div>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">

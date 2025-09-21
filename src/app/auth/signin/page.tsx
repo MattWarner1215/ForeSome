@@ -1,13 +1,14 @@
 'use client'
 
-import { useState } from 'react'
-import { signIn } from 'next-auth/react'
+import { useState, useEffect } from 'react'
+import { signIn, getProviders } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faLock, faEye, faEyeSlash, faArrowRight } from '@fortawesome/free-solid-svg-icons'
+import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import Link from 'next/link'
 
 export default function SignInPage() {
@@ -16,7 +17,25 @@ export default function SignInPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
   const [showPassword, setShowPassword] = useState(false)
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false)
+  const [providers, setProviders] = useState<any>(null)
+  const [isProvidersLoaded, setIsProvidersLoaded] = useState(false)
   const router = useRouter()
+
+  // Load available providers on component mount
+  useEffect(() => {
+    const loadProviders = async () => {
+      try {
+        const availableProviders = await getProviders()
+        setProviders(availableProviders)
+      } catch (error) {
+        console.error('Failed to load providers:', error)
+      } finally {
+        setIsProvidersLoaded(true)
+      }
+    }
+    loadProviders()
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +60,31 @@ export default function SignInPage() {
       setIsLoading(false)
     }
   }
+
+  const handleGoogleSignIn = async () => {
+    setIsGoogleLoading(true)
+    setError('')
+
+    try {
+      const result = await signIn('google', {
+        callbackUrl: '/',
+        redirect: false,
+      })
+
+      if (result?.error) {
+        setError('Google sign-in failed')
+      } else if (result?.url) {
+        router.push(result.url)
+      }
+    } catch (error) {
+      setError('An error occurred with Google sign-in')
+    } finally {
+      setIsGoogleLoading(false)
+    }
+  }
+
+  // Check if Google provider is available
+  const isGoogleProviderAvailable = providers?.google && isProvidersLoaded
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4 relative">
@@ -162,8 +206,42 @@ export default function SignInPage() {
               </div>
             </form>
 
+            {/* Conditionally render Google sign-in section */}
+            {isGoogleProviderAvailable && (
+              <>
+                {/* Divider */}
+                <div key="divider" className="mt-6 flex items-center">
+                  <div className="flex-1 border-t border-gray-200"></div>
+                  <div className="px-4 text-sm text-gray-500 font-medium">or</div>
+                  <div className="flex-1 border-t border-gray-200"></div>
+                </div>
+
+                {/* Google Sign-In Button */}
+                <div key="google-signin" className="mt-6">
+                  <Button
+                    type="button"
+                    onClick={handleGoogleSignIn}
+                    disabled={isGoogleLoading || isLoading}
+                    className="w-full h-12 bg-white hover:bg-gray-50 text-gray-700 font-semibold border border-gray-300 hover:border-gray-400 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                  >
+                    {isGoogleLoading ? (
+                      <div key="loading" className="flex items-center space-x-2">
+                        <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                        <span>Signing in with Google...</span>
+                      </div>
+                    ) : (
+                      <div key="normal" className="flex items-center space-x-3">
+                        <FontAwesomeIcon icon={faGoogle} className="h-5 w-5 text-red-500" />
+                        <span>Continue with Google</span>
+                      </div>
+                    )}
+                  </Button>
+                </div>
+              </>
+            )}
+
             {/* Forgot Password Link */}
-            <div className="mt-6 text-center">
+            <div key="forgot-password" className="mt-6 text-center">
               <Link
                 href="/auth/forgot-password"
                 className="text-sm text-green-600 hover:text-green-700 transition-colors hover:underline"

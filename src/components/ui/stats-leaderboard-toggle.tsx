@@ -104,12 +104,16 @@ export default function StatsLeaderboardToggle() {
         <CardHeader>
           <div className="flex justify-between items-center">
             <CardTitle className="text-green-800 flex items-center space-x-2">
-              <div className="p-2 bg-green-100 rounded-lg">
-                <FontAwesomeIcon 
-                  icon={showStats ? faChartLine : faTrophy} 
-                  className="h-5 w-5 text-green-600" 
-                />
-              </div>
+              {showStats ? (
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <FontAwesomeIcon
+                    icon={faChartLine}
+                    className="h-5 w-5 text-green-600"
+                  />
+                </div>
+              ) : (
+                <img src="/images/topGolfer_Icon.png?v=3" alt="Top Golfer" className="h-12 w-12" style={{filter: 'brightness(0.8)'}} />
+              )}
               <div className="flex items-center space-x-2">
                 <span>{showStats ? 'Golf Stats' : 'Top Golfers'}</span>
                 {!showStats && (
@@ -130,7 +134,7 @@ export default function StatsLeaderboardToggle() {
               title={showStats ? 'Show Top Golfers' : 'Show Golf Stats'}
             >
               <span className="hidden sm:inline font-medium">
-                {showStats ? 'Show Leaderboard' : 'My Stats'}
+                {showStats ? 'Show Leaderboard' : 'Stats'}
               </span>
               <FontAwesomeIcon 
                 icon={showStats ? faToggleOff : faToggleOn} 
@@ -240,7 +244,7 @@ export default function StatsLeaderboardToggle() {
                   <div className="group flex items-center justify-between px-4 py-3 hover:bg-purple-50/50 transition-all duration-200">
                     <div className="flex items-center space-x-3">
                       <div className="p-2 bg-gradient-to-br from-purple-400 to-purple-500 rounded-lg shadow-sm">
-                        <FontAwesomeIcon icon={faTrophy} className="h-4 w-4 text-white" />
+                        <img src="/images/topGolfer_Icon.png?v=3" alt="Trophy" className="h-4 w-4" style={{filter: 'brightness(0) invert(1)'}} />
                       </div>
                       <div>
                         <div className="text-sm font-medium text-gray-800">Achievements</div>
@@ -271,7 +275,7 @@ export default function StatsLeaderboardToggle() {
             ) : leaderboard.length === 0 ? (
               <div className="text-center py-8">
                 <div className="p-3 bg-amber-100 rounded-full w-fit mx-auto mb-3">
-                  <FontAwesomeIcon icon={faTrophy} className="h-6 w-6 text-amber-600" />
+                  <img src="/images/topGolfer_Icon.png?v=3" alt="Top Golfer" className="h-6 w-6" style={{filter: 'sepia(1) saturate(2) hue-rotate(15deg) brightness(1.2)'}} />
                 </div>
                 <p className="text-amber-800 font-medium text-sm">No active players yet</p>
               </div>
@@ -293,7 +297,11 @@ export default function StatsLeaderboardToggle() {
                       {/* Rank */}
                       <div className={`p-2 bg-gradient-to-br ${getRankBg(rank)} rounded-full flex items-center justify-center min-w-[36px] h-9`}>
                         {rank <= 3 ? (
-                          <FontAwesomeIcon icon={icon} className={`h-4 w-4 text-white`} />
+                          rank === 1 ? (
+                            <img src="/images/topGolfer_Icon.png?v=3" alt="Top Golfer" className="h-4 w-4" style={{filter: 'brightness(0) invert(1)'}} />
+                          ) : (
+                            <FontAwesomeIcon icon={getRankIcon(rank).icon} className={`h-4 w-4 text-white`} />
+                          )
                         ) : (
                           <span className="text-white font-bold text-sm">#{rank}</span>
                         )}
@@ -347,7 +355,7 @@ export default function StatsLeaderboardToggle() {
           <div className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto animate-in fade-in-0 zoom-in-95 duration-200">
             <div className="flex items-center justify-between p-6 border-b border-gray-200">
               <h3 className="text-lg font-bold text-gray-900 flex items-center space-x-2">
-                <FontAwesomeIcon icon={faTrophy} className="h-5 w-5 text-amber-600" />
+                <img src="/images/topGolfer_Icon.png?v=3" alt="Top Golfer" className="h-5 w-5" style={{filter: 'sepia(1) saturate(2) hue-rotate(15deg) brightness(1.2)'}} />
                 <span>How Points Are Calculated</span>
               </h3>
               <button

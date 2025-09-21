@@ -59,7 +59,18 @@ export function NotificationBell() {
     queryFn: async () => {
       const response = await fetch('/api/notifications?limit=10')
       if (!response.ok) throw new Error('Failed to fetch notifications')
-      return response.json()
+
+      const text = await response.text()
+      if (!text.trim()) {
+        throw new Error('Empty response from server')
+      }
+
+      try {
+        return JSON.parse(text)
+      } catch (error) {
+        console.error('Failed to parse notifications JSON:', text)
+        throw new Error('Invalid JSON response from server')
+      }
     },
     staleTime: 0, // Always fetch fresh notification data
     gcTime: 300000, // 5 minutes
@@ -77,7 +88,18 @@ export function NotificationBell() {
         body: JSON.stringify({ notificationIds })
       })
       if (!response.ok) throw new Error('Failed to mark notifications as read')
-      return response.json()
+
+      const text = await response.text()
+      if (!text.trim()) {
+        throw new Error('Empty response from server')
+      }
+
+      try {
+        return JSON.parse(text)
+      } catch (error) {
+        console.error('Failed to parse mark as read JSON:', text)
+        throw new Error('Invalid JSON response from server')
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
@@ -93,7 +115,18 @@ export function NotificationBell() {
         body: JSON.stringify({ markAllAsRead: true })
       })
       if (!response.ok) throw new Error('Failed to mark all notifications as read')
-      return response.json()
+
+      const text = await response.text()
+      if (!text.trim()) {
+        throw new Error('Empty response from server')
+      }
+
+      try {
+        return JSON.parse(text)
+      } catch (error) {
+        console.error('Failed to parse mark all as read JSON:', text)
+        throw new Error('Invalid JSON response from server')
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
@@ -109,7 +142,18 @@ export function NotificationBell() {
         body: JSON.stringify({ notificationIds: [notificationId] })
       })
       if (!response.ok) throw new Error('Failed to delete notification')
-      return response.json()
+
+      const text = await response.text()
+      if (!text.trim()) {
+        throw new Error('Empty response from server')
+      }
+
+      try {
+        return JSON.parse(text)
+      } catch (error) {
+        console.error('Failed to parse delete notification JSON:', text)
+        throw new Error('Invalid JSON response from server')
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
@@ -210,6 +254,9 @@ export function NotificationBell() {
   }
 
   const formatRelativeTime = (dateString: string) => {
+    // Return a placeholder on server to prevent hydration mismatch
+    if (typeof window === 'undefined') return '...'
+
     const date = new Date(dateString)
     const now = new Date()
     const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60))

@@ -121,6 +121,7 @@ model Group {
   id          String      @id @default(cuid())
   name        String
   description String?
+  icon        String?     // Supabase Storage URL for group icon
   isPrivate   Boolean     @default(true)
   creatorId   String
   createdAt   DateTime    @default(now())
