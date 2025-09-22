@@ -4,9 +4,13 @@
  * Script to populate the database with golf courses from Golf Course.md
  */
 
+import { config } from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 import fs from 'fs'
 import path from 'path'
+
+// Load environment variables from .env.local
+config({ path: '.env.local' })
 
 const prisma = new PrismaClient()
 
@@ -18,7 +22,7 @@ interface GolfCourseData {
   zipCode: string
   phone?: string
   website?: string
-  type: 'Public' | 'Private' | 'Semi-Private'
+  type: 'Public' | 'Private' | 'Semi-Private' | 'Indoor Golf Simulator'
   holes?: number
   features?: string
 }
@@ -118,7 +122,7 @@ function parseGolfCourseMarkdown(filePath: string): GolfCourseData[] {
           const typeMatch = line.match(/- \*\*Type:\*\*\s*(.+)/)
           if (typeMatch) {
             const type = typeMatch[1].trim()
-            if (type === 'Private' || type === 'Semi-Private' || type === 'Public') {
+            if (type === 'Private' || type === 'Semi-Private' || type === 'Public' || type === 'Indoor Golf Simulator') {
               course.type = type
             }
           }
@@ -206,12 +210,14 @@ async function populateDatabase() {
     const publicCourses = await prisma.golfCourse.count({ where: { type: 'Public' } })
     const privateCourses = await prisma.golfCourse.count({ where: { type: 'Private' } })
     const semiPrivateCourses = await prisma.golfCourse.count({ where: { type: 'Semi-Private' } })
-    
+    const indoorSimulators = await prisma.golfCourse.count({ where: { type: 'Indoor Golf Simulator' } })
+
     console.log('\n📊 Database Statistics:')
-    console.log(`   Total Courses: ${totalCourses}`)
+    console.log(`   Total Facilities: ${totalCourses}`)
     console.log(`   Public: ${publicCourses}`)
     console.log(`   Private: ${privateCourses}`)
     console.log(`   Semi-Private: ${semiPrivateCourses}`)
+    console.log(`   Indoor Golf Simulators: ${indoorSimulators}`)
     
   } catch (error) {
     console.error('❌ Error populating database:', error)

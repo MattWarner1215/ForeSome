@@ -1,0 +1,171 @@
+{
+  "total_courses": 179,
+  "excluded_course": "Cumberland Trail Golf Club",
+  "courses": [
+    {
+      "id": 1,
+      "name": "Airport Golf Course",
+      "type": "municipal",
+      "location": "Columbus, OH",
+      "website": "crpdgolf.com",
+      "phone": "(614) 645-3127",
+      "address": "900 N. Hamilton Road, Columbus, OH 43219",
+      "logo_available": "CRPD Golf logo",
+      "category": "Columbus Municipal (CRPD)"
+    },
+    {
+      "id": 2,
+      "name": "Champions Golf Course",
+      "type": "municipal",
+      "location": "Columbus, OH",
+      "website": "crpdgolf.com",
+      "phone": "(614) 645-7111",
+      "address": "3900 Westerville Road, Columbus, OH 43224",
+      "logo_available": "CRPD Golf logo",
+      "category": "Columbus Municipal (CRPD)"
+    },
+    {
+      "id": 3,
+      "name": "Raymond Memorial Golf Course",
+      "type": "municipal",
+      "location": "Columbus, OH",
+      "website": "crpdgolf.com",
+      "phone": "(614) 645-3276",
+      "address": "3860 Trabue Road, Columbus, OH 43228",
+      "logo_available": "CRPD Golf logo",
+      "category": "Columbus Municipal (CRPD)"
+    },
+    {
+      "id": 4,
+      "name": "Mentel Memorial Golf Course",
+      "type": "municipal",
+      "location": "Columbus, OH",
+      "website": "crpdgolf.com",
+      "phone": "(614) 645-3050",
+      "address": "6005 Alkire Road, Galloway, OH 43119",
+      "logo_available": "CRPD Golf logo",
+      "category": "Columbus Municipal (CRPD)"
+    },
+    {
+      "id": 5,
+      "name": "Turnberry Golf Course",
+      "type": "municipal",
+      "location": "Columbus, OH",
+      "website": "crpdgolf.com",
+      "phone": "(614) 645-8570",
+      "address": "1145 Clubhouse Lane, Pickerington, OH 43147",
+      "logo_available": "CRPD Golf logo",
+      "category": "Columbus Municipal (CRPD)"
+    },
+    {
+      "id": 6,
+      "name": "Wilson Road Golf Course",
+      "type": "municipal",
+      "location": "Columbus, OH",
+      "website": "crpdgolf.com",
+      "phone": "(614) 645-3221",
+      "address": "1900 Wilson Road, Columbus, OH 43228",
+      "logo_available": "CRPD Golf logo",
+      "category": "Columbus Municipal (CRPD)"
+    },
+    {
+      "id": 7,
+      "name": "Minerva Lake Golf Club",
+      "type": "public",
+      "location": "Columbus, OH",
+      "website": "mineralakegolfclub.com",
+      "phone": "(614) 882-9988",
+      "address": "2955 Minerva Lake Road, Columbus, OH 43231",
+      "logo_available": "unknown",
+      "category": "Other Columbus Area Public"
+    },
+    {
+      "id": 8,
+      "name": "Blacklick Woods Golf Course",
+      "type": "public",
+      "location": "Reynoldsburg, OH",
+      "website": "metroparks.net",
+      "phone": "(614) 861-3193",
+      "address": "7309 E. Livingston Avenue, Reynoldsburg, OH 43068",
+      "logo_available": "Metro Parks logo",
+      "category": "Other Columbus Area Public"
+    },
+    {
+      "id": 9,
+      "name": "Pleasant Valley Golf Course",
+      "type": "public",
+      "location": "Lancaster, OH",
+      "website": "pleasantvalleygolfcourse.net",
+      "phone": "(740) 654-3293",
+      "address": "180 Coonpath Road NE, Lancaster, OH 43130",
+      "logo_available": "unknown",
+      "category": "Other Columbus Area Public"
+    },
+    {
+      "id": 10,
+      "name": "Big Walnut Golf Club",
+      "type": "semi-private",
+      "location": "Sunbury, OH",
+      "website": "bigwalnutgolfclub.com",
+      "phone": "(740) 524-8642",
+      "address": "6683 N. State Route 61, Sunbury, OH 43074",
+      "logo_available": "unknown",
+      "category": "Other Columbus Area Public"
+    },
+    {
+      "id": 11,
+      "name": "Scioto Country Club",
+      "type": "private",
+      "location": "Columbus, OH",
+      "website": "sciotocc.org",
+      "phone": "(614) 486-4341",
+      "address": "2196 Riverside Drive, Columbus, OH 43221",
+      "logo_available": "unknown",
+      "category": "Columbus Area Private"
+    },
+    {
+      "id": 12,
+      "name": "Columbus Country Club",
+      "type": "private",
+      "location": "Columbus, OH",
+      "website": "columbuscc.org",
+      "phone": "(614) 861-0800",
+      "address": "4831 E. Broad Street, Columbus, OH 43213",
+      "logo_available": "unknown",
+      "category": "Columbus Area Private"
+    },
+    {
+      "id": 13,
+      "name": "Muirfield Village Golf Club",
+      "type": "private",
+      "location": "Dublin, OH",
+      "website": "muirfieldvillage.com",
+      "phone": "(614) 889-6700",
+      "address": "5750 Memorial Drive, Dublin, OH 43017",
+      "logo_available": "Crest logo (.jpg), Wreath logo (.jpg)",
+      "category": "Columbus Area Private"
+    },
+    {
+      "id": 14,
+      "name": "The Ohio State University Golf Club (Scarlet Course)",
+      "type": "private",
+      "location": "Columbus, OH",
+      "website": "ohiostatebuckeyes.com",
+      "phone": "(614) 292-GOLF",
+      "address": "3605 Tremont Road, Columbus, OH 43221",
+      "logo_available": "Ohio State logo (.png)",
+      "category": "Columbus Area Private"
+    },
+    {
+      "id": 15,
+      "name": "Brookside Golf & Country Club",
+      "type": "private",
+      "location": "Columbus, OH",
+      "website": "brooksidegolf.net",
+      "phone": "(614) 235-7878",
+      "address": "1380 Carriage Road, Columbus, OH 43209",
+      "logo_available": "unknown",
+      "category": "Columbus Area Private"
+    }
+  ]
+}

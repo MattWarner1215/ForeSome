@@ -1299,10 +1299,80 @@
 - Document source and permission for each logo used
 - Maintain backup generic icons for all courses
 
+## X-Golf Indoor Golf Simulator Locations (Ohio)
+
+### 172. X-Golf Columbus
+- **Address:** 1165 Yard Street, Grandview Heights, OH 43212
+- **Phone:** (614) 549-7119
+- **Email:** contact@xgolfcolumbus.com
+- **Website:** playxgolf.com/locations/columbus
+- **Type:** Indoor Golf Simulator
+- **Features:** 7 state-of-the-art golf simulators, 7,000 sq ft sports bar, full food & drink menu, league play, private events, golf lessons
+
+### 173. X-Golf Cincinnati
+- **Address:** 7001 Miami Avenue, Madeira, OH 45243
+- **Phone:** (513) 538-2007
+- **Email:** Contact@xgolfcincinnati.com
+- **Website:** xgolfcincinnati.com
+- **Type:** Indoor Golf Simulator
+- **Features:** 8 large simulators with seating for 6, full bar and seating area, full kitchen menu, league play, private party room
+
+### 174. X-Golf Broadview Heights
+- **Address:** 9194 Broadview Road, Broadview Heights, OH 44147
+- **Phone:** (440) 799-0990
+- **Email:** ron@xgolfbroadviewhts.com
+- **Website:** playxgolf.com/locations/broadview-heights
+- **Type:** Indoor Golf Simulator
+- **Features:** 7 indoor golf simulators, Class A PGA Professional instruction, full liquor bar, food service, golf leagues
+
+### 175. X-Golf Toledo
+- **Address:** 7141 Spring Meadows Drive W, Holland, OH 43528
+- **Phone:** (419) 867-4653
+- **Website:** playxgolf.com/locations/toledo
+- **Type:** Indoor Golf Simulator
+- **Features:** Year-round indoor golf, premium simulators, full bar and restaurant, league play, private events
+
+### 176. X-Golf Perrysburg
+- **Address:** 26567 N. Dixie Highway, Perrysburg, OH 43551
+- **Phone:** (419) 874-4653
+- **Website:** xgolfperrysburg.com
+- **Type:** Indoor Golf Simulator
+- **Features:** Premium indoor golf memberships, leagues, lessons, full service bar and grill
+
+### 177. X-Golf Solon
+- **Address:** 33615 Aurora Road, Solon, OH 44139
+- **Phone:** (440) 542-4653
+- **Website:** playxgolf.com/locations/solon
+- **Type:** Indoor Golf Simulator
+- **Features:** State-of-the-art simulators, restaurant and bar, league play, private events, golf instruction
+
+### 178. X-Golf North Canton
+- **Address:** 4385 Whipple Avenue NW, Canton, OH 44718
+- **Phone:** (330) 244-4653
+- **Website:** playxgolf.com/locations/north-canton
+- **Type:** Indoor Golf Simulator
+- **Features:** Indoor golf simulators, full service bar and restaurant, leagues, lessons, private parties
+
+### 179. X-Golf Fairlawn
+- **Address:** 55 Springside Drive, Akron, OH 44333
+- **Phone:** (330) 666-4653
+- **Website:** playxgolf.com/locations/fairlawn
+- **Type:** Indoor Golf Simulator
+- **Features:** Premium golf simulators, sports bar atmosphere, food and beverages, league play
+
+### 180. X-Golf Powell
+- **Address:** W 285 Olentangy Suite 101, Powell, OH 43065
+- **Phone:** (614) 792-4653
+- **Website:** playxgolf.com/locations/powell
+- **Type:** Indoor Golf Simulator
+- **Features:** Indoor golf simulation technology, full bar and kitchen, leagues, lessons, corporate events
+
 ---
 
-*Note: This expanded list includes 170+ golf courses throughout Ohio, representing all major regions of the state. Phone numbers, addresses, and websites are current as of 2024, but it's recommended to verify details before visiting. Course types are designated as Public (open to all), Private (members only), or Semi-Private (limited public access).*
+*Note: This expanded list includes 180 golf facilities throughout Ohio, including traditional golf courses and indoor golf simulators, representing all major regions of the state. X-Golf locations feature the world's most accurate golf simulator technology with 99% accuracy for ball and swing data. Phone numbers, addresses, and websites are current as of 2025, but it's recommended to verify details before visiting.*
+
+*Course types are designated as Public (open to all), Private (members only), Semi-Private (limited public access), or Indoor Golf Simulator (year-round indoor facilities).*
 
 *Logo information added where publicly available. Private club logos may require direct contact for usage rights.*
 
-*Compiled from multiple sources including municipal golf departments, golf course directories, and official course websites.*
+*Compiled from multiple sources including municipal golf departments, golf course directories, official course websites, and X-Golf America corporate locations.*

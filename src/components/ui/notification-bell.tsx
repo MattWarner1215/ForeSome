@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { useRouter } from 'next/navigation'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -49,9 +50,17 @@ interface NotificationResponse {
 
 export function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false)
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 })
+  const [mounted, setMounted] = useState(false)
+  const buttonRef = useRef<HTMLButtonElement>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
   const queryClient = useQueryClient()
   const router = useRouter()
+
+  // Handle mounting for portal
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Fetch notifications
   const { data: notificationData, isLoading } = useQuery<NotificationResponse>({
@@ -160,10 +169,27 @@ export function NotificationBell() {
     }
   })
 
+  // Calculate dropdown position when opening
+  const updateDropdownPosition = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect()
+      const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+      setDropdownPosition({
+        top: rect.bottom + scrollTop + 8, // 8px gap
+        right: window.innerWidth - rect.right
+      })
+    }
+  }
+
   // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false)
       }
     }
@@ -276,11 +302,20 @@ export function NotificationBell() {
   const unreadCount = notificationData?.unreadCount || 0
   const notifications = notificationData?.notifications || []
 
+
   return (
-    <div className="relative" ref={dropdownRef}>
+    <>
       <Button
+        ref={buttonRef}
         size="sm"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={(e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          if (!isOpen) {
+            updateDropdownPosition()
+          }
+          setIsOpen(!isOpen)
+        }}
         className="relative bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
       >
         <FontAwesomeIcon icon={faBell} className="h-4 w-4" />
@@ -291,146 +326,141 @@ export function NotificationBell() {
         )}
       </Button>
 
-      {isOpen && (
-        <>
-          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)}></div>
-          <Card className="absolute right-0 top-12 w-[420px] max-h-[500px] overflow-hidden bg-white/95 backdrop-blur-md shadow-2xl border border-gray-200/50 rounded-3xl z-50 animate-in slide-in-from-top-2 duration-300">
-            <CardHeader className="pb-4 border-b border-gray-200/70 bg-gradient-to-r from-green-50/50 to-blue-50/50">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <div className="p-2 bg-gradient-to-br from-green-500 to-green-600 rounded-full shadow-sm">
-                    <FontAwesomeIcon icon={faBell} className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <CardTitle className="text-xl font-bold text-gray-900">Notifications</CardTitle>
-                    <p className="text-sm text-gray-600">{unreadCount} unread</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  {unreadCount > 0 && (
+      {mounted && isOpen &&
+        createPortal(
+          <div
+            ref={dropdownRef}
+            className="fixed z-[99999]"
+            style={{
+              top: `${dropdownPosition.top}px`,
+              right: `${dropdownPosition.right}px`
+            }}
+          >
+            <Card className="w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 shadow-lg">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-lg font-semibold">Notifications</CardTitle>
+                  <div className="flex items-center gap-2">
+                    {unreadCount > 0 && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={handleMarkAllAsRead}
+                        className="text-xs h-7 px-2"
+                      >
+                        <FontAwesomeIcon icon={faCheckDouble} className="h-3 w-3 mr-1" />
+                        Mark all read
+                      </Button>
+                    )}
                     <Button
                       size="sm"
                       variant="ghost"
-                      onClick={handleMarkAllAsRead}
-                      disabled={markAllAsReadMutation.isPending}
-                      className="text-xs text-green-600 hover:text-green-700 hover:bg-green-100/80 rounded-xl px-3 py-2 font-medium transition-all duration-200"
+                      onClick={() => setIsOpen(false)}
+                      className="h-7 w-7 p-0"
                     >
-                      <FontAwesomeIcon icon={faCheckDouble} className="h-4 w-4 mr-2" />
-                      Mark all read
+                      <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
                     </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => setIsOpen(false)}
-                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-100/80 rounded-xl p-2 transition-all duration-200"
-                  >
-                    <FontAwesomeIcon icon={faTimes} className="h-4 w-4" />
-                  </Button>
+                  </div>
                 </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0 max-h-[400px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent">
-              {isLoading ? (
-                <div className="p-6 text-center">
-                  <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-green-600 mx-auto"></div>
-                  <p className="text-sm text-gray-500 mt-2">Loading notifications...</p>
-                </div>
-              ) : notifications.length === 0 ? (
-                <div className="p-6 text-center">
-                  <FontAwesomeIcon icon={faBell} className="h-8 w-8 text-gray-300 mb-2" />
-                  <p className="text-sm text-gray-500">No notifications yet</p>
-                </div>
-              ) : (
-                <div className="divide-y divide-gray-100/70">
-                  {notifications.map((notification) => (
-                    <div
-                      key={notification.id}
-                      className={`group relative p-5 hover:bg-gradient-to-r hover:from-green-50/50 hover:to-blue-50/50 transition-all duration-300 cursor-pointer ${
-                        !notification.isRead
-                          ? 'bg-gradient-to-r from-blue-50/40 to-indigo-50/40 border-l-4 border-blue-500 shadow-sm'
-                          : 'hover:shadow-sm'
-                      }`}
-                      onClick={() => handleNotificationClick(notification)}
-                      title="Click to view"
-                    >
-                      <div className="flex items-start space-x-4">
-                        <div className={`p-3 rounded-xl shadow-sm ${getNotificationColor(notification.type)}`}>
-                          {notification.type === 'match_update' ? (
-                            <img src={LOGO_IMAGES.myrounds_icon} alt="Match Update" className="h-4 w-4" />
-                          ) : (
-                            <FontAwesomeIcon
-                              icon={getNotificationIcon(notification.type)}
-                              className="h-4 w-4"
-                            />
-                          )}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between">
-                            <div className="flex-1 pr-3">
-                              <p className={`text-sm font-semibold leading-5 ${
-                                !notification.isRead ? 'text-gray-900' : 'text-gray-700'
-                              }`}>
-                                {notification.title}
-                              </p>
-                              <p className="text-sm text-gray-600 mt-1 leading-5">
+              </CardHeader>
+              <CardContent className="p-0">
+                {isLoading ? (
+                  <div className="p-4 text-center text-gray-500">
+                    Loading notifications...
+                  </div>
+                ) : notifications.length === 0 ? (
+                  <div className="p-4 text-center text-gray-500">
+                    No notifications yet
+                  </div>
+                ) : (
+                  <div className="divide-y divide-gray-200">
+                    {notifications.map((notification, index) => (
+                      <div
+                        key={notification.id}
+                        className={`p-5 hover:bg-gray-50 cursor-pointer transition-all duration-200 relative border-l-4 ${
+                          !notification.isRead
+                            ? 'bg-blue-50/80 border-l-blue-500 shadow-sm'
+                            : 'bg-white border-l-transparent hover:border-l-gray-300'
+                        } ${index === 0 ? 'rounded-t-lg' : ''} ${index === notifications.length - 1 ? 'rounded-b-lg' : ''}`}
+                        onClick={() => handleNotificationClick(notification)}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-start gap-4 flex-1 min-w-0">
+                            <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${getNotificationColor(notification.type)}`}>
+                              {notification.type === 'match_update' && notification.match ? (
+                                <img
+                                  src={LOGO_IMAGES[notification.match.course] || '/images/default-logo.png'}
+                                  alt={notification.match.course}
+                                  className="w-7 h-7 rounded-full object-cover"
+                                />
+                              ) : (
+                                <FontAwesomeIcon
+                                  icon={getNotificationIcon(notification.type)}
+                                  className="h-5 w-5"
+                                />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-center gap-2 mb-1">
+                                <h4 className="font-semibold text-sm text-gray-900 truncate">
+                                  {notification.title}
+                                </h4>
+                                {!notification.isRead && (
+                                  <div className="w-2.5 h-2.5 bg-blue-500 rounded-full flex-shrink-0" />
+                                )}
+                              </div>
+                              <p className="text-sm text-gray-600 mt-1.5 mb-3 line-clamp-2 leading-relaxed">
                                 {notification.message}
                               </p>
-                              {notification.match && (
-                                <div className="mt-2 p-2 bg-gray-50/80 rounded-lg border border-gray-200/50">
-                                  <p className="text-xs text-gray-700 font-medium">
-                                    📍 {notification.match.course}
-                                  </p>
-                                  <p className="text-xs text-gray-500">
-                                    📅 {new Date(notification.match.date).toLocaleDateString()}
-                                  </p>
-                                </div>
-                              )}
-                              <p className="text-xs text-gray-400 mt-2 font-medium">
-                                {formatRelativeTime(notification.createdAt)}
-                              </p>
+                              <div className="flex items-center justify-between mt-3">
+                                <span className="text-xs text-gray-400">
+                                  {formatRelativeTime(notification.createdAt)}
+                                </span>
+                                {notification.sender && (
+                                  <span className="text-xs text-gray-500">
+                                    from {notification.sender.name || notification.sender.email}
+                                  </span>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex flex-col items-center space-y-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                              {!notification.isRead && (
-                                <Button
-                                  size="sm"
-                                  variant="ghost"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    handleMarkAsRead(notification.id)
-                                  }}
-                                  disabled={markAsReadMutation.isPending}
-                                  className="text-green-600 hover:text-white hover:bg-green-500 w-10 h-10 rounded-full shadow-md border border-green-200 bg-white transition-all duration-200 hover:scale-105"
-                                  title="Mark as read"
-                                >
-                                  <FontAwesomeIcon icon={faCheck} className="h-5 w-5" />
-                                </Button>
-                              )}
+                          </div>
+                          <div className="flex items-start gap-1.5 mt-1">
+                            {!notification.isRead && (
                               <Button
                                 size="sm"
                                 variant="ghost"
                                 onClick={(e) => {
                                   e.stopPropagation()
-                                  handleDeleteNotification(notification.id)
+                                  handleMarkAsRead(notification.id)
                                 }}
-                                disabled={deleteNotificationMutation.isPending}
-                                className="text-red-500 hover:text-white hover:bg-red-500 w-10 h-10 rounded-full shadow-md border border-red-200 bg-white transition-all duration-200 hover:scale-105"
-                                title="Delete notification"
+                                className="h-7 w-7 p-0 hover:bg-green-50 hover:text-green-700"
                               >
-                                <FontAwesomeIcon icon={faTrash} className="h-4 w-4" />
+                                <FontAwesomeIcon icon={faCheck} className="h-3.5 w-3.5" />
                               </Button>
-                            </div>
+                            )}
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                handleDeleteNotification(notification.id)
+                              }}
+                              className="h-7 w-7 p-0 text-red-500 hover:text-red-700 hover:bg-red-50"
+                            >
+                              <FontAwesomeIcon icon={faTrash} className="h-3.5 w-3.5" />
+                            </Button>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>,
+          document.body
+        )
+      }
+    </>
   )
 }

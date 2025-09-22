@@ -88,26 +88,8 @@ export default function SignInPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 flex items-center justify-center p-4 relative">
-      {/* Background Decoration */}
-      <div className="absolute inset-0 opacity-30">
-        <div className="absolute top-10 left-10 w-2 h-2 bg-green-300 rounded-full"></div>
-        <div className="absolute top-32 right-20 w-3 h-3 bg-green-200 rounded-full"></div>
-        <div className="absolute bottom-20 left-32 w-4 h-4 bg-green-100 rounded-full"></div>
-        <div className="absolute bottom-40 right-10 w-2 h-2 bg-green-300 rounded-full"></div>
-        <div className="absolute top-1/2 left-20 w-1 h-1 bg-green-400 rounded-full"></div>
-        <div className="absolute top-1/3 right-32 w-2 h-2 bg-green-200 rounded-full"></div>
-      </div>
       
       <div className="relative w-full max-w-md">
-        {/* Golf Ball Animation */}
-        <div className="absolute -top-16 left-1/2 transform -translate-x-1/2">
-          <div className="w-8 h-8 bg-white rounded-full shadow-lg border-2 border-gray-200 animate-bounce">
-            <div className="w-full h-full rounded-full bg-gradient-to-br from-white to-gray-100 flex items-center justify-center">
-              <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-            </div>
-          </div>
-        </div>
-
         <Card className="w-full shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
@@ -274,9 +256,6 @@ export default function SignInPage() {
           </CardContent>
         </Card>
 
-        {/* Decorative Elements */}
-        <div className="absolute -bottom-6 -right-6 w-12 h-12 bg-green-100 rounded-full opacity-50"></div>
-        <div className="absolute -top-6 -left-6 w-8 h-8 bg-green-200 rounded-full opacity-30"></div>
       </div>
     </div>
   )

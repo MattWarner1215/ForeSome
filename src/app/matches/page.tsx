@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faLocationDot, faUsers, faClock, faArrowLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
+import EnhancedRoundCard from '@/components/ui/enhanced-round-card'
 import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
 import { invalidateMatchQueries } from '@/lib/query-invalidation'
 
@@ -286,120 +287,20 @@ function RoundesPageContent() {
               <CardContent className="pt-4">
                 {rounds && rounds.length > 0 ? (
                   <div className="grid gap-6">
-                {rounds.map((match) => (
-                  <Card key={match.id} className="hover:shadow-lg transition-shadow">
-                    <CardHeader>
-                      <div className="flex justify-between items-start">
-                        <div className="flex items-start space-x-3">
-                          <GolfCourseAvatar 
-                            courseName={match.course} 
-                            size="lg"
-                            roundType={activeTab === 'public' ? 'public' : 'my'}
-                          />
-                          <div>
-                            <CardTitle className="text-xl">{match.title}</CardTitle>
-                            <CardDescription className="text-base">
-                              {match.course}
-                            </CardDescription>
-                          </div>
-                        </div>
-                        <div className="flex items-center space-x-2 text-sm text-gray-500">
-                          <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
-                          <span>
-                            {match._count.players + 1}/{match.maxPlayers} players
-                          </span>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {match.description && (
-                          <p className="text-gray-600">{match.description}</p>
-                        )}
-                        
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                          <div className="flex items-center space-x-2">
-                            <img src={LOGO_IMAGES.myrounds_icon} alt="Date" className="h-4 w-4" />
-                            <span>{formatDate(match.date)}</span>
-                          </div>
-                          <div className="flex items-center space-x-2">
-                            <FontAwesomeIcon icon={faClock} className="h-4 w-4 text-gray-400" />
-                            <span>{formatTime(match.time)}</span>
-                          </div>
-                          <div className="flex items-center space-x-2 md:col-span-2">
-                            <FontAwesomeIcon icon={faLocationDot} className="h-4 w-4 text-gray-400" />
-                            <span>{match.address}</span>
-                          </div>
-                        </div>
-
-                        <div className="pt-3 border-t">
-                          <div className="flex items-center justify-between">
-                            <div className="text-sm text-gray-600">
-                              Created by {match.creator.name || match.creator.email}
-                              {match.creator.handicap && (
-                                <span className="text-gray-400 ml-1">
-                                  (Handicap: {match.creator.handicap})
-                                </span>
-                              )}
-                            </div>
-                            
-                            <div className="flex space-x-2">
-                              {match.creatorId === session?.user?.id ? (
-                                <div className="flex space-x-2">
-                                  <Button asChild size="sm" variant="outline">
-                                    <Link href={`/matches/${match.id}/manage`}>
-                                      Manage
-                                      {match.pendingRequestsCount && match.pendingRequestsCount > 0 && (
-                                        <span className="ml-1 bg-red-500 text-white rounded-full px-2 py-1 text-xs">
-                                          {match.pendingRequestsCount}
-                                        </span>
-                                      )}
-                                    </Link>
-                                  </Button>
-                                </div>
-                              ) : match.userStatus === 'pending' ? (
-                                <Button size="sm" disabled variant="outline">
-                                  Request Pending
-                                </Button>
-                              ) : match.userStatus === 'accepted' ? (
-                                canLeaveRound(match) ? (
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    onClick={() => leaveRound.mutate(match.id)}
-                                    disabled={leaveRound.isPending}
-                                  >
-                                    {leaveRound.isPending ? 'Leaving...' : 'Leave Round'}
-                                  </Button>
-                                ) : (
-                                  <Button size="sm" disabled variant="outline">
-                                    Joined
-                                  </Button>
-                                )
-                              ) : match.userStatus === 'declined' ? (
-                                <Button size="sm" disabled variant="outline">
-                                  Request Declined
-                                </Button>
-                              ) : canRequestJoin(match) ? (
-                                <Button
-                                  size="sm"
-                                  onClick={() => joinRound.mutate(match.id)}
-                                  disabled={joinRound.isPending}
-                                >
-                                  {joinRound.isPending ? 'Requesting...' : 'Request to Join'}
-                                </Button>
-                              ) : (
-                                <Button size="sm" disabled>
-                                  {match._count.players >= match.maxPlayers ? 'Full' : 'Past Round'}
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
+                    {rounds.map((match) => (
+                      <EnhancedRoundCard
+                        key={match.id}
+                        match={match}
+                        currentUserId={session?.user?.id}
+                        roundType={activeTab}
+                        size="lg"
+                        onCardClick={() => router.push(`/matches/${match.id}`)}
+                        onJoinClick={() => joinRound.mutate(match.id)}
+                        onLeaveClick={() => leaveRound.mutate(match.id)}
+                        onManageClick={() => router.push(`/matches/${match.id}/manage`)}
+                        isLoading={joinRound.isPending || leaveRound.isPending}
+                      />
+                    ))}
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
