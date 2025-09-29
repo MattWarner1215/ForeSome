@@ -2,14 +2,14 @@
 
 import { useState, useEffect, useCallback, Suspense, useRef } from 'react'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useSession } from 'next-auth/react'
+import { useSession, signOut } from 'next-auth/react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLocationDot, faUsers, faClock, faArrowLeft, faSearch, faBars, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faUsers, faClock, faArrowLeft, faSearch, faBars, faTimes, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
 import EnhancedRoundCard from '@/components/ui/enhanced-round-card'
@@ -431,6 +431,20 @@ function RoundesPageContent() {
                 <FontAwesomeIcon icon={faClock} className="w-4 h-4 mr-3 text-gray-500" />
                 <span>Match History</span>
               </Link>
+
+              {/* Logout option */}
+              <div className="border-t border-gray-100/20 mt-1 pt-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false)
+                    signOut({ callbackUrl: '/' })
+                  }}
+                  className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-red-50/50 transition-all duration-200 hover:text-red-700"
+                >
+                  <FontAwesomeIcon icon={faRightFromBracket} className="w-4 h-4 mr-3 text-gray-500" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
             </div>
         </div>
       )}
