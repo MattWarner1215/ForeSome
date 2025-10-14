@@ -27,8 +27,14 @@ ENV NEXTAUTH_SECRET="dummy-secret-for-build"
 ENV NEXTAUTH_URL="http://localhost:3000"
 ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key"
 
-# Build Next.js application
-RUN npm run build
+# Debug: Check environment and files before build
+RUN echo "=== Environment Check ===" && \
+    echo "NODE_ENV: $NODE_ENV" && \
+    echo "DATABASE_URL: ${DATABASE_URL:0:30}..." && \
+    ls -la | head -20 && \
+    echo "=== Starting build ===" && \
+    npm run build 2>&1 | tee build.log || \
+    (echo "=== Build failed. Last 100 lines of output: ===" && tail -100 build.log && exit 1)
 
 # Expose port
 EXPOSE 3000
