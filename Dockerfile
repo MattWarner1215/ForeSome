@@ -1,39 +1,61 @@
-# Use Node.js 18
-FROM node:18-slim
-
-# Set working directory
+# Stage 1: Dependencies
+FROM node:18-alpine AS deps
+RUN apk add --no-cache libc6-compat openssl
 WORKDIR /app
 
-# Install OpenSSL for Prisma
-RUN apt-get update -y && apt-get install -y openssl
+# Install dependencies
+COPY package.json package-lock.json ./
+RUN npm ci
 
-# Copy package files
-COPY package*.json ./
+# Stage 2: Build
+FROM node:18-alpine AS builder
+RUN apk add --no-cache libc6-compat openssl
+WORKDIR /app
 
-# Install ALL dependencies (including devDependencies for build)
-RUN npm ci --ignore-scripts
-
-# Copy source code
+# Copy dependencies from deps stage
+COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
-# Generate Prisma client
+# Generate Prisma Client
 RUN npx prisma generate
 
-# Set dummy environment variables for build process
-ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co"
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-anon-key"
-ENV NEXTAUTH_SECRET="dummy-secret-for-build"
-ENV NEXTAUTH_URL="http://localhost:3000"
-ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key"
-ENV NODE_ENV="production"
-ENV SKIP_ENV_VALIDATION="true"
+# Set build environment variables
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV SKIP_ENV_VALIDATION=1
 
-# Build the application
-RUN npm run build
+# Build with all required dummy env vars
+RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
+    NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co" \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-anon-key" \
+    NEXTAUTH_SECRET="dummy-secret-for-build" \
+    NEXTAUTH_URL="http://localhost:3000" \
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key" \
+    npm run build
 
-# Expose port 3000
+# Stage 3: Runner
+FROM node:18-alpine AS runner
+RUN apk add --no-cache libc6-compat openssl
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
+
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nextjs
+
+# Copy necessary files
+COPY --from=builder /app/public ./public
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=builder /app/prisma ./prisma
+
+USER nextjs
+
 EXPOSE 3000
 
-# Start the application
-CMD ["npm", "run", "start"]
+ENV PORT=3000
+ENV HOSTNAME="0.0.0.0"
+
+CMD ["node", "server.js"]
