@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ForeSum Deployment Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            min-height: 100vh;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 20px;
+            margin: -20px -20px 40px -20px;
+            border-radius: 0 0 10px 10px;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 5px;
+        }
+
+        .toc h2 {
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .toc ul {
+            list-style: none;
+        }
+
+        .toc li {
+            margin: 8px 0;
+        }
+
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .toc a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        h2 {
+            color: #667eea;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-size: 2rem;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        h4 {
+            color: #555;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #e83e8c;
+        }
+
+        pre {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 5px;
+            overflow-x: auto;
+            margin: 20px 0;
+            line-height: 1.5;
+        }
+
+        pre code {
+            background: transparent;
+            color: #f8f8f2;
+            padding: 0;
+        }
+
+        ul, ol {
+            margin-left: 30px;
+            margin-bottom: 15px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        table th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            border-left: 4px solid #2196F3;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .success-box {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .badge-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .checklist {
+            list-style: none;
+            margin-left: 0;
+        }
+
+        .checklist li:before {
+            content: " ";
+            margin-right: 8px;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 2px solid #eee;
+            color: #666;
+            text-align: center;
+        }
+
+        .meta-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+
+        .meta-info strong {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ForeSum Deployment Guide</h1>
+            <p>Complete build and deployment process for ForeSum to Azure Container Instance</p>
+        </header>
+
+        <nav class="toc">
+            <h2>Table of Contents</h2>
+            <ul>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#prerequisites">Prerequisites</a></li>
+                <li><a href="#build-process">Build Process</a></li>
+                <li><a href="#docker-configuration">Docker Configuration</a></li>
+                <li><a href="#azure-deployment">Azure Deployment</a></li>
+                <li><a href="#environment-variables">Environment Variables</a></li>
+                <li><a href="#monitoring">Monitoring & Management</a></li>
+                <li><a href="#troubleshooting">Troubleshooting</a></li>
+                <li><a href="#custom-domain">Custom Domain Setup</a></li>
+                <li><a href="#resources">Additional Resources</a></li>
+            </ul>
+        </nav>
+
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>ForeSum uses a containerized deployment strategy with:</p>
+            <ul>
+                <li><strong>Container Registry:</strong> Azure Container Registry (ACR) - <code>foresomeregistry.azurecr.io</code></li>
+                <li><strong>Deployment Platform:</strong> Azure Container Instance (ACI)</li>
+                <li><strong>Build Tool:</strong> Docker with multi-stage builds</li>
+                <li><strong>Runtime:</strong> Node.js 18 with custom Socket.IO server</li>
+            </ul>
+
+            <div class="meta-info">
+                <h4>Current Production Configuration</h4>
+                <ul>
+                    <li><strong>Public URL:</strong> <a href="http://foresum-app.eastus.azurecontainer.io:3000" target="_blank">http://foresum-app.eastus.azurecontainer.io:3000</a></li>
+                    <li><strong>Container IP:</strong> 20.75.179.214:3000</li>
+                    <li><strong>Resource Group:</strong> foresome-rg</li>
+                    <li><strong>Container Name:</strong> foresum-container</li>
+                    <li><strong>Image:</strong> foresomeregistry.azurecr.io/foresum:latest</li>
+                </ul>
+            </div>
+        </section>
+
+        <section id="prerequisites">
+            <h2>Prerequisites</h2>
+
+            <h3>Required Tools</h3>
+
+            <h4>1. Docker - for building container images</h4>
+            <pre><code>docker --version  # Verify installation</code></pre>
+
+            <h4>2. Azure CLI - for deploying to Azure</h4>
+            <pre><code>az --version      # Verify installation
+az login          # Authenticate with Azure</code></pre>
+
+            <h4>3. Node.js 18+ - for local development</h4>
+            <pre><code>node --version    # Should be v18.x or higher</code></pre>
+
+            <h3>Azure Resources Setup</h3>
+            <p>If deploying for the first time, create these resources:</p>
+            <pre><code># Create resource group
+az group create --name foresome-rg --location eastus
+
+# Create Azure Container Registry
+az acr create --resource-group foresome-rg \
+  --name foresomeregistry --sku Basic
+
+# Login to ACR
+az acr login --name foresomeregistry</code></pre>
+        </section>
+
+        <section id="build-process">
+            <h2>Build Process</h2>
+
+            <h3>1. Local Build (Development)</h3>
+            <pre><code># Install dependencies
+npm install
+
+# Generate Prisma client
+npm run db:generate
+
+# Build Next.js application
+npm run build
+
+# Start production server locally
+npm run start</code></pre>
+
+            <h3>2. Docker Build Process</h3>
+            <p>The build uses a single-stage Dockerfile optimized for production:</p>
+            <pre><code>FROM node:18                    # Base image
+WORKDIR /app                    # Set working directory
+COPY package*.json ./           # Copy package files
+RUN npm install                 # Install all dependencies
+COPY . .                        # Copy source code
+RUN npx prisma generate         # Generate Prisma client
+RUN npm run build               # Build Next.js app
+EXPOSE 3000                     # Expose port
+CMD ["npm", "run", "start"]     # Start server</code></pre>
+
+            <h4>Build Commands:</h4>
+            <pre><code># Build Docker image
+docker build -t foresomeregistry.azurecr.io/foresum:latest .
+
+# Optional: Tag with version
+docker tag foresomeregistry.azurecr.io/foresum:latest \
+           foresomeregistry.azurecr.io/foresum:v2
+
+# Test image locally
+docker run -p 3000:3000 \
+  -e DATABASE_URL="your-db-url" \
+  -e NEXTAUTH_SECRET="your-secret" \
+  -e NEXTAUTH_URL="http://localhost:3000" \
+  foresomeregistry.azurecr.io/foresum:latest</code></pre>
+
+            <h3>3. Build Environment Variables</h3>
+            <p>During build, dummy environment variables are used:</p>
+            <pre><code>DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-anon-key"
+NEXTAUTH_SECRET="dummy-secret-for-build"
+NEXTAUTH_URL="http://localhost:3000"</code></pre>
+            <div class="info-box">
+                <strong>Why?</strong> Next.js requires these variables at build time for static optimization, but actual values are provided at runtime.
+            </div>
+        </section>
+
+        <section id="docker-configuration">
+            <h2>Docker Configuration</h2>
+
+            <h3>Custom Server (server.js)</h3>
+            <p>ForeSum uses a custom Node.js server instead of the standard Next.js server to support Socket.IO for real-time chat:</p>
+            <pre><code>const { createServer } = require('http')
+const { Server } = require('socket.io')
+const next = require('next')
+
+// Key configuration for container deployment
+const hostname = process.env.HOSTNAME || '0.0.0.0'  // Critical for external access
+const port = process.env.PORT || 3000</code></pre>
+
+            <div class="warning-box">
+                <strong>Important:</strong> <code>hostname</code> must be <code>0.0.0.0</code> (not <code>localhost</code>) for the container to accept external connections.
+            </div>
+
+            <h3>Package.json Scripts</h3>
+            <pre><code>{
+  "dev": "node server.js",                          // Development with Socket.IO
+  "build": "next build",                            // Build Next.js app
+  "start": "NODE_ENV=production node server.js",    // Production with Socket.IO
+  "db:generate": "prisma generate",                 // Generate Prisma client
+  "db:push": "prisma db push"                       // Push schema changes
+}</code></pre>
+        </section>
+
+        <section id="azure-deployment">
+            <h2>Azure Deployment</h2>
+
+            <h3>Option 1: Automated Deployment Script</h3>
+            <p>Use the provided <code>deploy-to-azure.sh</code> script:</p>
+            <pre><code># Make script executable
+chmod +x deploy-to-azure.sh
+
+# Run deployment
+./deploy-to-azure.sh</code></pre>
+
+            <h3>Option 2: Manual Deployment Steps</h3>
+
+            <h4>Step 1: Build and Push Image</h4>
+            <pre><code># Build Docker image
+docker build -t foresomeregistry.azurecr.io/foresum:latest .
+
+# Login to Azure Container Registry
+az acr login --name foresomeregistry
+
+# Push image to registry
+docker push foresomeregistry.azurecr.io/foresum:latest</code></pre>
+
+            <h4>Step 2: Deploy Container</h4>
+            <pre><code># Generate secure secret
+NEXTAUTH_SECRET=$(openssl rand -base64 32)
+
+# Deploy to Azure Container Instance
+az container create \
+  --resource-group foresome-rg \
+  --name foresum-container \
+  --image foresomeregistry.azurecr.io/foresum:latest \
+  --dns-name-label foresum-app \
+  --ports 3000 \
+  --cpu 1 \
+  --memory 2 \
+  --os-type Linux \
+  --environment-variables \
+    NEXT_PUBLIC_SHOW_COMING_SOON=true \
+    NEXTAUTH_URL=http://foresum-app.eastus.azurecontainer.io:3000 \
+    NEXTAUTH_SECRET="$NEXTAUTH_SECRET" \
+    NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co \
+    NODE_ENV=production \
+    HOSTNAME=0.0.0.0 \
+    PORT=3000 \
+  --secure-environment-variables \
+    DATABASE_URL="your-supabase-postgres-url" \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="your-supabase-anon-key" \
+  --registry-login-server foresomeregistry.azurecr.io</code></pre>
+
+            <h4>Step 3: Update Existing Container</h4>
+            <p>If the container already exists:</p>
+            <pre><code># Delete existing container
+az container delete --resource-group foresome-rg \
+  --name foresum-container --yes
+
+# Redeploy with new image (use command from Step 2)</code></pre>
+        </section>
+
+        <section id="environment-variables">
+            <h2>Environment Variables</h2>
+
+            <h3>Public Variables (Non-sensitive)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Value</th>
+                        <th>Purpose</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>NEXT_PUBLIC_SHOW_COMING_SOON</code></td>
+                        <td><code>true</code></td>
+                        <td>Show coming soon page</td>
+                    </tr>
+                    <tr>
+                        <td><code>NEXTAUTH_URL</code></td>
+                        <td><code>http://foresum-app.eastus.azurecontainer.io:3000</code></td>
+                        <td>Auth callback URL</td>
+                    </tr>
+                    <tr>
+                        <td><code>NEXT_PUBLIC_SUPABASE_URL</code></td>
+                        <td><code>https://npmksisxmjgnqytcduhs.supabase.co</code></td>
+                        <td>Supabase project URL</td>
+                    </tr>
+                    <tr>
+                        <td><code>NODE_ENV</code></td>
+                        <td><code>production</code></td>
+                        <td>Node environment</td>
+                    </tr>
+                    <tr>
+                        <td><code>HOSTNAME</code></td>
+                        <td><code>0.0.0.0</code></td>
+                        <td>Server bind address</td>
+                    </tr>
+                    <tr>
+                        <td><code>PORT</code></td>
+                        <td><code>3000</code></td>
+                        <td>Server port</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Secure Variables (Sensitive)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Variable</th>
+                        <th>Purpose</th>
+                        <th>How to Get</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>DATABASE_URL</code></td>
+                        <td>PostgreSQL connection</td>
+                        <td>Supabase Dashboard ’ Settings ’ Database</td>
+                    </tr>
+                    <tr>
+                        <td><code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code></td>
+                        <td>Supabase client key</td>
+                        <td>Supabase Dashboard ’ Settings ’ API</td>
+                    </tr>
+                    <tr>
+                        <td><code>NEXTAUTH_SECRET</code></td>
+                        <td>Session encryption</td>
+                        <td>Generate: <code>openssl rand -base64 32</code></td>
+                    </tr>
+                    <tr>
+                        <td><code>GOOGLE_CLIENT_ID</code></td>
+                        <td>Google OAuth</td>
+                        <td>Google Cloud Console</td>
+                    </tr>
+                    <tr>
+                        <td><code>GOOGLE_CLIENT_SECRET</code></td>
+                        <td>Google OAuth</td>
+                        <td>Google Cloud Console</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4>Environment Variable Notes</h4>
+                <ol>
+                    <li><strong>NEXTAUTH_URL Protocol:</strong> Must use HTTP (not HTTPS) to match container protocol</li>
+                    <li><strong>Hostname Binding:</strong> Must be <code>0.0.0.0</code> for external access, not <code>localhost</code></li>
+                    <li><strong>Database Connection:</strong> Use Supabase pooled connection with <code>pgbouncer=true</code></li>
+                    <li><strong>Secrets Management:</strong> Use <code>--secure-environment-variables</code> for sensitive data</li>
+                </ol>
+            </div>
+        </section>
+
+        <section id="monitoring">
+            <h2>Monitoring & Management</h2>
+
+            <h3>Check Container Status</h3>
+            <pre><code># View container details
+az container show --resource-group foresome-rg \
+  --name foresum-container
+
+# Get container state
+az container show --resource-group foresome-rg \
+  --name foresum-container \
+  --query "containers[0].instanceView.currentState"
+
+# Get IP address
+az container show --resource-group foresome-rg \
+  --name foresum-container \
+  --query "ipAddress.ip" --output tsv</code></pre>
+
+            <h3>View Logs</h3>
+            <pre><code># View container logs
+az container logs --resource-group foresome-rg \
+  --name foresum-container
+
+# Follow logs (stream)
+az container logs --resource-group foresome-rg \
+  --name foresum-container --follow</code></pre>
+
+            <h3>Container Resource Usage</h3>
+            <pre><code># View resource allocation
+az container show --resource-group foresome-rg \
+  --name foresum-container \
+  --query "containers[0].resources"</code></pre>
+
+            <h3>Restart Container</h3>
+            <pre><code># Restart container
+az container restart --resource-group foresome-rg \
+  --name foresum-container</code></pre>
+        </section>
+
+        <section id="troubleshooting">
+            <h2>Troubleshooting</h2>
+
+            <h3>Common Issues</h3>
+
+            <div class="warning-box">
+                <h4>1. Site Not Accessible</h4>
+                <p><strong>Symptom:</strong> Cannot reach http://foresum-app.eastus.azurecontainer.io:3000</p>
+                <p><strong>Solutions:</strong></p>
+                <ul>
+                    <li>Check hostname binding in <code>server.js</code> - must be <code>0.0.0.0</code></li>
+                    <li>Verify port 3000 is exposed in container</li>
+                    <li>Check container status: <code>az container show ...</code></li>
+                    <li>View logs for errors: <code>az container logs ...</code></li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>2. Authentication Failures</h4>
+                <p><strong>Symptom:</strong> NextAuth login redirects fail or show errors</p>
+                <p><strong>Solutions:</strong></p>
+                <ul>
+                    <li>Verify <code>NEXTAUTH_URL</code> uses HTTP (not HTTPS)</li>
+                    <li>Ensure <code>NEXTAUTH_URL</code> includes port number <code>:3000</code></li>
+                    <li>Check <code>NEXTAUTH_SECRET</code> is set and secure</li>
+                    <li>Verify Google OAuth redirect URLs match container URL</li>
+                </ul>
+            </div>
+
+            <div class="warning-box">
+                <h4>3. Database Connection Errors</h4>
+                <p><strong>Symptom:</strong> "Unable to connect to database" errors</p>
+                <p><strong>Solutions:</strong></p>
+                <ul>
+                    <li>Verify <code>DATABASE_URL</code> is correctly formatted</li>
+                    <li>Check Supabase database is accessible</li>
+                    <li>Ensure connection pooling parameters are set</li>
+                    <li>Test connection from local environment first</li>
+                </ul>
+            </div>
+
+            <h3>Deployment Checklist</h3>
+            <p>Before deploying to production:</p>
+            <ul class="checklist">
+                <li>Update <code>.env.local</code> with production values</li>
+                <li>Generate new <code>NEXTAUTH_SECRET</code> for production</li>
+                <li>Run database migrations: <code>npm run db:push</code></li>
+                <li>Test build locally: <code>docker build ...</code></li>
+                <li>Verify all environment variables are set</li>
+                <li>Check database schema matches Prisma schema</li>
+                <li>Update Google OAuth redirect URLs</li>
+                <li>Test container locally before pushing</li>
+                <li>Push image to ACR: <code>docker push ...</code></li>
+                <li>Deploy to ACI: <code>az container create ...</code></li>
+                <li>Verify deployment: Check logs and access URL</li>
+                <li>Test authentication flow end-to-end</li>
+                <li>Test Socket.IO real-time features</li>
+            </ul>
+        </section>
+
+        <section id="custom-domain">
+            <h2>Custom Domain Setup</h2>
+            <p>To point your Azure Container Instance at your custom domain, you have several options:</p>
+
+            <h3>Option 1: Azure Application Gateway<span class="badge badge-info">Recommended for Enterprise</span></h3>
+            <p><strong>Best for:</strong> Enterprise-grade production deployments with SSL termination and load balancing.</p>
+            <pre><code># 1. Create Application Gateway with your domain
+az network application-gateway create \
+  --name foresum-gateway \
+  --resource-group foresome-rg \
+  --location eastus \
+  --sku Standard_v2 \
+  --public-ip-address foresum-public-ip \
+  --vnet-name foresum-vnet \
+  --subnet gateway-subnet
+
+# 2. Configure backend pool to point to container IP
+az network application-gateway address-pool create \
+  --gateway-name foresum-gateway \
+  --resource-group foresome-rg \
+  --name foresum-backend \
+  --servers 20.75.179.214
+
+# 3. Point your domain DNS A record to the gateway public IP
+# In your domain registrar: yourdomain.com ’ gateway IP</code></pre>
+
+            <div class="success-box">
+                <strong>Benefits:</strong>
+                <ul>
+                    <li>Full SSL/TLS termination</li>
+                    <li>Load balancing capabilities</li>
+                    <li>Web Application Firewall (WAF) support</li>
+                    <li>Azure-native integration</li>
+                </ul>
+                <strong>Costs:</strong> ~$140/month for Standard_v2 SKU
+            </div>
+
+            <h3>Option 2: Azure Front Door<span class="badge badge-info">Global CDN</span></h3>
+            <p><strong>Best for:</strong> Global distribution with CDN capabilities and DDoS protection.</p>
+            <pre><code># Create Front Door profile
+az afd profile create \
+  --profile-name foresum-frontdoor \
+  --resource-group foresome-rg \
+  --sku Standard_AzureFrontDoor
+
+# Add custom domain
+az afd custom-domain create \
+  --custom-domain-name yourdomain \
+  --profile-name foresum-frontdoor \
+  --resource-group foresome-rg \
+  --host-name yourdomain.com
+
+# Create origin pointing to container
+az afd origin create \
+  --origin-name foresum-container \
+  --profile-name foresum-frontdoor \
+  --origin-group-name default-origin-group \
+  --resource-group foresome-rg \
+  --host-name foresum-app.eastus.azurecontainer.io \
+  --origin-host-header foresum-app.eastus.azurecontainer.io \
+  --http-port 3000</code></pre>
+
+            <div class="success-box">
+                <strong>Benefits:</strong>
+                <ul>
+                    <li>Global CDN with edge locations</li>
+                    <li>Automatic SSL certificates</li>
+                    <li>DDoS protection</li>
+                    <li>Better performance for global users</li>
+                </ul>
+                <strong>Costs:</strong> ~$35/month base + data transfer
+            </div>
+
+            <h3>Option 3: Cloudflare Tunnel<span class="badge badge-success">FREE</span></h3>
+            <p><strong>Best for:</strong> Quick setup, free SSL, no Azure infrastructure changes needed.</p>
+            <pre><code># 1. Install cloudflared
+brew install cloudflared
+
+# 2. Authenticate with Cloudflare
+cloudflared tunnel login
+
+# 3. Create tunnel
+cloudflared tunnel create foresum
+
+# 4. Configure tunnel (create config.yml)
+cat > ~/.cloudflared/config.yml <<EOF
+tunnel: &lt;tunnel-id-from-step-3&gt;
+credentials-file: ~/.cloudflared/&lt;tunnel-id&gt;.json
+
+ingress:
+  - hostname: yourdomain.com
+    service: http://foresum-app.eastus.azurecontainer.io:3000
+  - service: http_status:404
+EOF
+
+# 5. Route DNS (automatically creates CNAME in Cloudflare)
+cloudflared tunnel route dns foresum yourdomain.com
+
+# 6. Run tunnel (or install as service)
+cloudflared tunnel run foresum
+
+# Optional: Install as system service for auto-restart
+cloudflared service install</code></pre>
+
+            <div class="success-box">
+                <strong>Benefits:</strong>
+                <ul>
+                    <li><strong>FREE</strong> SSL certificates</li>
+                    <li>No Azure infrastructure changes</li>
+                    <li>DDoS protection</li>
+                    <li>Analytics dashboard</li>
+                    <li>Easy setup and maintenance</li>
+                </ul>
+                <strong>Costs:</strong> Free (Cloudflare Free plan)
+            </div>
+
+            <h3>Option 4: Simple DNS CNAME<span class="badge badge-warning">Testing Only</span></h3>
+            <p><strong>Best for:</strong> Testing only - NOT recommended for production.</p>
+            <pre><code>Type: CNAME
+Name: www (or @)
+Value: foresum-app.eastus.azurecontainer.io</code></pre>
+
+            <div class="warning-box">
+                <strong>Limitations:</strong>
+                <ul>
+                    <li>No SSL/HTTPS encryption</li>
+                    <li>Port 3000 visible in URL</li>
+                    <li>Not suitable for production</li>
+                    <li>Security warnings in browsers</li>
+                </ul>
+            </div>
+
+            <h3>Option 5: Azure Container Apps<span class="badge badge-success">RECOMMENDED</span></h3>
+            <p><strong>Best for:</strong> Modern production deployment with built-in custom domain support.</p>
+            <p>Azure Container Apps is the successor to Container Instances with better features:</p>
+            <pre><code># 1. Create Container Apps environment
+az containerapp env create \
+  --name foresum-env \
+  --resource-group foresome-rg \
+  --location eastus
+
+# 2. Deploy app
+az containerapp create \
+  --name foresum \
+  --resource-group foresome-rg \
+  --environment foresum-env \
+  --image foresomeregistry.azurecr.io/foresum:latest \
+  --target-port 3000 \
+  --ingress external \
+  --registry-server foresomeregistry.azurecr.io \
+  --cpu 1 --memory 2Gi \
+  --min-replicas 1 --max-replicas 3 \
+  --env-vars \
+    NEXT_PUBLIC_SHOW_COMING_SOON=true \
+    NODE_ENV=production \
+    HOSTNAME=0.0.0.0 \
+    PORT=3000 \
+  --secrets \
+    database-url=&lt;your-database-url&gt; \
+    nextauth-secret=&lt;your-secret&gt; \
+    supabase-key=&lt;your-key&gt;
+
+# 3. Add custom domain (requires domain verification)
+az containerapp hostname add \
+  --name foresum \
+  --resource-group foresome-rg \
+  --hostname yourdomain.com
+
+# 4. Bind free managed certificate
+az containerapp hostname bind \
+  --name foresum \
+  --resource-group foresome-rg \
+  --hostname yourdomain.com \
+  --environment foresum-env \
+  --validation-method CNAME</code></pre>
+
+            <div class="success-box">
+                <strong>Benefits:</strong>
+                <ul>
+                    <li><strong>Free managed SSL certificates</strong> (auto-renewal)</li>
+                    <li>Automatic HTTPS (no port numbers)</li>
+                    <li>Built-in autoscaling (0-N replicas)</li>
+                    <li>Better for microservices</li>
+                    <li>Simpler than Container Instances</li>
+                    <li>Same or lower pricing</li>
+                </ul>
+                <strong>Costs:</strong> ~$15-30/month (similar to ACI)
+            </div>
+
+            <h3>Comparison Table</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Option</th>
+                        <th>SSL</th>
+                        <th>Cost</th>
+                        <th>Setup Difficulty</th>
+                        <th>Best For</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Application Gateway</strong></td>
+                        <td> Yes</td>
+                        <td>~$140/mo</td>
+                        <td>Hard</td>
+                        <td>Enterprise production</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Front Door</strong></td>
+                        <td> Yes</td>
+                        <td>~$35/mo</td>
+                        <td>Medium</td>
+                        <td>Global CDN needs</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Cloudflare Tunnel</strong></td>
+                        <td> Yes</td>
+                        <td>Free</td>
+                        <td>Easy</td>
+                        <td>Quick setup, cost-effective</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Container Apps</strong></td>
+                        <td> Yes</td>
+                        <td>~$15-30/mo</td>
+                        <td>Easy</td>
+                        <td>Modern Azure deployment</td>
+                    </tr>
+                    <tr>
+                        <td><strong>DNS CNAME</strong></td>
+                        <td>L No</td>
+                        <td>Free</td>
+                        <td>Very Easy</td>
+                        <td>Testing only</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="info-box">
+                <h4>Recommended Solution for ForeSum</h4>
+                <p>We recommend <strong>Option 5: Azure Container Apps</strong> because:</p>
+                <ol>
+                    <li><strong>Built-in SSL:</strong> Free managed certificates with auto-renewal</li>
+                    <li><strong>Modern Platform:</strong> Microsoft's recommended path forward</li>
+                    <li><strong>Cost-Effective:</strong> Similar pricing to Container Instances</li>
+                    <li><strong>Easy Migration:</strong> Uses same Docker images</li>
+                    <li><strong>Better Features:</strong> Auto-scaling, secrets management, easier domain setup</li>
+                    <li><strong>Clean URLs:</strong> No port numbers, proper HTTPS</li>
+                </ol>
+            </div>
+
+            <h3>Post-Migration Checklist</h3>
+            <p>After setting up custom domain:</p>
+            <ul class="checklist">
+                <li>Update <code>NEXTAUTH_URL</code> to use custom domain</li>
+                <li>Update Google OAuth redirect URLs</li>
+                <li>Update any hardcoded URLs in frontend</li>
+                <li>Test authentication flow end-to-end</li>
+                <li>Verify SSL certificate is valid</li>
+                <li>Test Socket.IO connections over HTTPS</li>
+                <li>Update documentation with new URL</li>
+                <li>Configure DNS CAA records (optional)</li>
+                <li>Set up monitoring for SSL expiration</li>
+            </ul>
+        </section>
+
+        <section id="resources">
+            <h2>Additional Resources</h2>
+            <ul>
+                <li><a href="https://docs.microsoft.com/azure/container-instances/" target="_blank">Azure Container Instances Docs</a></li>
+                <li><a href="https://docs.microsoft.com/azure/container-registry/" target="_blank">Azure Container Registry Docs</a></li>
+                <li><a href="https://docs.microsoft.com/azure/container-apps/" target="_blank">Azure Container Apps Docs</a></li>
+                <li><a href="https://developers.cloudflare.com/cloudflare-one/connections/connect-apps/" target="_blank">Cloudflare Tunnel Docs</a></li>
+                <li><a href="https://nextjs.org/docs/deployment" target="_blank">Next.js Deployment</a></li>
+                <li><a href="https://docs.docker.com/" target="_blank">Docker Documentation</a></li>
+                <li><a href="https://www.prisma.io/docs/guides/deployment" target="_blank">Prisma Deployment</a></li>
+            </ul>
+        </section>
+
+        <footer>
+            <div class="meta-info">
+                <p><strong>Last Updated:</strong> 2025-10-07</p>
+                <p><strong>Production URL:</strong> <a href="http://foresum-app.eastus.azurecontainer.io:3000" target="_blank">http://foresum-app.eastus.azurecontainer.io:3000</a></p>
+                <p><strong>Registry:</strong> foresomeregistry.azurecr.io</p>
+            </div>
+            <p style="margin-top: 20px; color: #999;">ForeSum Deployment Guide &copy; 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

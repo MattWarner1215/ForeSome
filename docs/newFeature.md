@@ -24,7 +24,7 @@ Based on analysis of the current website, here's what I've found and my recommen
 
 ### **1. Real-Time Features**
 ```
-- Live chat for each round
+
 - Push notifications for join requests
 - Real-time weather integration for courses
 - Live round updates/scoring during play

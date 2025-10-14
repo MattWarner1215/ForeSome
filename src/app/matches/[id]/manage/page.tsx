@@ -232,7 +232,7 @@ export default function ManageRoundPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button asChild variant="ghost">
-                <Link href="/matches">
+                <Link href="/rounds">
                   <FontAwesomeIcon icon={faArrowLeft} className="h-4 w-4 mr-2" />
                   Back to Rounds
                 </Link>

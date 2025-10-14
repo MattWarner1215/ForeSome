@@ -74,9 +74,16 @@ ngrok http 3000
    - Set authorized redirect URIs: `http://localhost:3000/api/auth/callback/google` (development), `https://your-domain.com/api/auth/callback/google` (production)
    - Set `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in your environment
 7. (Optional) Set `GOLF_COURSE_API_KEY` for enhanced course search - get free key at https://golfcourseapi.com/
-8. Run `npm run db:generate && npm run db:push` to initialize database
-9. Run `npx tsx scripts/setup-supabase-storage.ts` to create storage buckets
-10. Run `npx tsx scripts/seed-golf-courses.ts` to populate the golf course database with 171+ Ohio courses
+8. Set up Google Maps API for rounds location mapping:
+   - Go to [Google Cloud Console](https://console.cloud.google.com/)
+   - Enable Maps JavaScript API and Geocoding API
+   - Create an API key and restrict it to your domain
+   - Set `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in your environment
+9. Run `npm run db:generate && npm run db:push` to initialize database
+10. Run `npx tsx scripts/setup-supabase-storage.ts` to create storage buckets
+11. Run `npx tsx scripts/seed-golf-courses.ts` to populate the golf course database with 172 Ohio courses
+12. (Optional) Run `node scripts/update-golf-course-coordinates.js` to geocode golf course coordinates
+13. (Optional) Run `node scripts/remove-duplicate-golf-courses.js` to clean up duplicate course records
 
 ## Architecture Overview
 
@@ -87,7 +94,7 @@ ngrok http 3000
 - **Authentication**: NextAuth.js with credentials provider
 - **State Management**: TanStack Query (server state) + Zustand (client state)
 - **UI**: Tailwind CSS + shadcn/ui components
-- **Golf Course Data**: Database-driven golf course search with 171+ Ohio courses
+- **Golf Course Data**: Database-driven golf course search with 172 Ohio courses (95 with coordinates, 55.2% coverage)
 
 ### Database Schema Architecture
 The schema is designed around golf round-making with these core relationships:
@@ -224,6 +231,33 @@ The schema is designed around golf round-making with these core relationships:
 - `/src/app/api/profile/avatar/route.ts` - Migrated avatar upload/delete API
 - `/scripts/setup-supabase-storage.ts` - Storage bucket setup utility
 - `.env.local` - Supabase configuration variables
+
+## Google Maps Integration (Latest Update)
+
+### Interactive Maps for Golf Round Discovery
+- **Location-based round finding**: Users can view public rounds on an interactive map
+- **Google Maps API integration**: Full-featured maps with custom markers and controls
+- **Distance calculations**: Shows distance from user's location to each golf course
+- **Real-time geolocation**: Browser-based location detection for accurate distance measurements
+
+### Golf Course Coordinate System
+- **Database**: 172 Ohio golf courses with 95 having precise GPS coordinates (55.2% coverage)
+- **Geocoding**: Automated coordinate lookup using OpenStreetMap Nominatim API
+- **Data quality**: Duplicate records removed, prioritizing entries with coordinate data
+- **Coverage areas**: Comprehensive coverage across Ohio including Columbus, Cleveland, Cincinnati, Toledo, and Dayton regions
+
+### Maps Implementation Features
+- **Interactive markers**: Green pins for golf courses, blue pin for user location
+- **Course information**: Click markers to view round details, dates, and player counts
+- **Responsive design**: Mobile-optimized with touch controls and proper sizing
+- **Modern UI**: Glassmorphism design with smooth animations and hover effects
+- **Distance sorting**: Rounds automatically sorted by proximity to user
+
+### Key Maps Files
+- `/src/components/ui/google-maps.tsx` - Main Google Maps component with interactive features
+- `/src/app/api/rounds/locations/route.ts` - API endpoint for round location data with coordinate matching
+- `/scripts/update-golf-course-coordinates.js` - Geocoding script for coordinate population
+- `/scripts/remove-duplicate-golf-courses.js` - Database cleanup for duplicate course removal
 
 ### Benefits of Supabase Storage
 - **Scalability**: No more large files in Git repository

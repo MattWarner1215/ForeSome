@@ -9,8 +9,9 @@ export async function GET(request: Request) {
     const zipCode = searchParams.get('zipCode')
     const myMatches = searchParams.get('myMatches') === 'true'
     const publicParam = searchParams.get('public')
+    const privateParam = searchParams.get('private')
     const publicOnly = publicParam === 'true'
-    const privateOnly = publicParam === 'false'
+    const privateOnly = privateParam === 'true'
     const showCompleted = searchParams.get('showCompleted') === 'true'
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : undefined
     
@@ -105,21 +106,21 @@ export async function GET(request: Request) {
           id: 'no-rounds-found'
         })
       }
-    } else if (zipCode) {
-      whereClause = addActiveMatchFilters({
-        zipCode: zipCode,
-        isPublic: true,
-        creatorId: {
-          not: session.user.id
-        }
-      })
     } else {
-      whereClause = addActiveMatchFilters({
+      // Default behavior: show public rounds, excluding user's own rounds
+      let defaultClause: any = {
         isPublic: true,
         creatorId: {
           not: session.user.id
         }
-      })
+      }
+
+      // If zipCode is provided, add it to the filter
+      if (zipCode) {
+        defaultClause.zipCode = zipCode
+      }
+
+      whereClause = addActiveMatchFilters(defaultClause)
     }
 
     const rounds = await prisma.match.findMany({

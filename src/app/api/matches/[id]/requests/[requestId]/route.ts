@@ -89,14 +89,29 @@ export async function PUT(
         console.error('Failed to create join approved notification:', error)
       }
 
-      console.log('Request accepted:', { 
-        matchId, 
-        requestId, 
+      console.log('Request accepted:', {
+        matchId,
+        requestId,
         playerId: matchRequest.playerId,
         playerName: matchRequest.player.name || matchRequest.player.email
       })
 
-      return NextResponse.json({ 
+      // Delete related join request notifications since the request is now resolved
+      try {
+        await prisma.notification.deleteMany({
+          where: {
+            type: 'join_request',
+            matchId: matchId,
+            metadata: {
+              contains: matchRequest.playerId
+            }
+          }
+        })
+      } catch (error) {
+        console.error('Failed to clean up join request notifications:', error)
+      }
+
+      return NextResponse.json({
         message: `Request accepted. ${matchRequest.player.name || matchRequest.player.email} has been added to the match.`,
         success: true
       })
@@ -118,14 +133,29 @@ export async function PUT(
         where: { id: requestId }
       })
 
-      console.log('Request declined:', { 
-        matchId, 
-        requestId, 
+      console.log('Request declined:', {
+        matchId,
+        requestId,
         playerId: matchRequest.playerId,
         playerName: matchRequest.player.name || matchRequest.player.email
       })
 
-      return NextResponse.json({ 
+      // Delete related join request notifications since the request is now resolved
+      try {
+        await prisma.notification.deleteMany({
+          where: {
+            type: 'join_request',
+            matchId: matchId,
+            metadata: {
+              contains: matchRequest.playerId
+            }
+          }
+        })
+      } catch (error) {
+        console.error('Failed to clean up join request notifications:', error)
+      }
+
+      return NextResponse.json({
         message: `Request declined and removed.`,
         success: true
       })

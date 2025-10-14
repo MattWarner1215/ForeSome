@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
@@ -101,8 +101,14 @@ export default function PublicRoundsPage() {
     )
   }
 
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (status !== 'loading' && !session) {
+      router.push('/auth/signin')
+    }
+  }, [session, status, router])
+
   if (!session) {
-    router.push('/auth/signin')
     return null
   }
 

@@ -81,10 +81,10 @@ export function NotificationBell() {
         throw new Error('Invalid JSON response from server')
       }
     },
-    staleTime: 0, // Always fetch fresh notification data
+    staleTime: 5000, // Cache for 5 seconds to avoid constant refetching
     gcTime: 300000, // 5 minutes
     refetchOnWindowFocus: true, // Refresh when user returns to tab
-    refetchInterval: 2000, // Auto-refresh every 2 seconds for notifications
+    refetchInterval: 5000, // Reduced frequency to every 5 seconds
     refetchIntervalInBackground: false // Don't refetch when tab is not active
   })
 
@@ -110,7 +110,37 @@ export function NotificationBell() {
         throw new Error('Invalid JSON response from server')
       }
     },
-    onSuccess: () => {
+    onMutate: async (notificationIds: string[]) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['notifications'] })
+
+      // Snapshot the previous value for rollback
+      const previousNotifications = queryClient.getQueryData<NotificationResponse>(['notifications'])
+
+      // Optimistically update notifications to mark as read
+      if (previousNotifications) {
+        const updatedNotifications = {
+          ...previousNotifications,
+          notifications: previousNotifications.notifications.map(notification =>
+            notificationIds.includes(notification.id)
+              ? { ...notification, isRead: true }
+              : notification
+          ),
+          unreadCount: Math.max(0, previousNotifications.unreadCount - notificationIds.length)
+        }
+        queryClient.setQueryData(['notifications'], updatedNotifications)
+      }
+
+      return { previousNotifications }
+    },
+    onError: (err, notificationIds, context) => {
+      // Rollback on error
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(['notifications'], context.previousNotifications)
+      }
+    },
+    onSettled: () => {
+      // Invalidate and refetch after mutation completes
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
     }
   })
@@ -137,7 +167,35 @@ export function NotificationBell() {
         throw new Error('Invalid JSON response from server')
       }
     },
-    onSuccess: () => {
+    onMutate: async () => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['notifications'] })
+
+      // Snapshot the previous value for rollback
+      const previousNotifications = queryClient.getQueryData<NotificationResponse>(['notifications'])
+
+      // Optimistically mark all notifications as read
+      if (previousNotifications) {
+        const updatedNotifications = {
+          ...previousNotifications,
+          notifications: previousNotifications.notifications.map(notification =>
+            ({ ...notification, isRead: true })
+          ),
+          unreadCount: 0
+        }
+        queryClient.setQueryData(['notifications'], updatedNotifications)
+      }
+
+      return { previousNotifications }
+    },
+    onError: (err, variables, context) => {
+      // Rollback on error
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(['notifications'], context.previousNotifications)
+      }
+    },
+    onSettled: () => {
+      // Invalidate and refetch after mutation completes
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
     }
   })
@@ -164,7 +222,38 @@ export function NotificationBell() {
         throw new Error('Invalid JSON response from server')
       }
     },
-    onSuccess: () => {
+    onMutate: async (notificationId: string) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: ['notifications'] })
+
+      // Snapshot the previous value for rollback
+      const previousNotifications = queryClient.getQueryData<NotificationResponse>(['notifications'])
+
+      // Optimistically remove notification
+      if (previousNotifications) {
+        const notificationToDelete = previousNotifications.notifications.find(n => n.id === notificationId)
+        const updatedNotifications = {
+          ...previousNotifications,
+          notifications: previousNotifications.notifications.filter(notification =>
+            notification.id !== notificationId
+          ),
+          unreadCount: notificationToDelete && !notificationToDelete.isRead
+            ? Math.max(0, previousNotifications.unreadCount - 1)
+            : previousNotifications.unreadCount
+        }
+        queryClient.setQueryData(['notifications'], updatedNotifications)
+      }
+
+      return { previousNotifications }
+    },
+    onError: (err, notificationId, context) => {
+      // Rollback on error
+      if (context?.previousNotifications) {
+        queryClient.setQueryData(['notifications'], context.previousNotifications)
+      }
+    },
+    onSettled: () => {
+      // Invalidate and refetch after mutation completes
       queryClient.invalidateQueries({ queryKey: ['notifications'] })
     }
   })
@@ -336,17 +425,17 @@ export function NotificationBell() {
               right: `${dropdownPosition.right}px`
             }}
           >
-            <Card className="w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 shadow-lg">
-              <CardHeader className="pb-3">
+            <Card className="w-96 max-h-96 overflow-y-auto bg-white border border-gray-200 shadow-xl rounded-xl">
+              <CardHeader className="bg-gradient-to-r from-green-50 to-white border-b border-green-100 pb-3">
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-lg font-semibold">Notifications</CardTitle>
+                  <CardTitle className="text-lg font-bold text-green-800">Notifications</CardTitle>
                   <div className="flex items-center gap-2">
                     {unreadCount > 0 && (
                       <Button
                         size="sm"
                         variant="ghost"
                         onClick={handleMarkAllAsRead}
-                        className="text-xs h-7 px-2"
+                        className="text-xs h-7 px-2 text-green-700 hover:bg-green-100 hover:text-green-800 transition-all duration-200"
                       >
                         <FontAwesomeIcon icon={faCheckDouble} className="h-3 w-3 mr-1" />
                         Mark all read
@@ -356,7 +445,7 @@ export function NotificationBell() {
                       size="sm"
                       variant="ghost"
                       onClick={() => setIsOpen(false)}
-                      className="h-7 w-7 p-0"
+                      className="h-7 w-7 p-0 text-gray-500 hover:bg-green-100 hover:text-green-700 transition-all duration-200"
                     >
                       <FontAwesomeIcon icon={faTimes} className="h-3 w-3" />
                     </Button>
@@ -389,7 +478,7 @@ export function NotificationBell() {
                             <div className={`flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center shadow-sm ${getNotificationColor(notification.type)}`}>
                               {notification.type === 'match_update' && notification.match ? (
                                 <img
-                                  src={LOGO_IMAGES[notification.match.course] || '/images/default-logo.png'}
+                                  src={LOGO_IMAGES[notification.match.course as keyof typeof LOGO_IMAGES] || '/images/default-logo.png'}
                                   alt={notification.match.course}
                                   className="w-7 h-7 rounded-full object-cover"
                                 />

@@ -104,24 +104,39 @@ export default function LandingPage() {
   // Show landing page for unauthenticated users
   return (
     <div className="h-screen bg-gradient-to-br from-emerald-50 via-slate-50 to-green-50 flex items-center justify-center p-3 relative overflow-hidden">
-      {/* Modern Golf Images Background Carousel */}
+      {/* Modern Golf Images Background Carousel with Parallax */}
       <div className="absolute inset-0">
         <div className="relative w-full h-full">
           <img
             src={golfCarouselData[currentCarouselIndex].image}
             alt="Golf background"
-            className="w-full h-full object-cover transition-all duration-2000 ease-out scale-105"
+            className="parallax-layer w-full h-full object-cover transition-all duration-2000 ease-out animate-parallax-slow"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/40 via-slate-900/30 to-green-900/50"></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-900/40 via-slate-900/30 to-green-900/50 animate-parallax-medium"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent gradient-mesh"></div>
         </div>
       </div>
 
-      {/* Floating particles animation */}
+      {/* Animated Golf Video Hero - Fade In and Dissolve */}
+      <div className="absolute inset-0 pointer-events-none z-10">
+        <video
+          autoPlay
+          muted
+          playsInline
+          className="w-full h-full object-cover opacity-0 animate-video-fade-dissolve"
+          style={{mixBlendMode: 'screen'}}
+        >
+          <source src="/videos/golf-animation.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      {/* Enhanced Floating particles animation */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 left-1/4 w-2 h-2 bg-white/20 rounded-full animate-bounce" style={{animationDelay: '0s', animationDuration: '3s'}}></div>
         <div className="absolute top-1/3 right-1/3 w-1 h-1 bg-emerald-300/30 rounded-full animate-bounce" style={{animationDelay: '1s', animationDuration: '4s'}}></div>
         <div className="absolute bottom-1/4 left-1/3 w-3 h-3 bg-green-200/20 rounded-full animate-bounce" style={{animationDelay: '2s', animationDuration: '5s'}}></div>
+        <div className="absolute top-1/2 left-1/2 w-2 h-2 bg-teal-200/25 rounded-full animate-bounce" style={{animationDelay: '0.5s', animationDuration: '3.5s'}}></div>
+        <div className="absolute bottom-1/3 right-1/4 w-1.5 h-1.5 bg-green-300/20 rounded-full animate-bounce" style={{animationDelay: '1.5s', animationDuration: '4.5s'}}></div>
       </div>
 
       <div className="relative w-full max-w-6xl z-20 px-2 sm:px-4 h-full flex items-center">
@@ -137,7 +152,7 @@ export default function LandingPage() {
                 />
               </div>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 bg-clip-text text-transparent mb-2 shimmer-text">
               Welcome to ForeSum
             </h1>
             <CardDescription className="text-slate-600 text-sm sm:text-base md:text-lg px-4 sm:px-0 font-medium max-w-2xl mx-auto leading-relaxed">
@@ -167,7 +182,7 @@ export default function LandingPage() {
             {/* Compact Features Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mb-4 sm:mb-6">
               {/* Enhanced Find Rounds Card */}
-              <Card className="group relative bg-gradient-to-br from-emerald-50/90 via-white/80 to-green-50/70 backdrop-blur-2xl shadow-2xl border border-emerald-200/50 rounded-[2rem] hover:shadow-emerald-500/25 hover:shadow-3xl hover:border-emerald-300/70 transition-all duration-700 hover:scale-[1.05] hover:-translate-y-2 overflow-hidden">
+              <Card className="card-3d group relative bg-gradient-to-br from-emerald-50/90 via-white/80 to-green-50/70 backdrop-blur-2xl shadow-2xl border border-emerald-200/50 rounded-[2rem] hover:shadow-emerald-500/25 hover:shadow-3xl hover:border-emerald-300/70 transition-all duration-700 hover:scale-[1.05] hover:-translate-y-2 overflow-hidden animate-card-float" style={{animationDelay: '0s'}}>
                 {/* Enhanced Decorative Background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/10 via-transparent to-green-400/15 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-200/20 to-transparent rounded-full transform translate-x-16 -translate-y-16 group-hover:scale-150 transition-transform duration-700"></div>
@@ -210,7 +225,7 @@ export default function LandingPage() {
               </Card>
 
               {/* Enhanced Create Rounds Card */}
-              <Card className="group relative bg-gradient-to-br from-blue-50/90 via-white/80 to-indigo-50/70 backdrop-blur-2xl shadow-2xl border border-blue-200/50 rounded-[2rem] hover:shadow-blue-500/25 hover:shadow-3xl hover:border-blue-300/70 transition-all duration-700 hover:scale-[1.05] hover:-translate-y-2 overflow-hidden">
+              <Card className="card-3d group relative bg-gradient-to-br from-blue-50/90 via-white/80 to-indigo-50/70 backdrop-blur-2xl shadow-2xl border border-blue-200/50 rounded-[2rem] hover:shadow-blue-500/25 hover:shadow-3xl hover:border-blue-300/70 transition-all duration-700 hover:scale-[1.05] hover:-translate-y-2 overflow-hidden animate-card-float" style={{animationDelay: '0.5s'}}>
                 {/* Enhanced Decorative Background */}
                 <div className="absolute inset-0 bg-gradient-to-br from-blue-400/10 via-transparent to-indigo-400/15 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-200/20 to-transparent rounded-full transform -translate-x-16 -translate-y-16 group-hover:scale-150 transition-transform duration-700"></div>
@@ -255,15 +270,15 @@ export default function LandingPage() {
 
             {/* Compact Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center mt-2">
-              <Button asChild size="default" className="group w-full sm:w-auto bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-[1.03] rounded-xl px-6 py-2 font-bold">
+              <Button asChild size="default" className="ripple-container group w-full sm:w-auto bg-gradient-to-r from-emerald-600 via-green-600 to-teal-600 hover:from-emerald-700 hover:via-green-700 hover:to-teal-700 shadow-xl hover:shadow-emerald-500/25 transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.98] rounded-xl px-6 py-2 font-bold">
                 <Link href="/auth/signin" className="flex items-center space-x-2">
                   <span className="group-hover:tracking-wide transition-all duration-300">Sign In</span>
-                  <FontAwesomeIcon icon={faArrowRight} className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300" />
+                  <FontAwesomeIcon icon={faArrowRight} className="h-4 w-4 group-hover:translate-x-1 transition-transform duration-300 animate-flag-wave" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="default" className="group w-full sm:w-auto border-2 border-emerald-300/70 text-emerald-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:border-emerald-400 shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 transform hover:scale-[1.03] rounded-xl px-6 py-2 font-bold backdrop-blur-sm bg-white/80">
+              <Button asChild variant="outline" size="default" className="ripple-container group w-full sm:w-auto border-2 border-emerald-300/70 text-emerald-700 hover:bg-gradient-to-r hover:from-emerald-50 hover:to-green-50 hover:border-emerald-400 shadow-xl hover:shadow-emerald-500/20 transition-all duration-300 transform hover:scale-[1.05] active:scale-[0.98] rounded-xl px-6 py-2 font-bold backdrop-blur-sm bg-white/80">
                 <Link href="/auth/signup" className="group-hover:tracking-wide transition-all duration-300 flex items-center space-x-2">
-                  <FontAwesomeIcon icon={faStar} className="h-3 w-3" />
+                  <FontAwesomeIcon icon={faStar} className="h-3 w-3 group-hover:rotate-[360deg] transition-transform duration-500" />
                   <span>Sign Up for Free</span>
                 </Link>
               </Button>

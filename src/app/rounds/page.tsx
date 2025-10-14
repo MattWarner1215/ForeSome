@@ -16,6 +16,7 @@ import EnhancedRoundCard from '@/components/ui/enhanced-round-card'
 import { NotificationBell } from '@/components/ui/notification-bell'
 import { BACKGROUND_IMAGES, LOGO_IMAGES } from '@/lib/images'
 import { invalidateMatchQueries } from '@/lib/query-invalidation'
+import { GoogleMapsCard } from '@/components/ui/google-maps'
 
 interface Round {
   id: string
@@ -135,6 +136,25 @@ function RoundesPageContent() {
     refetchOnWindowFocus: true, // Refresh when user returns to tab
     refetchInterval: 4000, // Auto-refresh every 4 seconds
     refetchIntervalInBackground: false // Don't refetch when tab is not active
+  })
+
+  // Query for rounds with location data (only for public rounds)
+  const { data: roundsWithLocations } = useQuery({
+    queryKey: ['rounds-locations', zipCodeFilter],
+    queryFn: async () => {
+      const params = new URLSearchParams()
+      if (zipCodeFilter) {
+        params.set('zipCode', zipCodeFilter)
+      }
+      const response = await fetch(`/api/rounds/locations?${params}`)
+      if (!response.ok) throw new Error('Failed to fetch round locations')
+      const data = await response.json()
+      console.log('[ROUNDS PAGE] Received rounds with locations:', data)
+      return data
+    },
+    enabled: !!session && activeTab === 'public', // Only fetch for public rounds
+    staleTime: 0, // Always fresh for debugging
+    gcTime: 0, // No cache for debugging
   })
 
   const joinRound = useMutation({
@@ -452,7 +472,7 @@ function RoundesPageContent() {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col lg:flex-row gap-8">
           {/* Sidebar */}
-          <div className="lg:w-1/4">
+          <div className="lg:w-1/4 space-y-8">
             <Card>
               <CardHeader>
                 <CardTitle>Filter Rounds</CardTitle>
@@ -497,6 +517,11 @@ function RoundesPageContent() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Google Maps Card - Show under Filter Rounds card for public rounds with locations  */}
+            {activeTab === 'public' && roundsWithLocations && roundsWithLocations.length > 0 && (
+              <GoogleMapsCard rounds={roundsWithLocations} />
+            )}
           </div>
 
           {/* Main Content */}

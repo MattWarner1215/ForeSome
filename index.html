@@ -18,18 +18,17 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            background: #0f172a;
             color: #f8fafc;
         }
 
-        /* Modern gradient background with subtle pattern */
+        /* Modern gradient background matching the site */
         .background {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 25%, #334155 50%, #475569 75%, #64748b 100%);
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
             z-index: -3;
         }
 
@@ -67,36 +66,34 @@
             position: relative;
         }
 
-        /* Logo styling with glow effect */
+        /* Logo styling matching the site */
         .logo {
-            width: 200px;
-            height: 200px;
+            width: 192px;
+            height: 192px;
             object-fit: contain;
             margin-bottom: 2rem;
-            filter: drop-shadow(0 10px 30px rgba(34, 197, 94, 0.3)) brightness(1.1);
+            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.3)) brightness(1.1);
             transition: all 0.3s ease;
         }
 
         .logo:hover {
             transform: scale(1.05);
-            filter: drop-shadow(0 15px 40px rgba(34, 197, 94, 0.4)) brightness(1.2);
+            filter: drop-shadow(0 25px 50px rgba(0, 0, 0, 0.4)) brightness(1.2);
         }
 
-        /* Modern glass morphism card */
+        /* Glassmorphism card matching the Next.js design */
         .main-card {
             background: rgba(15, 23, 42, 0.8);
-            backdrop-filter: blur(20px);
-            border-radius: 2rem;
-            padding: 3rem;
-            box-shadow:
-                0 25px 50px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(34, 197, 94, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border-radius: 1.5rem;
+            padding: 3rem 3rem 2.5rem;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(34, 197, 94, 0.2);
-            max-width: 600px;
+            max-width: 672px;
             width: 100%;
             text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
@@ -108,92 +105,79 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.1), transparent);
-            transition: left 0.6s ease;
+            background: linear-gradient(90deg, transparent, rgba(34, 197, 94, 0.05), transparent);
+            animation: shimmer 3s infinite;
         }
 
         .main-card:hover {
-            transform: translateY(-8px) scale(1.02);
-            box-shadow:
-                0 40px 80px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(34, 197, 94, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 50px rgba(34, 197, 94, 0.1);
         }
 
-        .main-card:hover::before {
-            left: 100%;
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
         }
 
-        /* Modern typography with animations */
+        /* Typography matching the site */
         .main-title {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+            background: linear-gradient(135deg, #4ade80 0%, #22c55e 50%, #16a34a 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            font-size: 4rem;
+            font-size: 3rem;
             font-weight: 900;
             margin-bottom: 1rem;
-            letter-spacing: -0.03em;
-            text-shadow: 0 0 30px rgba(34, 197, 94, 0.3);
-            animation: glow 2s ease-in-out infinite alternate;
+            letter-spacing: -0.025em;
+            animation: pulse-slow 3s infinite;
         }
 
-        @keyframes glow {
-            from {
-                text-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
-            }
-            to {
-                text-shadow: 0 0 40px rgba(34, 197, 94, 0.6);
-            }
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.9; }
         }
 
         .subtitle {
             color: #e2e8f0;
-            font-size: 1.75rem;
+            font-size: 1.875rem;
             font-weight: 300;
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
             opacity: 0.9;
         }
 
         .description {
             color: #cbd5e1;
             font-size: 1.25rem;
-            line-height: 1.8;
-            margin-bottom: 2.5rem;
-            font-weight: 400;
+            line-height: 1.75;
+            margin-bottom: 2rem;
+            font-weight: 500;
         }
 
-        /* Email form styling */
+        /* Email form matching the site */
         .email-form {
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.5rem;
             margin-bottom: 2rem;
-        }
-
-        .email-input-container {
-            position: relative;
         }
 
         .email-input {
             width: 100%;
-            padding: 1.25rem 1.5rem;
+            padding: 1rem 1.5rem;
             border: 2px solid rgba(71, 85, 105, 0.3);
-            border-radius: 1rem;
+            border-radius: 0.75rem;
             font-size: 1.125rem;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            background: rgba(15, 23, 42, 0.6);
-            color: #f8fafc;
+            background: rgba(30, 41, 59, 0.6);
+            color: #f1f5f9;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .email-input:focus {
             outline: none;
             border-color: #22c55e;
-            box-shadow:
-                0 0 0 3px rgba(34, 197, 94, 0.2),
-                0 8px 25px rgba(34, 197, 94, 0.15);
-            background: rgba(15, 23, 42, 0.8);
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+            background: rgba(30, 41, 59, 0.8);
             transform: translateY(-2px);
         }
 
@@ -201,160 +185,110 @@
             color: #94a3b8;
         }
 
-        /* Modern 3D button with hover effects */
+        /* Button matching the site's gradient design */
         .submit-button {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%);
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
             color: white;
             border: none;
-            padding: 1.25rem 2.5rem;
-            border-radius: 1rem;
+            padding: 1rem 2rem;
+            border-radius: 0.75rem;
             font-size: 1.125rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow:
-                0 10px 25px rgba(34, 197, 94, 0.3),
-                0 5px 10px rgba(0, 0, 0, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 0.75rem;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .submit-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.6s ease;
         }
 
         .submit-button:hover {
-            background: linear-gradient(135deg, #16a34a 0%, #15803d 50%, #166534 100%);
-            transform: translateY(-3px) scale(1.02);
-            box-shadow:
-                0 20px 40px rgba(34, 197, 94, 0.4),
-                0 10px 20px rgba(0, 0, 0, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
-        }
-
-        .submit-button:hover::before {
-            left: 100%;
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            transform: scale(1.02);
+            box-shadow: 0 20px 40px rgba(34, 197, 94, 0.25);
         }
 
         .submit-button:active {
-            transform: translateY(-1px) scale(1.01);
+            transform: scale(1);
         }
 
         .submit-button:disabled {
-            opacity: 0.6;
+            opacity: 0.5;
             cursor: not-allowed;
             transform: none;
         }
 
-        /* Modern message styling with animations */
+        /* Message styling matching the site */
         .message {
-            padding: 1.25rem;
-            border-radius: 1rem;
-            margin-bottom: 1rem;
+            padding: 1rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
             font-weight: 500;
             display: none;
             backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border: 1px solid;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .message::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            animation: progress 0.8s ease-out;
-        }
-
-        @keyframes progress {
-            from { transform: translateX(-100%); }
-            to { transform: translateX(0); }
+            transition: all 0.3s ease;
         }
 
         .message.success {
             background: rgba(34, 197, 94, 0.15);
-            color: #22c55e;
+            color: #4ade80;
             border-color: rgba(34, 197, 94, 0.3);
-            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.15);
-        }
-
-        .message.success::before {
-            background: linear-gradient(90deg, #22c55e, #16a34a);
         }
 
         .message.error {
             background: rgba(239, 68, 68, 0.15);
-            color: #ef4444;
+            color: #f87171;
             border-color: rgba(239, 68, 68, 0.3);
-            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+        }
+
+        .message::before {
+            content: '';
+            display: inline-block;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 50%;
+            margin-right: 0.75rem;
+            vertical-align: middle;
+        }
+
+        .message.success::before {
+            background: #22c55e;
         }
 
         .message.error::before {
-            background: linear-gradient(90deg, #ef4444, #dc2626);
+            background: #ef4444;
         }
 
-        /* Features section */
+        /* Features grid matching the site */
         .features {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(3, 1fr);
             gap: 1.5rem;
             margin-top: 2rem;
         }
 
         .feature {
             text-align: center;
-            padding: 2rem;
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 1.5rem;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            border: 1px solid rgba(71, 85, 105, 0.2);
+            padding: 1.5rem;
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 1px solid rgba(71, 85, 105, 0.5);
             backdrop-filter: blur(10px);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .feature:hover {
-            background: rgba(15, 23, 42, 0.8);
-            transform: translateY(-5px) scale(1.02);
+            background: rgba(30, 41, 59, 0.6);
+            transform: translateY(-5px);
             border-color: rgba(34, 197, 94, 0.3);
-            box-shadow:
-                0 20px 40px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(34, 197, 94, 0.2);
-        }
-
-        .feature:hover::before {
-            opacity: 1;
         }
 
         .feature-icon {
-            background: linear-gradient(135deg, #22c55e, #16a34a);
+            background: linear-gradient(135deg, #4ade80, #16a34a);
             color: white;
             width: 4rem;
             height: 4rem;
@@ -362,32 +296,22 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 1.5rem;
-            font-size: 1.5rem;
-            box-shadow:
-                0 10px 25px rgba(34, 197, 94, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-        }
-
-        .feature:hover .feature-icon {
-            transform: scale(1.1) rotate(5deg);
-            box-shadow:
-                0 15px 35px rgba(34, 197, 94, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            margin: 0 auto 1rem;
+            font-size: 2rem;
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
         }
 
         .feature-title {
             font-weight: 600;
-            color: #f8fafc;
-            margin-bottom: 0.75rem;
+            color: #e2e8f0;
+            margin-bottom: 0.5rem;
             font-size: 1.125rem;
         }
 
         .feature-description {
-            color: #cbd5e1;
-            font-size: 0.9375rem;
-            line-height: 1.6;
+            color: #94a3b8;
+            font-size: 0.875rem;
+            line-height: 1.5;
         }
 
         /* Responsive design */
@@ -402,7 +326,7 @@
             }
 
             .subtitle {
-                font-size: 1.25rem;
+                font-size: 1.5rem;
             }
 
             .logo {
@@ -421,7 +345,7 @@
             }
 
             .subtitle {
-                font-size: 1.125rem;
+                font-size: 1.25rem;
             }
 
             .description {
@@ -429,11 +353,11 @@
             }
         }
 
-        /* Loading animation */
+        /* Loading spinner */
         .loading {
             display: inline-block;
-            width: 1rem;
-            height: 1rem;
+            width: 1.25rem;
+            height: 1.25rem;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
             border-top-color: white;
@@ -441,9 +365,7 @@
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -452,7 +374,7 @@
     <div class="background-overlay"></div>
 
     <div class="container">
-        
+        <img src="./public/images/foresum_logo.png" alt="ForeSum Logo" class="logo">
 
         <div class="main-card">
             <h1 class="main-title">ForeSum</h1>
@@ -465,15 +387,13 @@
             <div id="message" class="message"></div>
 
             <form class="email-form" id="emailForm">
-                <div class="email-input-container">
-                    <input
-                        type="email"
-                        id="email"
-                        class="email-input"
-                        placeholder="Enter your email address"
-                        required
-                    >
-                </div>
+                <input
+                    type="email"
+                    id="email"
+                    class="email-input"
+                    placeholder="Enter your email address"
+                    required
+                >
                 <button type="submit" class="submit-button" id="submitBtn">
                     <i class="fas fa-bell"></i>
                     Notify Me When It's Ready
@@ -519,7 +439,6 @@
             submitBtn.innerHTML = '<div class="loading"></div> Submitting...';
 
             try {
-                // Send email via serverless function to hide recipient email
                 const response = await fetch('/api/contact', {
                     method: 'POST',
                     headers: {
@@ -533,7 +452,6 @@
                 });
 
                 if (response.ok) {
-                    // Success
                     messageDiv.className = 'message success';
                     messageDiv.textContent = '🎉 Thanks! We\'ll notify you when ForeSum launches.';
                     messageDiv.style.display = 'block';
@@ -542,7 +460,7 @@
                     throw new Error('Failed to submit');
                 }
             } catch (error) {
-                // Fallback: Show success message and store in localStorage
+                // Fallback: Store in localStorage
                 localStorage.setItem('foresum_signup_' + Date.now(), email);
 
                 messageDiv.className = 'message success';
@@ -550,27 +468,22 @@
                 messageDiv.style.display = 'block';
                 document.getElementById('email').value = '';
             } finally {
-                // Reset button
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = '<i class="fas fa-bell"></i> Notify Me When It\'s Ready';
             }
         });
 
-        // Add some interactive effects
+        // Animate features on load
         document.addEventListener('DOMContentLoaded', function() {
-            // Animate features on scroll/load
             const features = document.querySelectorAll('.feature');
             features.forEach((feature, index) => {
+                feature.style.opacity = '0';
+                feature.style.transform = 'translateY(20px)';
                 setTimeout(() => {
-                    feature.style.opacity = '0';
-                    feature.style.transform = 'translateY(20px)';
                     feature.style.transition = 'all 0.6s ease';
-
-                    setTimeout(() => {
-                        feature.style.opacity = '1';
-                        feature.style.transform = 'translateY(0)';
-                    }, 100);
-                }, index * 200);
+                    feature.style.opacity = '1';
+                    feature.style.transform = 'translateY(0)';
+                }, 100 + (index * 200));
             });
         });
     </script>
