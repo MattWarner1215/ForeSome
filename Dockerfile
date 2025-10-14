@@ -34,14 +34,8 @@ RUN npm run build > build.log 2>&1 || \
      tail -50 build.log && \
      exit 1)
 
-# Copy public folder to standalone output (required for standalone mode)
-RUN cp -r public .next/standalone/public
-
-# Copy static folder to standalone output
-RUN cp -r .next/static .next/standalone/.next/static
-
 # Expose port
 EXPOSE 3000
 
-# Start the custom server
+# Start the custom server (runs from root with all files available)
 CMD ["npm", "run", "start"]
