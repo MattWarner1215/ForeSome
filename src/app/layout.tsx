@@ -9,6 +9,10 @@ export const metadata = {
   description: 'Find and create golf rounds at local courses',
 }
 
+// Force all routes to be dynamic (no static generation during build)
+export const dynamic = 'force-dynamic'
+export const dynamicParams = true
+
 export default function RootLayout({
   children,
 }: {
