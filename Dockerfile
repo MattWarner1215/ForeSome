@@ -20,18 +20,18 @@ COPY . .
 RUN npx prisma generate
 
 # Set build environment variables
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV NODE_ENV=production
-ENV SKIP_ENV_VALIDATION=1
-
-# Build with all required dummy env vars
-RUN DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NODE_ENV=production \
+    SKIP_ENV_VALIDATION=1 \
+    DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy" \
     NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co" \
     NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-anon-key" \
     NEXTAUTH_SECRET="dummy-secret-for-build" \
     NEXTAUTH_URL="http://localhost:3000" \
-    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key" \
-    npm run build
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key"
+
+# Build the application
+RUN npm run build
 
 # Stage 3: Runner
 FROM node:18-alpine AS runner
