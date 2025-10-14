@@ -67,7 +67,6 @@ jobs:
           --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
           --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD }} \
           --environment-variables \
-            NEXT_PUBLIC_SHOW_COMING_SOON=true \
             NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} \
             NODE_ENV=production \
             HOSTNAME=0.0.0.0 \
@@ -76,7 +75,8 @@ jobs:
             DATABASE_URL=${{ secrets.DATABASE_URL }} \
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
             NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }} \
-            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }} \
+            SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
     - name: Get container IP and URL
       run: |
