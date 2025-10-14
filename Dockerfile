@@ -10,9 +10,8 @@ RUN apt-get update -y && apt-get install -y openssl
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production --ignore-scripts && \
-    npm cache clean --force
+# Install ALL dependencies (including devDependencies for build)
+RUN npm ci --ignore-scripts
 
 # Copy source code
 COPY . .
@@ -30,8 +29,8 @@ ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key"
 ENV NODE_ENV="production"
 ENV SKIP_ENV_VALIDATION="true"
 
-# Build the application with error handling
-RUN npm run build || (cat /app/.next/build-manifest.json 2>/dev/null && exit 1)
+# Build the application
+RUN npm run build
 
 # Expose port 3000
 EXPOSE 3000

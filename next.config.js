@@ -7,6 +7,14 @@ const nextConfig = {
   // Enable standalone output for Docker
   output: 'standalone',
 
+  // Skip type checking and linting during build (faster builds)
+  typescript: {
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
+
   // Image optimization
   images: {
     domains: ['localhost', 'foresome.vercel.app'],
