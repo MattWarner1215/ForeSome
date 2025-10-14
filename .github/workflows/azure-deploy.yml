@@ -1,0 +1,109 @@
+name: Deploy to Azure Container Instance
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+env:
+  REGISTRY_NAME: foresomeregistry.azurecr.io
+  IMAGE_NAME: foresum
+  RESOURCE_GROUP: foresome-rg
+  CONTAINER_NAME: foresum-container
+  DNS_NAME_LABEL: foresum-app
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Log in to Azure Container Registry
+      uses: azure/docker-login@v1
+      with:
+        login-server: ${{ env.REGISTRY_NAME }}
+        username: ${{ secrets.AZURE_REGISTRY_USERNAME }}
+        password: ${{ secrets.AZURE_REGISTRY_PASSWORD }}
+
+    - name: Build and push Docker image
+      run: |
+        IMAGE_TAG=v${{ github.run_number }}
+        echo "Building image: ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}"
+        docker build -t ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG} .
+        docker tag ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG} ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:latest
+        docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${IMAGE_TAG}
+        docker push ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:latest
+        echo "IMAGE_TAG=${IMAGE_TAG}" >> $GITHUB_ENV
+
+    - name: Log in to Azure
+      uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+    - name: Delete existing container instance
+      run: |
+        echo "Deleting existing container instance..."
+        az container delete \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --yes \
+          || echo "No existing container to delete"
+
+    - name: Deploy to Azure Container Instance
+      run: |
+        echo "Deploying container instance with image tag: ${{ env.IMAGE_TAG }}"
+        az container create \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --image ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
+          --dns-name-label ${{ env.DNS_NAME_LABEL }} \
+          --ports 3000 \
+          --cpu 1 \
+          --memory 2 \
+          --os-type Linux \
+          --registry-login-server ${{ env.REGISTRY_NAME }} \
+          --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
+          --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD }} \
+          --environment-variables \
+            NEXT_PUBLIC_SHOW_COMING_SOON=true \
+            NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }} \
+            NODE_ENV=production \
+            HOSTNAME=0.0.0.0 \
+            PORT=3000 \
+          --secure-environment-variables \
+            DATABASE_URL=${{ secrets.DATABASE_URL }} \
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET }} \
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL }} \
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+
+    - name: Get container IP and URL
+      run: |
+        echo "Waiting for container to start..."
+        sleep 10
+        CONTAINER_IP=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --query "ipAddress.ip" \
+          --output tsv)
+        CONTAINER_FQDN=$(az container show \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --query "ipAddress.fqdn" \
+          --output tsv)
+        echo "Container IP: ${CONTAINER_IP}"
+        echo "Container URL: http://${CONTAINER_FQDN}:3000"
+        echo "---"
+        echo "Deployment complete! 🚀"
+        echo "Access your application at: http://${CONTAINER_FQDN}:3000"
+
+    - name: Show container logs
+      if: always()
+      run: |
+        echo "Fetching container logs..."
+        az container logs \
+          --resource-group ${{ env.RESOURCE_GROUP }} \
+          --name ${{ env.CONTAINER_NAME }} \
+          --tail 50 \
+          || echo "Could not fetch logs"
