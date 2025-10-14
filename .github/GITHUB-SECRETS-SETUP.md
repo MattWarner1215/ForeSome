@@ -38,7 +38,7 @@ az acr credential show --name foresomeregistry --query "passwords[0].value" --ou
 az ad sp create-for-rbac \
   --name "github-actions-foresum" \
   --role contributor \
-  --scopes /subscriptions/YOUR_SUBSCRIPTION_ID/resourceGroups/foresome-rg \
+  --scopes /subscriptions/26dc84f1-087b-40c8-b345-2dd4efec447a/resourceGroups/foresome-rg \
   --sdk-auth
 ```
 
