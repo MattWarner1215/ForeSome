@@ -1,14 +1,18 @@
-# Use regular Node.js (not Alpine) for better compatibility
-FROM node:18
+# Use Node.js 18
+FROM node:18-slim
 
 # Set working directory
 WORKDIR /app
 
+# Install OpenSSL for Prisma
+RUN apt-get update -y && apt-get install -y openssl
+
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies with more verbose output
-RUN npm install
+# Install dependencies
+RUN npm ci --only=production --ignore-scripts && \
+    npm cache clean --force
 
 # Copy source code
 COPY . .
@@ -22,9 +26,12 @@ ENV NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co"
 ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-anon-key"
 ENV NEXTAUTH_SECRET="dummy-secret-for-build"
 ENV NEXTAUTH_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key"
+ENV NODE_ENV="production"
+ENV SKIP_ENV_VALIDATION="true"
 
-# Build the application
-RUN npm run build
+# Build the application with error handling
+RUN npm run build || (cat /app/.next/build-manifest.json 2>/dev/null && exit 1)
 
 # Expose port 3000
 EXPOSE 3000

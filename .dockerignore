@@ -1,14 +1,51 @@
+# Dependencies
 node_modules
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.git
-.gitignore
+
+# Next.js
+.next
+out
+.swc
+
+# Environment files
 .env
 .env.local
-.env.production
-.next
-docs
-.DS_Store
-coverage
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Git
+.git
+.gitignore
+
+# IDE
 .vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Testing
+coverage
+.nyc_output
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local
+.cache
+tmp
+temp
+
+# Deployment
+.github
+Dockerfile
+.dockerignore
