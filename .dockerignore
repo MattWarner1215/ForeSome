@@ -9,7 +9,8 @@ yarn-error.log*
 out
 .swc
 
-# Environment files
+# Environment files (MUST be excluded - Docker sets its own ENV vars)
+.env*
 .env
 .env.local
 .env.development.local
