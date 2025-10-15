@@ -35,7 +35,7 @@ RUN npm run build > build.log 2>&1 || \
      exit 1)
 
 # Expose port
-EXPOSE 3000
+EXPOSE 80
 
 # Start the custom server (runs from root with all files available)
 CMD ["npm", "run", "start"]
