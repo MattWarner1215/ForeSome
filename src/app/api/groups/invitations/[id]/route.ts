@@ -6,7 +6,7 @@ import { prisma } from '@/lib/prisma'
 // PATCH - Accept or decline invitation
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -24,9 +24,12 @@ export async function PATCH(
       )
     }
 
+    // Await params for Next.js 15
+    const { id } = await params
+
     // Fetch the invitation
     const invitation = await prisma.groupInvitation.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         group: {
           select: {
@@ -66,7 +69,7 @@ export async function PATCH(
       const result = await prisma.$transaction(async (tx) => {
         // Update invitation status
         const updatedInvitation = await tx.groupInvitation.update({
-          where: { id: params.id },
+          where: { id },
           data: { status: 'accepted' }
         })
 
@@ -98,7 +101,7 @@ export async function PATCH(
     } else {
       // Decline invitation
       const updatedInvitation = await prisma.groupInvitation.update({
-        where: { id: params.id },
+        where: { id },
         data: { status: 'declined' }
       })
 
@@ -128,7 +131,7 @@ export async function PATCH(
 // DELETE - Cancel/revoke invitation (for inviters)
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -137,9 +140,12 @@ export async function DELETE(
       return NextResponse.json({ message: 'Unauthorized' }, { status: 401 })
     }
 
+    // Await params for Next.js 15
+    const { id } = await params
+
     // Fetch the invitation
     const invitation = await prisma.groupInvitation.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         group: {
           select: {
@@ -169,7 +175,7 @@ export async function DELETE(
 
     // Delete the invitation
     await prisma.groupInvitation.delete({
-      where: { id: params.id }
+      where: { id }
     })
 
     return NextResponse.json({ message: 'Invitation cancelled successfully' })
