@@ -48,8 +48,9 @@ ngrok http 3000
 
 **Current Deployment Status:**
 - **Production**: Successfully deployed to Azure Container Instance
-  - URL: http://foresum-app.eastus.azurecontainer.io:3000
-  - Container IP: 20.75.179.214:3000
+  - Azure URL: http://foresum-app.eastus.azurecontainer.io (port 80)
+  - Custom Domain: https://foresumgolf.com (in progress - Cloudflare setup)
+  - Container IP: 4.156.206.204:80
   - Coming Soon page: `/coming-soon` with email collection
   - Authentication: Fixed and functional (HTTP-based NEXTAUTH_URL)
 - **Development**: Local server running on port 3000 with Socket.IO support
@@ -59,6 +60,7 @@ ngrok http 3000
 - Real-time chat functionality enabled
 - Fully accessible from mobile devices and external networks via tunnels
 - NEXTAUTH_URL: HTTP-based for container compatibility
+- **Cloudflare Integration**: SSL/TLS termination, CDN, and custom domain routing
 
 ### Environment Setup
 1. Copy `.env.example` to `.env.local`
@@ -275,58 +277,100 @@ ForeSum is successfully deployed on Azure Container Instance with the following 
 - **Resource Group**: `foresome-rg`
 - **Container Name**: `foresum-container`
 - **Registry**: Azure Container Registry (ACR) - `foresomeregistry.azurecr.io`
-- **Image**: `foresum:v2` (fixed hostname binding)
-- **Public URL**: http://foresum-app.eastus.azurecontainer.io:3000
-- **Current IP**: 20.75.179.214:3000
+- **Image**: `foresum:v25` (latest with port 80 for Cloudflare)
+- **Azure URL**: http://foresum-app.eastus.azurecontainer.io (port 80)
+- **Custom Domain**: https://foresumgolf.com (via Cloudflare)
+- **Current IP**: 4.156.206.204:80
+- **CI/CD**: GitHub Actions automated deployment on push to main
 
 ### Docker Configuration
 ```dockerfile
-# Multi-stage build optimized for production
-FROM node:18-alpine AS base
-# ... (see Dockerfile for complete configuration)
-CMD ["node", "server.js"]
+# Single-stage Node.js 18 build
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+RUN npx prisma generate
+
+# Build-time dummy environment variables
+ENV NEXT_TELEMETRY_DISABLED=1
+ENV NODE_ENV=production
+ENV SKIP_ENV_VALIDATION=1
+# ... (dummy values for build)
+
+RUN npm run build > build.log 2>&1 || (echo "=== BUILD FAILED ===" && tail -50 build.log && exit 1)
+
+EXPOSE 80
+CMD ["npm", "run", "start"]
 ```
 
 ### Environment Variables (Production)
 ```bash
 NEXT_PUBLIC_SHOW_COMING_SOON=true          # Shows coming soon page by default
-NEXTAUTH_URL=http://foresum-app.eastus.azurecontainer.io:3000  # HTTP for container compatibility
+NEXTAUTH_URL=http://foresum-app.eastus.azurecontainer.io  # HTTP for container compatibility (no port needed with 80)
 NEXTAUTH_SECRET=<generated-secret>          # Secure random secret
 NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
 NODE_ENV=production
 HOSTNAME=0.0.0.0                           # Essential for container external access
-PORT=3000
+PORT=80                                     # Changed from 3000 for Cloudflare compatibility
 DATABASE_URL=<supabase-postgres-url>       # Secure environment variable
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<supabase-key>  # Secure environment variable
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<maps-key>    # Google Maps API key
+SUPABASE_SERVICE_ROLE_KEY=<service-key>    # Supabase service role key
 ```
 
 ### Deployment Commands
 ```bash
+# Manual deployment (automated via GitHub Actions)
 # Build and tag Docker image
-docker build -t foresomeregistry.azurecr.io/foresum:v2 .
+docker build -t foresomeregistry.azurecr.io/foresum:v25 .
 
 # Push to Azure Container Registry
-docker push foresomeregistry.azurecr.io/foresum:v2
+docker push foresomeregistry.azurecr.io/foresum:v25
 
 # Deploy to Azure Container Instance
 az container create \
   --resource-group foresome-rg \
   --name foresum-container \
-  --image foresomeregistry.azurecr.io/foresum:v2 \
+  --image foresomeregistry.azurecr.io/foresum:v25 \
   --dns-name-label foresum-app \
-  --ports 3000 \
+  --ports 80 \
   --cpu 1 \
   --memory 2 \
   --os-type Linux \
-  --environment-variables [vars] \
-  --secure-environment-variables [secure-vars]
+  --environment-variables \
+    NEXT_PUBLIC_SUPABASE_URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
+    NODE_ENV=production \
+    HOSTNAME=0.0.0.0 \
+    PORT=80 \
+    DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+    NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
+    NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}" \
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
+    SUPABASE_SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+    NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}"
 ```
+
+### GitHub Actions CI/CD Pipeline
+Automated deployment on push to main branch:
+- Checks out code with Git LFS enabled (for image files)
+- Builds and pushes Docker image to Azure Container Registry
+- Deletes existing container instance
+- Creates new container with updated image and environment variables
+- Retrieves and displays container URL and logs
+
+See `.github/workflows/azure-deploy.yml` for complete workflow configuration.
 
 ### Key Deployment Fixes Applied
 1. **Hostname Binding**: Updated `server.js` from `localhost` to `0.0.0.0` for external container access
 2. **Authentication URL**: Fixed `NEXTAUTH_URL` to use HTTP instead of HTTPS to match container protocol
 3. **Container Configuration**: Optimized resource allocation (1 CPU, 2GB RAM)
-4. **Security**: Sensitive environment variables use `--secure-environment-variables`
+4. **Port Configuration**: Changed from 3000 to 80 for Cloudflare proxy compatibility
+5. **Git LFS Integration**: Enabled in GitHub Actions for proper image file handling
+6. **Environment Variables**: Switched to `--environment-variables` for proper secret injection
+7. **Build Optimization**: Single-stage Docker build with dummy env vars for Next.js build
+8. **FontAwesome Fix**: Configured CSS import and autoAddCss to prevent icon rendering issues
 
 ### Coming Soon Page Features
 - **URL**: `/coming-soon`
@@ -350,15 +394,63 @@ az container show --resource-group foresome-rg --name foresum-container --query 
 az container delete --resource-group foresome-rg --name foresum-container --yes
 ```
 
+### Custom Domain Limitations (IMPORTANT)
+
+**Azure Container Instances does NOT support custom domains natively**. Azure ACI enforces hostname validation and only accepts requests with the official Azure hostname (`foresum-app.eastus.azurecontainer.io`). Any requests using custom domains or direct IP addresses return "Web Page Blocked" errors.
+
+**Current Status**:
+- ✅ **Working**: http://foresum-app.eastus.azurecontainer.io (port 80)
+- ❌ **Not Working**: Custom domain (foresumgolf.com) - blocked by Azure ACI hostname validation
+- DNS configured correctly (CNAME → Azure hostname) but Azure rejects non-Azure hostnames
+
+**Solutions for Custom Domain Support**:
+
+1. **Migrate to Azure Container Apps** (RECOMMENDED)
+   - Native custom domain support with automatic SSL
+   - Better suited for production workloads
+   - Similar pricing to ACI
+
+2. **Deploy Reverse Proxy**
+   - Deploy nginx/Caddy as separate container
+   - Proxy accepts custom domain, forwards to app with Azure hostname
+   - Adds complexity but enables custom domain with current ACI setup
+
+3. **Use Azure App Service**
+   - Full custom domain and SSL support
+   - More expensive than ACI but production-ready
+
+**Attempted Cloudflare Configuration** (Not functional due to ACI limitations):
+- Type: CNAME record
+- Name: @ (root domain)
+- Target: `foresum-app.eastus.azurecontainer.io`
+- Proxy: DNS only (gray cloud) - required since proxied mode also fails
+- Result: Azure blocks with "Web Page Blocked" error regardless of proxy setting
+
 ### Production Notes
 - **Database Schema**: Production database needs `EmailRegistration` table for coming soon page
 - **Node.js Version**: Currently using Node 18 (Supabase recommends upgrading to Node 20+)
-- **Next.js Build**: Uses standalone output for optimal container size
+- **Next.js Build**: Standard build without standalone mode (incompatible with custom server.js)
 - **Performance**: Container starts in ~30 seconds with image caching
 - **Scaling**: Can be easily scaled or upgraded through Azure portal or CLI
+- **Custom Domain**: Configured via Cloudflare for HTTPS and CDN
 
 ### Troubleshooting
+
+#### Common Issues
 - **Site unreachable**: Check hostname binding in `server.js` (should be `0.0.0.0`, not `localhost`)
 - **Login failures**: Verify `NEXTAUTH_URL` matches actual container protocol and port
 - **Database errors**: Ensure production database schema is up to date with Prisma migrations
 - **Image issues**: Verify Azure Container Registry credentials and image tags
+- **Icons not showing**: Check Git LFS checkout in GitHub Actions and FontAwesome CSS configuration
+- **DNS not resolving**: Wait 5-10 minutes for propagation, purge Cloudflare cache if needed
+
+#### Custom Domain Issues (Azure ACI Limitation)
+- **"Web Page Blocked" error**: Azure Container Instances enforces hostname validation
+  - Only accepts requests with Host header: `foresum-app.eastus.azurecontainer.io`
+  - Rejects all custom domains, IPs, and alternative hostnames
+  - This is an Azure platform limitation, not a configuration issue
+- **Cloudflare 503 errors**: Occurs when Cloudflare proxy tries to connect with custom domain
+  - Cloudflare sends `Host: foresumgolf.com` header
+  - Azure ACI rejects it with 503 Service Unavailable
+  - Turning off Cloudflare proxy (DNS only) still doesn't work - Azure validates hostname
+- **Solution**: Migrate to Azure Container Apps or deploy reverse proxy (see Custom Domain Limitations section)

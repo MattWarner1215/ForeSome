@@ -185,7 +185,7 @@ export function GoogleMapsCard({ rounds, className = '' }: GoogleMapsCardProps) 
         let message = 'Unable to get your location'
         switch (error.code) {
           case error.PERMISSION_DENIED:
-            message = 'Location access denied. Please enable location access for distance calculations.'
+            message = 'Location access denied. Note: Location access requires HTTPS (not available on HTTP deployments). Map will show all rounds without distance sorting.'
             break
           case error.POSITION_UNAVAILABLE:
             message = 'Location information unavailable'
