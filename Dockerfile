@@ -16,16 +16,21 @@ COPY . .
 # Generate Prisma Client
 RUN npx prisma generate
 
+# Declare build arguments for NEXT_PUBLIC_ variables
+ARG NEXT_PUBLIC_SUPABASE_URL
+ARG NEXT_PUBLIC_SUPABASE_ANON_KEY
+ARG NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+
 # Set build environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 ENV SKIP_ENV_VALIDATION=1
 ENV DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
-ENV NEXT_PUBLIC_SUPABASE_URL="https://dummy.supabase.co"
-ENV NEXT_PUBLIC_SUPABASE_ANON_KEY="dummy-anon-key"
+ENV NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL:-"https://dummy.supabase.co"}
+ENV NEXT_PUBLIC_SUPABASE_ANON_KEY=${NEXT_PUBLIC_SUPABASE_ANON_KEY:-"dummy-anon-key"}
 ENV NEXTAUTH_SECRET="dummy-secret-for-build"
 ENV NEXTAUTH_URL="http://localhost:3000"
-ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="dummy-maps-key"
+ENV NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${NEXT_PUBLIC_GOOGLE_MAPS_API_KEY:-"dummy-maps-key"}
 
 # Build Next.js application with error logging
 RUN npm run build > build.log 2>&1 || \
