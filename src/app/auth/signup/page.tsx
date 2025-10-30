@@ -6,8 +6,9 @@ import { signIn, getProviders } from 'next-auth/react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
+import { Textarea } from '@/components/ui/textarea'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faUserPlus } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faUserPlus, faGolfBall, faLocationDot, faPhone, faAlignLeft } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import Link from 'next/link'
 
@@ -16,7 +17,11 @@ export default function SignUpPage() {
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    handicap: '',
+    zipCode: '',
+    phoneNumber: '',
+    bio: ''
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
@@ -60,7 +65,11 @@ export default function SignUpPage() {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          password: formData.password
+          password: formData.password,
+          handicap: formData.handicap ? parseFloat(formData.handicap) : null,
+          zipCode: formData.zipCode,
+          phoneNumber: formData.phoneNumber || null,
+          bio: formData.bio || null
         })
       })
 
@@ -77,7 +86,7 @@ export default function SignUpPage() {
     }
   }
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setFormData(prev => ({
       ...prev,
       [e.target.name]: e.target.value
@@ -200,6 +209,92 @@ export default function SignUpPage() {
                     className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200"
                     placeholder="Enter your email"
                     required
+                  />
+                </div>
+              </div>
+
+              {/* Handicap Field */}
+              <div className="space-y-2">
+                <label htmlFor="handicap" className="block text-sm font-semibold text-gray-700">
+                  Handicap <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FontAwesomeIcon icon={faGolfBall} className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="handicap"
+                    name="handicap"
+                    type="number"
+                    step="0.1"
+                    value={formData.handicap}
+                    onChange={handleInputChange}
+                    className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200"
+                    placeholder="e.g., 12.5"
+                  />
+                </div>
+              </div>
+
+              {/* Zip Code Field */}
+              <div className="space-y-2">
+                <label htmlFor="zipCode" className="block text-sm font-semibold text-gray-700">
+                  Zip Code
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FontAwesomeIcon icon={faLocationDot} className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="zipCode"
+                    name="zipCode"
+                    type="text"
+                    value={formData.zipCode}
+                    onChange={handleInputChange}
+                    className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200"
+                    placeholder="Enter your zip code"
+                    required
+                  />
+                </div>
+              </div>
+
+              {/* Phone Number Field */}
+              <div className="space-y-2">
+                <label htmlFor="phoneNumber" className="block text-sm font-semibold text-gray-700">
+                  Phone Number <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <FontAwesomeIcon icon={faPhone} className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Input
+                    id="phoneNumber"
+                    name="phoneNumber"
+                    type="tel"
+                    value={formData.phoneNumber}
+                    onChange={handleInputChange}
+                    className="pl-10 h-12 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200"
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+              </div>
+
+              {/* Bio Field */}
+              <div className="space-y-2">
+                <label htmlFor="bio" className="block text-sm font-semibold text-gray-700">
+                  Bio <span className="text-gray-400 font-normal">(optional)</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute top-3 left-0 pl-3 flex items-start pointer-events-none">
+                    <FontAwesomeIcon icon={faAlignLeft} className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <Textarea
+                    id="bio"
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleInputChange}
+                    className="pl-10 border-gray-300 focus:border-green-500 focus:ring-green-500 transition-all duration-200 resize-none"
+                    placeholder="Tell us about yourself and your golf experience..."
+                    rows={3}
                   />
                 </div>
               </div>
