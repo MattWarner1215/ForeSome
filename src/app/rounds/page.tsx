@@ -9,7 +9,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faLocationDot, faUsers, faClock, faArrowLeft, faSearch, faBars, faTimes, faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import { faLocationDot, faUsers, faClock, faArrowLeft, faSearch, faBars, faTimes, faRightFromBracket, faFlag, faUserCircle, faUsersRectangle, faClockRotateLeft } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
 import { GolfCourseAvatar } from '@/components/ui/golf-course-avatar'
 import EnhancedRoundCard from '@/components/ui/enhanced-round-card'
@@ -406,15 +406,17 @@ function RoundesPageContent() {
             {/* Modern arrow pointer */}
             <div className="absolute -top-2 right-6 w-4 h-4 bg-white/98 backdrop-blur-xl rotate-45 border-l border-t border-gray-200/20"></div>
 
-            {/* Profile Section */}
-            <div className="px-4 py-3 border-b border-gray-100/20">
+            {/* Header */}
+            <div className="px-4 py-3 border-b border-gray-100/60">
               <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center">
-                  <FontAwesomeIcon icon={faUsers} className="w-5 h-5 text-white" />
+                <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="font-bold text-white text-sm">
+                    {(session?.user?.name || session?.user?.email)?.charAt(0).toUpperCase()}
+                  </span>
                 </div>
-                <div className="min-w-0">
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-gray-900 truncate">
-                    {session?.user?.name || 'Golfer'}
+                    {session?.user?.name || 'User'}
                   </p>
                   <p className="text-xs text-gray-500 truncate">
                     {session?.user?.email}
@@ -425,44 +427,88 @@ function RoundesPageContent() {
 
             {/* Menu Items */}
             <div className="py-1">
-              <Link
-                href="/profile"
-                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-green-50/50 transition-all duration-200 hover:text-green-700"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <FontAwesomeIcon icon={faUsers} className="w-4 h-4 mr-3 text-gray-500" />
-                <span>Profile & Settings</span>
-              </Link>
-
-              <Link
-                href="/groups"
-                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-blue-50/50 transition-all duration-200 hover:text-blue-700"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <FontAwesomeIcon icon={faUsers} className="w-4 h-4 mr-3 text-gray-500" />
-                <span>My Groups</span>
-              </Link>
-
-              <Link
-                href="/matches/completed"
-                className="flex items-center px-4 py-3 text-sm text-gray-700 hover:bg-purple-50/50 transition-all duration-200 hover:text-purple-700"
-                onClick={() => setIsMenuOpen(false)}
-              >
-                <FontAwesomeIcon icon={faClock} className="w-4 h-4 mr-3 text-gray-500" />
-                <span>Match History</span>
-              </Link>
-
-              {/* Logout option */}
-              <div className="border-t border-gray-100/20 mt-1 pt-1">
+              <div className="px-2 py-1">
                 <button
                   onClick={() => {
-                    setIsMenuOpen(false)
-                    signOut({ callbackUrl: '/' })
+                    setIsMenuOpen(false);
+                    router.push('/dashboard');
                   }}
-                  className="flex items-center w-full px-4 py-3 text-sm text-gray-700 hover:bg-red-50/50 transition-all duration-200 hover:text-red-700"
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-green-50/80 hover:to-emerald-50/80 hover:text-green-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-green-300/60"
+                  type="button"
                 >
-                  <FontAwesomeIcon icon={faRightFromBracket} className="w-4 h-4 mr-3 text-gray-500" />
-                  <span>Sign Out</span>
+                  <div className="w-9 h-9 bg-gradient-to-br from-green-50 to-green-100 group-hover:from-green-100 group-hover:to-green-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faFlag} className="h-4 w-4 text-green-600 group-hover:text-green-700" />
+                  </div>
+                  <span className="font-medium">Dashboard</span>
+                </button>
+              </div>
+
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/profile');
+                  }}
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-blue-50/80 hover:to-blue-50/80 hover:text-blue-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-blue-300/60"
+                  type="button"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-blue-50 to-blue-100 group-hover:from-blue-100 group-hover:to-blue-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faUserCircle} className="h-4 w-4 text-blue-600 group-hover:text-blue-700" />
+                  </div>
+                  <span className="font-medium">Profile Settings</span>
+                </button>
+              </div>
+
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/groups');
+                  }}
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-purple-50/80 hover:to-purple-50/80 hover:text-purple-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-purple-300/60"
+                  type="button"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-purple-50 to-purple-100 group-hover:from-purple-100 group-hover:to-purple-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faUsersRectangle} className="h-4 w-4 text-purple-600 group-hover:text-purple-700" />
+                  </div>
+                  <span className="font-medium">My Groups</span>
+                </button>
+              </div>
+
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    router.push('/matches/completed');
+                  }}
+                  className="group flex items-center space-x-3 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-orange-50/80 hover:to-orange-50/80 hover:text-orange-800 transition-all duration-300 ease-out cursor-pointer w-full text-left rounded-xl mb-1 border border-gray-200/60 hover:border-orange-300/60"
+                  type="button"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-orange-50 to-orange-100 group-hover:from-orange-100 group-hover:to-orange-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faClockRotateLeft} className="h-4 w-4 text-orange-600 group-hover:text-orange-700" />
+                  </div>
+                  <span className="font-medium">Match History</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Divider */}
+            <div className="mx-4 border-t border-gray-100/80"></div>
+
+            {/* Sign Out */}
+            <div className="py-1">
+              <div className="px-2 py-1">
+                <button
+                  onClick={() => {
+                    setIsMenuOpen(false);
+                    signOut({ callbackUrl: '/' });
+                  }}
+                  className="group flex items-center space-x-3 w-full text-left px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gradient-to-r hover:from-red-50/80 hover:to-red-50/80 hover:text-red-700 transition-all duration-300 ease-out cursor-pointer rounded-xl border border-gray-200/60 hover:border-red-300/60"
+                >
+                  <div className="w-9 h-9 bg-gradient-to-br from-red-50 to-red-100 group-hover:from-red-100 group-hover:to-red-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
+                    <FontAwesomeIcon icon={faRightFromBracket} className="h-4 w-4 text-red-600 group-hover:text-red-700" />
+                  </div>
+                  <span className="font-medium">Sign Out</span>
                 </button>
               </div>
             </div>

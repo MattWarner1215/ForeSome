@@ -11,6 +11,7 @@ interface GroupIconUploadProps {
   onIconChange: (iconUrl: string | null) => void
   disabled?: boolean
   defaultIcon?: string
+  compact?: boolean
 }
 
 export function GroupIconUpload({
@@ -18,7 +19,8 @@ export function GroupIconUpload({
   currentIcon,
   onIconChange,
   disabled = false,
-  defaultIcon = "/images/owner_icon.png?v=1"
+  defaultIcon = "/images/owner_icon.png?v=1",
+  compact = false
 }: GroupIconUploadProps) {
   const [isUploading, setIsUploading] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
@@ -87,6 +89,58 @@ export function GroupIconUpload({
 
   const triggerFileSelect = () => {
     fileInputRef.current?.click()
+  }
+
+  if (compact) {
+    return (
+      <div className="relative">
+        <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-200 shadow-md flex items-center justify-center">
+          <img
+            src={(currentIcon && currentIcon.trim() !== '') ? currentIcon : defaultIcon}
+            alt={(currentIcon && currentIcon.trim() !== '') ? "Group icon" : "Default group icon"}
+            className="w-full h-full object-contain"
+            onError={(e) => {
+              const img = e.target as HTMLImageElement
+              if (img.src !== defaultIcon) {
+                img.src = defaultIcon
+              }
+            }}
+          />
+        </div>
+
+        {/* Upload Button Overlay */}
+        {!disabled && (
+          <button
+            onClick={triggerFileSelect}
+            disabled={isUploading || isDeleting}
+            className="absolute inset-0 w-16 h-16 rounded-full bg-black bg-opacity-50 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center group cursor-pointer"
+            title={isUploading ? "Uploading..." : "Click to upload new icon"}
+          >
+            {isUploading ? (
+              <FontAwesomeIcon icon={faSpinner} className="h-4 w-4 text-white animate-spin" />
+            ) : (
+              <FontAwesomeIcon icon={faCamera} className="h-4 w-4 text-white" />
+            )}
+          </button>
+        )}
+
+        {/* Hidden File Input */}
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/jpeg,image/png,image/gif,image/webp"
+          onChange={handleFileSelect}
+          className="hidden"
+        />
+
+        {/* Error Message */}
+        {error && (
+          <div className="absolute top-full mt-2 left-0 text-xs text-red-600 bg-red-50 border border-red-200 rounded px-2 py-1 whitespace-nowrap z-10">
+            {error}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (

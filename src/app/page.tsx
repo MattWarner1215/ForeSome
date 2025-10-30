@@ -14,12 +14,12 @@ export default function LandingPage() {
   const { data: session, status } = useSession()
   const router = useRouter()
 
-  // Redirect authenticated users to rounds page
+  // Redirect authenticated users to dashboard
   useEffect(() => {
     if (status === 'loading') return // Wait for session to load
 
     if (session) {
-      router.push('/rounds')
+      router.push('/dashboard')
     }
   }, [session, status, router])
 

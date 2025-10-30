@@ -302,28 +302,29 @@ export default function GroupsPage() {
                   <CardHeader>
                     <div className="flex justify-between items-start">
                       <div className="flex items-start space-x-4">
-                        {/* Group Icon */}
+                        {/* Group Icon with Upload */}
                         <div className="flex-shrink-0">
-                          <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-200 shadow-md flex items-center justify-center">
-                            {getGroupIcon(group) ? (
+                          {isUserCreator(group) ? (
+                            <GroupIconUpload
+                              groupId={group.id}
+                              currentIcon={getGroupIcon(group)}
+                              onIconChange={(iconUrl) => handleIconChange(group.id, iconUrl)}
+                              defaultIcon={getDefaultIcon(group)}
+                              compact={true}
+                            />
+                          ) : (
+                            <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-green-200 shadow-md flex items-center justify-center">
                               <img
-                                src={getGroupIcon(group)!}
-                                alt={`${group.name} icon`}
+                                src={getGroupIcon(group) || getDefaultIcon(group)}
+                                alt="Group icon"
                                 className="w-full h-full object-contain"
                                 onError={(e) => {
                                   const img = e.target as HTMLImageElement
-                                  const defaultIcon = getDefaultIcon(group)
-                                  img.src = defaultIcon
+                                  img.src = getDefaultIcon(group)
                                 }}
                               />
-                            ) : (
-                              <img
-                                src={getDefaultIcon(group)}
-                                alt={isUserCreator(group) ? "Owner icon" : "Member group icon"}
-                                className="w-full h-full object-contain"
-                              />
-                            )}
-                          </div>
+                            </div>
+                          )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <CardTitle className="text-lg truncate">{group.name}</CardTitle>
@@ -332,24 +333,7 @@ export default function GroupsPage() {
                           </CardDescription>
                         </div>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-500">
-                        <FontAwesomeIcon icon={faUsers} className="h-4 w-4" />
-                        <span>{group._count.members} members</span>
-                      </div>
                     </div>
-
-                    {/* Icon Upload for Group Creators */}
-                    {isUserCreator(group) && (
-                      <div className="mt-4 pt-4 border-t border-gray-100">
-                        <div className="text-sm font-medium text-gray-700 mb-2">Group Icon</div>
-                        <GroupIconUpload
-                          groupId={group.id}
-                          currentIcon={getGroupIcon(group)}
-                          onIconChange={(iconUrl) => handleIconChange(group.id, iconUrl)}
-                          defaultIcon={getDefaultIcon(group)}
-                        />
-                      </div>
-                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
@@ -367,39 +351,51 @@ export default function GroupsPage() {
                       </div>
 
                       {/* Member badges */}
-                      {group.members && group.members.length > 0 && (
-                        <div>
-                          <p className="text-xs text-gray-600 mb-2 font-medium">Members:</p>
-                          <div className="flex flex-wrap gap-1">
-                            {group.members.slice(0, 6).map((member) => (
-                              <span
-                                key={member.id}
-                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-sm"
-                                style={{ 
-                                  backgroundColor: '#dcfce7', 
-                                  color: '#166534', 
-                                  border: '1px solid #bbf7d0' 
-                                }}
-                              >
-                                <FontAwesomeIcon icon={faUser} className="h-2 w-2 mr-1" style={{ color: '#059669' }} />
-                                {member.user.name || member.user.email.split('@')[0]}
-                              </span>
-                            ))}
-                            {group.members.length > 6 && (
-                              <span 
-                                className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-sm"
-                                style={{ 
-                                  backgroundColor: '#dbeafe', 
-                                  color: '#1e40af', 
-                                  border: '1px solid #93c5fd' 
-                                }}
-                              >
-                                +{group.members.length - 6} more
-                              </span>
-                            )}
-                          </div>
+                      <div>
+                        <p className="text-xs text-gray-600 mb-2 font-medium">Members:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {/* Show creator first with owner badge */}
+                          <span
+                            className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-sm"
+                            style={{
+                              backgroundColor: '#fef3c7',
+                              color: '#92400e',
+                              border: '1px solid #fde68a'
+                            }}
+                          >
+                            <FontAwesomeIcon icon={faUser} className="h-2 w-2 mr-1" style={{ color: '#d97706' }} />
+                            {group.creator.name || group.creator.email.split('@')[0]} (Owner)
+                          </span>
+
+                          {/* Show other members */}
+                          {group.members.slice(0, 5).map((member) => (
+                            <span
+                              key={member.id}
+                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-sm"
+                              style={{
+                                backgroundColor: '#dcfce7',
+                                color: '#166534',
+                                border: '1px solid #bbf7d0'
+                              }}
+                            >
+                              <FontAwesomeIcon icon={faUser} className="h-2 w-2 mr-1" style={{ color: '#059669' }} />
+                              {member.user.name || member.user.email.split('@')[0]}
+                            </span>
+                          ))}
+                          {group.members.length > 5 && (
+                            <span
+                              className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium shadow-sm"
+                              style={{
+                                backgroundColor: '#dbeafe',
+                                color: '#1e40af',
+                                border: '1px solid #93c5fd'
+                              }}
+                            >
+                              +{group.members.length - 5} more
+                            </span>
+                          )}
                         </div>
-                      )}
+                      </div>
 
                       <div className="flex space-x-2 pt-2">
                         {isUserCreator(group) ? (

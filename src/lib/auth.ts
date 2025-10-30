@@ -83,7 +83,11 @@ export const authOptions: NextAuthOptions = {
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
   callbacks: {
-    async signIn({ user, account, profile, email }) {
+    async redirect({ baseUrl }) {
+      // Always redirect to dashboard after sign in
+      return `${baseUrl}/dashboard`
+    },
+    async signIn({ user, account }) {
       // Allow all credentials sign-ins (handled by the authorize function)
       if (account?.provider === 'credentials') {
         return true
@@ -189,7 +193,8 @@ export const authOptions: NextAuthOptions = {
     }
   },
   pages: {
-    signIn: "/auth/signin"
+    signIn: "/auth/signin",
+    newUser: "/dashboard"
   },
   secret: process.env.NEXTAUTH_SECRET,
   debug: process.env.NODE_ENV === 'development'

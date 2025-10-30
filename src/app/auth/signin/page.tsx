@@ -51,12 +51,13 @@ export default function SignInPage() {
 
       if (result?.error) {
         setError('Invalid credentials')
-      } else {
-        router.push('/')
+        setIsLoading(false)
+      } else if (result?.ok) {
+        // Successfully logged in - redirect to dashboard
+        window.location.href = '/dashboard'
       }
     } catch (error) {
       setError('An error occurred')
-    } finally {
       setIsLoading(false)
     }
   }
@@ -67,7 +68,7 @@ export default function SignInPage() {
 
     try {
       const result = await signIn('google', {
-        callbackUrl: '/',
+        callbackUrl: '/dashboard',
         redirect: false,
       })
 

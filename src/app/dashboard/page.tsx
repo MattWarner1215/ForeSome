@@ -781,8 +781,8 @@ export default function HomePage() {
           <div className="flex items-center space-x-2 sm:space-x-4 w-full md:w-auto md:flex-shrink-0 justify-end min-w-0">
               <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm">
                 <Link href="/rounds">
-                  <span className="hidden sm:inline">Browse Rounds</span>
-                  <span className="sm:hidden">Rounds</span>
+                  <span className="hidden sm:inline">Public Rounds</span>
+                  <span className="sm:hidden">Public</span>
                 </Link>
               </Button>
               <Button asChild size="sm" className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-xs sm:text-sm">
@@ -853,7 +853,7 @@ export default function HomePage() {
                   <div className="w-9 h-9 bg-gradient-to-br from-green-50 to-green-100 group-hover:from-green-100 group-hover:to-green-200 rounded-xl flex items-center justify-center transition-all duration-300 shadow-sm group-hover:shadow-md">
                     <FontAwesomeIcon icon={faGlobe} className="h-4 w-4 text-green-600 group-hover:text-green-700" />
                   </div>
-                  <span className="font-medium">Browse Rounds</span>
+                  <span className="font-medium">Public Rounds</span>
                 </button>
               </div>
 
