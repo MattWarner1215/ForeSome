@@ -277,11 +277,22 @@ ForeSum is successfully deployed on Azure Container Instance with the following 
 - **Resource Group**: `foresome-rg`
 - **Container Name**: `foresum-container`
 - **Registry**: Azure Container Registry (ACR) - `foresomeregistry.azurecr.io`
-- **Image**: `foresum:v25` (latest with port 80 for Cloudflare)
+- **Image**: `foresum:v25` (WORKING VERSION - DO NOT CHANGE WITHOUT TESTING)
 - **Azure URL**: http://foresum-app.eastus.azurecontainer.io (port 80)
-- **Custom Domain**: https://foresumgolf.com (via Cloudflare)
-- **Current IP**: 4.156.206.204:80
+- **Production URL**: http://foresumgolf.com (HTTP only, no HTTPS)
+- **DNS Configuration**: Cloudflare CNAME (DNS only/gray cloud) → `foresum-app.eastus.azurecontainer.io`
+- **Current IP**: Dynamic (auto-resolved via CNAME)
 - **CI/CD**: GitHub Actions automated deployment on push to main
+
+### CRITICAL: Working Configuration Requirements
+
+**This exact configuration is REQUIRED for the site to work. Do not modify without understanding the dependencies.**
+
+1. **NEXTAUTH_URL** must be `http://foresumgolf.com` (HTTP, not HTTPS, not Azure hostname)
+2. **DATABASE_URL** must use URL-encoded password: `FenderBass0612%21` (not `FenderBass0612!`)
+3. **Cloudflare DNS** must be CNAME (not A record), DNS only mode (gray cloud, NOT proxied/orange cloud)
+4. **Container Port** must be 80 (not 3000)
+5. **Image Version** must be v25 (tested and working)
 
 ### Docker Configuration
 ```dockerfile
@@ -305,19 +316,31 @@ EXPOSE 80
 CMD ["npm", "run", "start"]
 ```
 
-### Environment Variables (Production)
+### Environment Variables (Production) - WORKING CONFIGURATION
+
+**IMPORTANT: These exact values are required. See "CRITICAL Configuration Requirements" section above.**
+
 ```bash
-NEXT_PUBLIC_SHOW_COMING_SOON=true          # Shows coming soon page by default
-NEXTAUTH_URL=http://foresum-app.eastus.azurecontainer.io  # HTTP for container compatibility (no port needed with 80)
-NEXTAUTH_SECRET=<generated-secret>          # Secure random secret
-NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
+# Core Configuration
 NODE_ENV=production
-HOSTNAME=0.0.0.0                           # Essential for container external access
-PORT=80                                     # Changed from 3000 for Cloudflare compatibility
-DATABASE_URL=<supabase-postgres-url>       # Secure environment variable
-NEXT_PUBLIC_SUPABASE_ANON_KEY=<supabase-key>  # Secure environment variable
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=<maps-key>    # Google Maps API key
-SUPABASE_SERVICE_ROLE_KEY=<service-key>    # Supabase service role key
+HOSTNAME=0.0.0.0                           # REQUIRED: Allows external container access
+PORT=80                                     # REQUIRED: Must be 80 for standard HTTP
+
+# Authentication (CRITICAL - DO NOT CHANGE)
+NEXTAUTH_URL=http://foresumgolf.com        # MUST be http://foresumgolf.com (HTTP, not HTTPS, not Azure hostname)
+NEXTAUTH_SECRET=UMCBaWdnSfsE/G/9KrrxYGcYAvEW9sJs4UxrvtdzZXM=  # Production secret
+
+# Database (CRITICAL - PASSWORD MUST BE URL-ENCODED)
+DATABASE_URL=postgresql://postgres.npmksisxmjgnqytcduhs:FenderBass0612%21@aws-1-us-east-1.pooler.supabase.com:5432/postgres
+# NOTE: Password uses %21 (URL-encoded !) not ! directly. Azure CLI escapes special characters incorrectly.
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzg1MDcsImV4cCI6MjA3MjY1NDUwN30.PlJE3-NbzXjuGx9UmcDE9h0IxvSO4xTBTaC7kvGvj4w
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzA3ODUwNywiZXhwIjoyMDcyNjU0NTA3fQ.ccFcXzjRXBZ02UHE2AmYg6G5Ax9ds7aT7XB7b5F6tWw
+
+# Google Maps
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAQ921igVhx1NedjGXnEaE-u5yqprLGK9I
 ```
 
 ### Deployment Commands
@@ -362,6 +385,36 @@ Automated deployment on push to main branch:
 
 See `.github/workflows/azure-deploy.yml` for complete workflow configuration.
 
+### GitHub Secrets Configuration (CRITICAL)
+
+**Repository secrets must be configured at**: https://github.com/MattWarner1215/ForeSome/settings/secrets/actions
+
+**Required Secrets with EXACT values**:
+
+```bash
+# Azure Configuration
+AZURE_CREDENTIALS=<azure-service-principal-json>
+AZURE_REGISTRY_USERNAME=foresomeregistry
+AZURE_REGISTRY_PASSWORD=<from-azure-acr>
+
+# CRITICAL: Must match production configuration EXACTLY
+NEXTAUTH_URL=http://foresumgolf.com
+NEXTAUTH_SECRET=UMCBaWdnSfsE/G/9KrrxYGcYAvEW9sJs4UxrvtdzZXM=
+
+# Database - MUST use URL-encoded password
+DATABASE_URL=postgresql://postgres.npmksisxmjgnqytcduhs:FenderBass0612%21@aws-1-us-east-1.pooler.supabase.com:5432/postgres
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzg1MDcsImV4cCI6MjA3MjY1NDUwN30.PlJE3-NbzXjuGx9UmcDE9h0IxvSO4xTBTaC7kvGvj4w
+SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzA3ODUwNywiZXhwIjoyMDcyNjU0NTA3fQ.ccFcXzjRXBZ02UHE2AmYg6G5Ax9ds7aT7XB7b5F6tWw
+
+# Google Maps
+NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAQ921igVhx1NedjGXnEaE-u5yqprLGK9I
+```
+
+**⚠️ CRITICAL**: If these secrets are not configured correctly, deployments will break authentication and database connectivity.
+
 ### Key Deployment Fixes Applied
 1. **Hostname Binding**: Updated `server.js` from `localhost` to `0.0.0.0` for external container access
 2. **Authentication URL**: Fixed `NEXTAUTH_URL` to use HTTP instead of HTTPS to match container protocol
@@ -394,37 +447,27 @@ az container show --resource-group foresome-rg --name foresum-container --query 
 az container delete --resource-group foresome-rg --name foresum-container --yes
 ```
 
-### Custom Domain Limitations (IMPORTANT)
+### Custom Domain Configuration (WORKING)
 
-**Azure Container Instances does NOT support custom domains natively**. Azure ACI enforces hostname validation and only accepts requests with the official Azure hostname (`foresum-app.eastus.azurecontainer.io`). Any requests using custom domains or direct IP addresses return "Web Page Blocked" errors.
+**✅ Custom domain http://foresumgolf.com is successfully configured and working.**
 
-**Current Status**:
-- ✅ **Working**: http://foresum-app.eastus.azurecontainer.io (port 80)
-- ❌ **Not Working**: Custom domain (foresumgolf.com) - blocked by Azure ACI hostname validation
-- DNS configured correctly (CNAME → Azure hostname) but Azure rejects non-Azure hostnames
+**Working Configuration**:
+- **DNS Type**: CNAME record (NOT A record)
+- **DNS Target**: `foresum-app.eastus.azurecontainer.io`
+- **Cloudflare Proxy**: **DNS only (gray cloud)** - Orange cloud (proxied) will NOT work
+- **Protocol**: HTTP only (port 80) - HTTPS is not supported on Azure ACI
+- **NEXTAUTH_URL**: Must be set to `http://foresumgolf.com` for authentication to work
 
-**Solutions for Custom Domain Support**:
+**Why This Works**:
+Azure Container Instances validates the Host header in requests. When using:
+- Direct IP access → Fails (503 "Web Page Blocked")
+- Cloudflare proxied (orange cloud) → Fails (Azure sees wrong hostname)
+- **DNS only (gray cloud)** → Works! Browser sends correct hostname via CNAME resolution
 
-1. **Migrate to Azure Container Apps** (RECOMMENDED)
-   - Native custom domain support with automatic SSL
-   - Better suited for production workloads
-   - Similar pricing to ACI
-
-2. **Deploy Reverse Proxy**
-   - Deploy nginx/Caddy as separate container
-   - Proxy accepts custom domain, forwards to app with Azure hostname
-   - Adds complexity but enables custom domain with current ACI setup
-
-3. **Use Azure App Service**
-   - Full custom domain and SSL support
-   - More expensive than ACI but production-ready
-
-**Attempted Cloudflare Configuration** (Not functional due to ACI limitations):
-- Type: CNAME record
-- Name: @ (root domain)
-- Target: `foresum-app.eastus.azurecontainer.io`
-- Proxy: DNS only (gray cloud) - required since proxied mode also fails
-- Result: Azure blocks with "Web Page Blocked" error regardless of proxy setting
+**Important Notes**:
+- Site is accessible via HTTP only: http://foresumgolf.com (not HTTPS)
+- Azure ACI does not support SSL termination
+- For HTTPS support, you would need to migrate to Azure Container Apps or use a reverse proxy
 
 ### Production Notes
 - **Database Schema**: Production database needs `EmailRegistration` table for coming soon page
@@ -444,13 +487,35 @@ az container delete --resource-group foresome-rg --name foresum-container --yes
 - **Icons not showing**: Check Git LFS checkout in GitHub Actions and FontAwesome CSS configuration
 - **DNS not resolving**: Wait 5-10 minutes for propagation, purge Cloudflare cache if needed
 
-#### Custom Domain Issues (Azure ACI Limitation)
-- **"Web Page Blocked" error**: Azure Container Instances enforces hostname validation
-  - Only accepts requests with Host header: `foresum-app.eastus.azurecontainer.io`
-  - Rejects all custom domains, IPs, and alternative hostnames
-  - This is an Azure platform limitation, not a configuration issue
-- **Cloudflare 503 errors**: Occurs when Cloudflare proxy tries to connect with custom domain
-  - Cloudflare sends `Host: foresumgolf.com` header
-  - Azure ACI rejects it with 503 Service Unavailable
-  - Turning off Cloudflare proxy (DNS only) still doesn't work - Azure validates hostname
-- **Solution**: Migrate to Azure Container Apps or deploy reverse proxy (see Custom Domain Limitations section)
+#### Authentication/Login Issues
+- **401 Unauthorized errors**: Usually caused by database connection failures
+  - **Check container logs**: `az container logs --resource-group foresome-rg --name foresum-container`
+  - **Look for**: "Authentication failed against database server" or "unexpected message from server"
+  - **Solution**: Verify DATABASE_URL uses URL-encoded password (`%21` not `!`)
+
+- **NEXTAUTH_URL misconfiguration**:
+  - ❌ Wrong: `https://foresumgolf.com` (HTTPS not supported)
+  - ❌ Wrong: `http://foresum-app.eastus.azurecontainer.io` (wrong domain)
+  - ✅ Correct: `http://foresumgolf.com`
+
+#### Database Connection Errors
+- **"Authentication failed against database server"**:
+  - Cause: Special characters in password not properly encoded
+  - Solution: Use URL encoding: `!` → `%21`, `@` → `%40`, etc.
+  - Working password: `FenderBass0612%21` (not `FenderBass0612!`)
+
+- **"Error querying the database: unexpected message from server"**:
+  - Cause: Azure CLI auto-escapes special characters with backslashes
+  - When you pass `FenderBass0612!`, Azure stores it as `FenderBass0612\!`
+  - Solution: Always use URL-encoded passwords in DATABASE_URL
+
+#### Site Not Loading After Deployment
+- **DNS propagation**: Wait 1-5 minutes for CNAME to resolve to new container IP
+- **Test Azure hostname first**: `curl http://foresum-app.eastus.azurecontainer.io`
+- **Check container is running**: Container should show "Ready on http://0.0.0.0:80" in logs
+- **Verify DNS resolution**: `dig foresumgolf.com` should resolve to current container IP
+
+#### Custom Domain Not Working
+- **Cloudflare proxy enabled (orange cloud)**: Turn OFF proxy (use gray cloud/DNS only)
+- **Using A record instead of CNAME**: Change to CNAME pointing to `foresum-app.eastus.azurecontainer.io`
+- **Trying to use HTTPS**: Azure ACI only supports HTTP on port 80
