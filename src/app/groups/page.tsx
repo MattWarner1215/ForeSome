@@ -13,6 +13,7 @@ import { faUsers, faPlus, faCog, faEnvelope, faUser, faArrowLeft } from '@fortaw
 import Link from 'next/link'
 import UserSearch from '@/components/ui/user-search'
 import { GroupIconUpload } from '@/components/ui/group-icon-upload'
+import { GroupInvitations } from '@/components/ui/group-invitations'
 
 interface Group {
   id: string
@@ -247,18 +248,18 @@ export default function GroupsPage() {
                     />
                   </div>
                   <div>
-                    <Label>Add Members</Label>
+                    <Label>Invite Members</Label>
                     <p className="text-sm text-gray-600 mb-2">
-                      Search by email to add members to your group. You can also add members later.
+                      Search and select users to send group invitations. They must accept before joining.
                     </p>
                     <UserSearch
                       selectedUsers={selectedMembers}
                       onUsersChange={setSelectedMembers}
-                      placeholder="Search by name or email to add members..."
+                      placeholder="Search by name or email to invite members..."
                     />
                     {selectedMembers.length > 0 && (
-                      <p className="text-sm text-gray-600 mt-2">
-                        {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected
+                      <p className="text-sm text-green-600 mt-2">
+                        {selectedMembers.length} invitation{selectedMembers.length !== 1 ? 's' : ''} will be sent
                       </p>
                     )}
                   </div>
@@ -294,6 +295,11 @@ export default function GroupsPage() {
               </CardContent>
             </Card>
           )}
+
+          {/* Group Invitations */}
+          <div className="mb-8">
+            <GroupInvitations />
+          </div>
 
             {groups && groups.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

@@ -115,50 +115,73 @@ export async function POST(request: Request) {
       validMemberIds = existingUsers.map(user => user.id)
     }
 
-    const group = await prisma.group.create({
-      data: {
-        name: name.trim(),
-        description: description?.trim() || null,
-        isPrivate: Boolean(isPrivate),
-        creatorId: session.user.id,
-        // Add members if any were provided
-        members: validMemberIds.length > 0 ? {
-          create: validMemberIds.map(memberId => ({
-            userId: memberId,
-            role: 'member'
-          }))
-        } : undefined
-      },
-      include: {
-        creator: {
-          select: {
-            id: true,
-            name: true,
-            email: true
-          }
+    // Create group and send invitations in a transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // Create the group
+      const group = await tx.group.create({
+        data: {
+          name: name.trim(),
+          description: description?.trim() || null,
+          isPrivate: Boolean(isPrivate),
+          creatorId: session.user.id
         },
-        members: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                name: true,
-                email: true,
-                handicap: true
+        include: {
+          creator: {
+            select: {
+              id: true,
+              name: true,
+              email: true
+            }
+          },
+          members: {
+            include: {
+              user: {
+                select: {
+                  id: true,
+                  name: true,
+                  email: true,
+                  handicap: true
+                }
               }
             }
-          }
-        },
-        _count: {
-          select: {
-            members: true,
-            groupMatches: true
+          },
+          _count: {
+            select: {
+              members: true,
+              groupMatches: true
+            }
           }
         }
+      })
+
+      // Send invitations to selected members
+      if (validMemberIds.length > 0) {
+        await tx.groupInvitation.createMany({
+          data: validMemberIds.map(memberId => ({
+            groupId: group.id,
+            inviterId: session.user.id,
+            inviteeId: memberId,
+            status: 'pending'
+          }))
+        })
+
+        // Create notifications for each invitee
+        await tx.notification.createMany({
+          data: validMemberIds.map(memberId => ({
+            type: 'group_invitation',
+            title: 'Group Invitation',
+            message: `You've been invited to join "${group.name}"`,
+            userId: memberId,
+            senderId: session.user.id,
+            groupId: group.id
+          }))
+        })
       }
+
+      return group
     })
 
-    return NextResponse.json(group, { status: 201 })
+    return NextResponse.json(result, { status: 201 })
   } catch (error) {
     console.error('Group creation error:', error)
     return NextResponse.json({ message: 'Internal server error' }, { status: 500 })

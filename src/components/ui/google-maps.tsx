@@ -349,7 +349,7 @@ export function GoogleMapsCard({ rounds, className = '' }: GoogleMapsCardProps) 
                         </span>
                         <span className="flex items-center">
                           <FontAwesomeIcon icon={faUsers} className="h-3 w-3 mr-1" />
-                          {round._count.players}/{round.maxPlayers}
+                          {round._count.players + 1}/{round.maxPlayers}
                         </span>
                       </div>
                     </div>

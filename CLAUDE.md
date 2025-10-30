@@ -110,10 +110,12 @@ The schema is designed around golf round-making with these core relationships:
 - `Match` includes `zipCode` for geographic filtering
 - Creator is automatically considered a participant (not stored in MatchPlayer)
 
-**Group System**: Private groups for recurring players with selective match sharing
+**Group System**: Private groups for recurring players with selective match sharing and invitation-based membership
 - `Group` -> `GroupMember` (membership with roles)
 - `Group` -> `GroupMatch` (selective sharing of private matches with specific groups)
+- `Group` -> `GroupInvitation` (invitation system for joining groups)
 - Users can choose which groups see their private rounds during creation
+- **Invitation System**: Members must be invited and accept before joining groups
 
 ### Authentication Flow
 - NextAuth.js with Prisma adapter for database integration
@@ -132,10 +134,12 @@ The schema is designed around golf round-making with these core relationships:
 
 ### API Route Organization
 ```
-/api/auth/           # NextAuth.js routes + custom signup
-/api/profile/        # User profile management and ratings
-/api/matches/       # Match CRUD, join/leave operations
-/api/groups/         # Group management and membership
+/api/auth/                    # NextAuth.js routes + custom signup
+/api/profile/                 # User profile management and ratings
+/api/matches/                 # Match CRUD, join/leave operations
+/api/groups/                  # Group management and membership
+/api/groups/invitations/      # Group invitation management (send, accept, decline)
+/api/groups/invitations/[id]/ # Individual invitation operations
 ```
 
 ### Frontend Architecture
@@ -148,13 +152,20 @@ The schema is designed around golf round-making with these core relationships:
 1. **Match Joining**: Users can join public matches if not full and not creator
 2. **Geographic Search**: Matches filtered by `zipCode` field for location-based discovery
 3. **Group Privacy**: Groups can share private matches with members only
-4. **Rating System**: Users rate each other after matches, with unique constraint per match
-5. **Authentication**: Credential-based with email/password, no OAuth providers configured
+4. **Group Invitations**: Invitation-based membership system
+   - Users must be invited to join groups
+   - Invitations can be accepted or declined
+   - Only group creators and admins can send invitations
+   - Automatic notifications for invitation events
+5. **Rating System**: Users rate each other after matches, with unique constraint per match
+6. **Authentication**: Credential-based with email/password + Google OAuth provider
 
 ### Database Constraints & Rules
 - Users can only join matches they didn't create
 - Match creators cannot leave their own matches
 - Group creators cannot leave their own groups
+- **Group invitations are unique per group/invitee combination** (one pending invitation per user per group)
+- **Invitations can only be in one state**: pending, accepted, or declined
 - Ratings are unique per rater/ratee/match combination
 - All foreign key relationships use cascade deletes for data integrity
 
@@ -168,19 +179,74 @@ The schema is designed around golf round-making with these core relationships:
 ### Core Components
 - `/src/components/ui/avatar-upload.tsx` - Avatar upload component with preview and error handling
 - `/src/components/ui/user-search.tsx` - Debounced user search for group member selection
+- `/src/components/ui/group-invitations.tsx` - Group invitation display and management component
 - `/src/app/page.tsx` - Main dashboard with carousel navigation and notifications
-- `/src/app/groups/page.tsx` - Group management interface with custom background
+- `/src/app/groups/page.tsx` - Group management interface with custom background and invitations
 
 ### API Routes
 - `/src/app/api/matches/route.ts` - Optimized matches API with single-query efficiency
 - `/src/app/api/profile/avatar/route.ts` - Avatar upload/delete handling
-- `/src/app/api/groups/route.ts` - Group creation with member management
+- `/src/app/api/groups/route.ts` - Group creation with invitation-based member management
+- `/src/app/api/groups/invitations/route.ts` - Fetch and send group invitations
+- `/src/app/api/groups/invitations/[id]/route.ts` - Accept/decline/cancel invitations
 - `/src/app/api/matches/[id]/route.ts` - Match details and management
 
 ### Configuration Files
 - `/src/lib/prisma.ts` - Enhanced Prisma client with performance optimizations
 - `/src/lib/auth.ts` - Authentication with error handling and session management
 - `.env.local` - Optimized database connection string with pooling parameters
+
+### Group Invitation System (Latest Implementation)
+
+#### Overview
+The group invitation system replaces direct member addition with an invitation-based workflow, ensuring users have control over which groups they join.
+
+#### Database Schema
+**GroupInvitation Model**:
+```prisma
+model GroupInvitation {
+  id         String   @id @default(cuid())
+  groupId    String
+  inviterId  String
+  inviteeId  String
+  status     String   @default("pending") // pending, accepted, declined
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  group    Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  inviter  User  @relation("GroupInvitationsSent", fields: [inviterId], references: [id])
+  invitee  User  @relation("GroupInvitationsReceived", fields: [inviteeId], references: [id])
+
+  @@unique([groupId, inviteeId])
+  @@index([inviteeId, status])
+  @@index([groupId, status])
+}
+```
+
+#### Key Features
+1. **Invitation Workflow**: When creating a group, selected users receive invitations instead of being added directly
+2. **Accept/Decline**: Users can accept or decline group invitations from the groups page
+3. **Notifications**: Automatic notifications are sent for all invitation events
+4. **Permission Control**: Only group creators and admins can send invitations
+5. **Duplicate Prevention**: Unique constraint prevents duplicate invitations per user per group
+6. **Transaction Safety**: All invitation operations use database transactions for consistency
+
+#### API Endpoints
+- `GET /api/groups/invitations` - Fetch user's pending invitations
+- `POST /api/groups/invitations` - Send invitation to user (creator/admin only)
+- `PATCH /api/groups/invitations/[id]` - Accept or decline invitation
+- `DELETE /api/groups/invitations/[id]` - Cancel invitation (creator/admin only)
+
+#### Frontend Integration
+- **GroupInvitations Component**: Displays pending invitations with accept/decline buttons
+- **Group Creation Form**: Updated to send invitations instead of adding members directly
+- **Real-time Updates**: React Query invalidates cache on invitation actions
+
+#### Database Setup
+If Prisma migrations fail due to connection issues, use the manual script:
+```bash
+node scripts/create-group-invitations-table.js
+```
 
 ### Recent Match Logic Improvements
 1. **Public Matches Filter**: Excludes user's own created matches

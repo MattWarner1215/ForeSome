@@ -59,6 +59,8 @@ model User {
   givenRatings  Rating[]        @relation("GivenRatings")
   groups        GroupMember[]
   createdGroups Group[]         @relation("GroupCreator")
+  groupInvitationsSent     GroupInvitation[] @relation("GroupInvitationsSent")
+  groupInvitationsReceived GroupInvitation[] @relation("GroupInvitationsReceived")
   notifications Notification[]  @relation("UserNotifications")
   sentNotifications Notification[] @relation("NotificationSender")
   chatRooms     ChatRoom[]
@@ -129,6 +131,7 @@ model Group {
 
   creator      User          @relation("GroupCreator", fields: [creatorId], references: [id])
   members      GroupMember[]
+  invitations  GroupInvitation[]
   groupMatches GroupMatch[]
   notifications Notification[]
 }
@@ -143,6 +146,24 @@ model GroupMember {
   user  User  @relation(fields: [userId], references: [id])
 
   @@unique([groupId, userId])
+}
+
+model GroupInvitation {
+  id         String   @id @default(cuid())
+  groupId    String
+  inviterId  String
+  inviteeId  String
+  status     String   @default("pending") // pending, accepted, declined
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  group    Group @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  inviter  User  @relation("GroupInvitationsSent", fields: [inviterId], references: [id])
+  invitee  User  @relation("GroupInvitationsReceived", fields: [inviteeId], references: [id])
+
+  @@unique([groupId, inviteeId])
+  @@index([inviteeId, status])
+  @@index([groupId, status])
 }
 
 model GroupMatch {
