@@ -51,6 +51,7 @@ jobs:
     - name: Deploy to Azure Container App
       run: |
         echo "Deploying Container App with image tag: ${{ env.IMAGE_TAG }}"
+        echo "Using Supabase pooler port 6543 for database connection"
         az containerapp update \
           --name ${{ env.CONTAINER_APP_NAME }} \
           --resource-group ${{ env.RESOURCE_GROUP }} \
@@ -60,7 +61,7 @@ jobs:
             NODE_ENV=production \
             HOSTNAME=0.0.0.0 \
             PORT=80 \
-            DATABASE_URL="${{ secrets.DATABASE_URL }}" \
+            "DATABASE_URL=postgresql://postgres.npmksisxmjgnqytcduhs:FenderBass0612%21@aws-1-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true&connection_limit=1" \
             NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
             NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}" \
             GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
