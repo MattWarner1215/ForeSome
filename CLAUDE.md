@@ -339,6 +339,10 @@ NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzg1MDcsImV4cCI6MjA3MjY1NDUwN30.PlJE3-NbzXjuGx9UmcDE9h0IxvSO4xTBTaC7kvGvj4w
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzA3ODUwNywiZXhwIjoyMDcyNjU0NTA3fQ.ccFcXzjRXBZ02UHE2AmYg6G5Ax9ds7aT7XB7b5F6tWw
 
+# Google OAuth (REQUIRED for Google Sign-In)
+GOOGLE_CLIENT_ID=<your-google-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
+
 # Google Maps
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAQ921igVhx1NedjGXnEaE-u5yqprLGK9I
 ```
@@ -409,11 +413,15 @@ NEXT_PUBLIC_SUPABASE_URL=https://npmksisxmjgnqytcduhs.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcwNzg1MDcsImV4cCI6MjA3MjY1NDUwN30.PlJE3-NbzXjuGx9UmcDE9h0IxvSO4xTBTaC7kvGvj4w
 SUPABASE_SERVICE_ROLE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5wbWtzaXN4bWpnbnF5dGNkdWhzIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NzA3ODUwNywiZXhwIjoyMDcyNjU0NTA3fQ.ccFcXzjRXBZ02UHE2AmYg6G5Ax9ds7aT7XB7b5F6tWw
 
+# Google OAuth (REQUIRED for Google Sign-In feature parity)
+GOOGLE_CLIENT_ID=<your-google-client-id>
+GOOGLE_CLIENT_SECRET=<your-google-client-secret>
+
 # Google Maps
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAQ921igVhx1NedjGXnEaE-u5yqprLGK9I
 ```
 
-**⚠️ CRITICAL**: If these secrets are not configured correctly, deployments will break authentication and database connectivity.
+**⚠️ CRITICAL**: If these secrets are not configured correctly, deployments will break authentication and database connectivity. Missing GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET will disable Google Sign-In.
 
 ### Key Deployment Fixes Applied
 1. **Hostname Binding**: Updated `server.js` from `localhost` to `0.0.0.0` for external container access

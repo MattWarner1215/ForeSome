@@ -1,4 +1,4 @@
-name: Deploy to Azure Container Instance
+name: Deploy to Azure Container Apps
 
 on:
   push:
@@ -9,8 +9,8 @@ env:
   REGISTRY_NAME: foresomeregistry.azurecr.io
   IMAGE_NAME: foresum
   RESOURCE_GROUP: foresome-rg
-  CONTAINER_NAME: foresum-container
-  DNS_NAME_LABEL: foresum-app
+  CONTAINER_APP_NAME: foresum-app
+  CONTAINER_APP_ENV: foresum-env
 
 jobs:
   build-and-deploy:
@@ -44,31 +44,14 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    - name: Delete existing container instance
+    - name: Deploy to Azure Container App
       run: |
-        echo "Deleting existing container instance..."
-        az container delete \
+        echo "Deploying Container App with image tag: ${{ env.IMAGE_TAG }}"
+        az containerapp update \
+          --name ${{ env.CONTAINER_APP_NAME }} \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.CONTAINER_NAME }} \
-          --yes \
-          || echo "No existing container to delete"
-
-    - name: Deploy to Azure Container Instance
-      run: |
-        echo "Deploying container instance with image tag: ${{ env.IMAGE_TAG }}"
-        az container create \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.CONTAINER_NAME }} \
           --image ${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }} \
-          --dns-name-label ${{ env.DNS_NAME_LABEL }} \
-          --ports 80 \
-          --cpu 1 \
-          --memory 2 \
-          --os-type Linux \
-          --registry-login-server ${{ env.REGISTRY_NAME }} \
-          --registry-username ${{ secrets.AZURE_REGISTRY_USERNAME }} \
-          --registry-password ${{ secrets.AZURE_REGISTRY_PASSWORD }} \
-          --environment-variables \
+          --set-env-vars \
             NEXT_PUBLIC_SUPABASE_URL="${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}" \
             NODE_ENV=production \
             HOSTNAME=0.0.0.0 \
@@ -76,36 +59,32 @@ jobs:
             DATABASE_URL="${{ secrets.DATABASE_URL }}" \
             NEXTAUTH_SECRET="${{ secrets.NEXTAUTH_SECRET }}" \
             NEXTAUTH_URL="${{ secrets.NEXTAUTH_URL }}" \
+            GOOGLE_CLIENT_ID="${{ secrets.GOOGLE_CLIENT_ID }}" \
+            GOOGLE_CLIENT_SECRET="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
             NEXT_PUBLIC_SUPABASE_ANON_KEY="${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}" \
             SUPABASE_SERVICE_ROLE_KEY="${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
             NEXT_PUBLIC_GOOGLE_MAPS_API_KEY="${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}"
 
-    - name: Get container IP and URL
+    - name: Get Container App URL
       run: |
-        echo "Waiting for container to start..."
-        sleep 10
-        CONTAINER_IP=$(az container show \
+        echo "Waiting for revision to be ready..."
+        sleep 15
+        CONTAINER_APP_URL=$(az containerapp show \
+          --name ${{ env.CONTAINER_APP_NAME }} \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.CONTAINER_NAME }} \
-          --query "ipAddress.ip" \
+          --query "properties.configuration.ingress.fqdn" \
           --output tsv)
-        CONTAINER_FQDN=$(az container show \
-          --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.CONTAINER_NAME }} \
-          --query "ipAddress.fqdn" \
-          --output tsv)
-        echo "Container IP: ${CONTAINER_IP}"
-        echo "Container URL: http://${CONTAINER_FQDN}:3000"
         echo "---"
         echo "Deployment complete! 🚀"
-        echo "Access your application at: http://${CONTAINER_FQDN}:3000"
+        echo "Container App URL: https://${CONTAINER_APP_URL}"
+        echo "Production URL: https://foresumgolf.com"
 
-    - name: Show container logs
+    - name: Show Container App logs
       if: always()
       run: |
-        echo "Fetching container logs..."
-        az container logs \
+        echo "Fetching Container App logs..."
+        az containerapp logs show \
+          --name ${{ env.CONTAINER_APP_NAME }} \
           --resource-group ${{ env.RESOURCE_GROUP }} \
-          --name ${{ env.CONTAINER_NAME }} \
           --tail 50 \
           || echo "Could not fetch logs"
