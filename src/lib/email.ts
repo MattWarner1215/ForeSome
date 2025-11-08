@@ -93,40 +93,18 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #10b981 0%, #059669 100%);
               color: white;
-              padding: 40px 30px;
+              padding: 24px 30px;
               text-align: center;
-              position: relative;
-            }
-            .header::after {
-              content: '';
-              position: absolute;
-              bottom: -20px;
-              left: 0;
-              right: 0;
-              height: 20px;
-              background: white;
-              border-radius: 20px 20px 0 0;
             }
             .header h1 {
-              font-size: 32px;
-              margin-bottom: 8px;
+              font-size: 24px;
+              margin-bottom: 4px;
               font-weight: 700;
             }
             .header p {
-              font-size: 16px;
+              font-size: 14px;
               opacity: 0.95;
-              font-weight: 500;
-            }
-            .icon-badge {
-              background: rgba(255,255,255,0.2);
-              width: 70px;
-              height: 70px;
-              border-radius: 50%;
-              margin: 0 auto 20px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 36px;
+              font-weight: 400;
             }
             .content {
               background: white;
@@ -241,11 +219,8 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <div class="icon-badge">
-                  <i class="fas fa-golf-ball"></i>
-                </div>
-                <h1>ForeSum</h1>
-                <p><i class="fas fa-user-plus"></i> New Join Request</p>
+                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
+                <p>New Join Request</p>
               </div>
               <div class="content">
                 <div class="greeting">Hi ${recipientName}!</div>
@@ -338,40 +313,18 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #10b981 0%, #059669 100%);
               color: white;
-              padding: 40px 30px;
+              padding: 24px 30px;
               text-align: center;
-              position: relative;
-            }
-            .header::after {
-              content: '';
-              position: absolute;
-              bottom: -20px;
-              left: 0;
-              right: 0;
-              height: 20px;
-              background: white;
-              border-radius: 20px 20px 0 0;
             }
             .header h1 {
-              font-size: 32px;
-              margin-bottom: 8px;
+              font-size: 24px;
+              margin-bottom: 4px;
               font-weight: 700;
             }
             .header p {
-              font-size: 16px;
+              font-size: 14px;
               opacity: 0.95;
-              font-weight: 500;
-            }
-            .icon-badge {
-              background: rgba(255,255,255,0.2);
-              width: 70px;
-              height: 70px;
-              border-radius: 50%;
-              margin: 0 auto 20px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 36px;
+              font-weight: 400;
             }
             .content {
               background: white;
@@ -509,11 +462,8 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <div class="icon-badge">
-                  <i class="fas fa-check-circle"></i>
-                </div>
-                <h1>ForeSum</h1>
-                <p><i class="fas fa-thumbs-up"></i> Request Approved!</p>
+                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
+                <p>Request Approved!</p>
               </div>
               <div class="content">
                 <div style="text-align: center;">
@@ -616,40 +566,18 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
               color: white;
-              padding: 40px 30px;
+              padding: 24px 30px;
               text-align: center;
-              position: relative;
-            }
-            .header::after {
-              content: '';
-              position: absolute;
-              bottom: -20px;
-              left: 0;
-              right: 0;
-              height: 20px;
-              background: white;
-              border-radius: 20px 20px 0 0;
             }
             .header h1 {
-              font-size: 32px;
-              margin-bottom: 8px;
+              font-size: 24px;
+              margin-bottom: 4px;
               font-weight: 700;
             }
             .header p {
-              font-size: 16px;
+              font-size: 14px;
               opacity: 0.95;
-              font-weight: 500;
-            }
-            .icon-badge {
-              background: rgba(255,255,255,0.2);
-              width: 70px;
-              height: 70px;
-              border-radius: 50%;
-              margin: 0 auto 20px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 36px;
+              font-weight: 400;
             }
             .content {
               background: white;
@@ -758,11 +686,8 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <div class="icon-badge">
-                  <i class="fas fa-info-circle"></i>
-                </div>
-                <h1>ForeSum</h1>
-                <p><i class="fas fa-file-circle-xmark"></i> Request Update</p>
+                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
+                <p>Request Update</p>
               </div>
               <div class="content">
                 <div class="greeting">Hi ${recipientName},</div>
@@ -851,40 +776,18 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #7c3aed 0%, #a78bfa 100%);
               color: white;
-              padding: 40px 30px;
+              padding: 24px 30px;
               text-align: center;
-              position: relative;
-            }
-            .header::after {
-              content: '';
-              position: absolute;
-              bottom: -20px;
-              left: 0;
-              right: 0;
-              height: 20px;
-              background: white;
-              border-radius: 20px 20px 0 0;
             }
             .header h1 {
-              font-size: 32px;
-              margin-bottom: 8px;
+              font-size: 24px;
+              margin-bottom: 4px;
               font-weight: 700;
             }
             .header p {
-              font-size: 16px;
+              font-size: 14px;
               opacity: 0.95;
-              font-weight: 500;
-            }
-            .icon-badge {
-              background: rgba(255,255,255,0.2);
-              width: 70px;
-              height: 70px;
-              border-radius: 50%;
-              margin: 0 auto 20px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 36px;
+              font-weight: 400;
             }
             .content {
               background: white;
@@ -999,11 +902,8 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <div class="icon-badge">
-                  <i class="fas fa-users"></i>
-                </div>
-                <h1>ForeSum</h1>
-                <p><i class="fas fa-envelope-open-text"></i> Group Invitation</p>
+                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
+                <p>Group Invitation</p>
               </div>
               <div class="content">
                 <div class="greeting">Hi ${recipientName}!</div>
@@ -1107,40 +1007,18 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
               color: white;
-              padding: 40px 30px;
+              padding: 24px 30px;
               text-align: center;
-              position: relative;
-            }
-            .header::after {
-              content: '';
-              position: absolute;
-              bottom: -20px;
-              left: 0;
-              right: 0;
-              height: 20px;
-              background: white;
-              border-radius: 20px 20px 0 0;
             }
             .header h1 {
-              font-size: 32px;
-              margin-bottom: 8px;
+              font-size: 24px;
+              margin-bottom: 4px;
               font-weight: 700;
             }
             .header p {
-              font-size: 16px;
+              font-size: 14px;
               opacity: 0.95;
-              font-weight: 500;
-            }
-            .icon-badge {
-              background: rgba(255,255,255,0.2);
-              width: 70px;
-              height: 70px;
-              border-radius: 50%;
-              margin: 0 auto 20px;
-              display: flex;
-              align-items: center;
-              justify-content: center;
-              font-size: 36px;
+              font-weight: 400;
             }
             .content {
               background: white;
@@ -1250,11 +1128,8 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <div class="icon-badge">
-                  <i class="fas fa-bell"></i>
-                </div>
-                <h1>ForeSum</h1>
-                <p><i class="fas fa-sync-alt"></i> Match Update</p>
+                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
+                <p>Match Update</p>
               </div>
               <div class="content">
                 <div class="greeting">Hi ${recipientName}!</div>
