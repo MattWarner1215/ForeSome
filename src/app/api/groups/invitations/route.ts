@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { EmailService } from '@/lib/email'
 
 // GET - Fetch user's pending group invitations
 export async function GET(request: Request) {
@@ -166,6 +167,37 @@ export async function POST(request: Request) {
           }
         })
 
+        // Send email notification if user has it enabled
+        try {
+          const invitee = await prisma.user.findUnique({
+            where: { id: inviteeId },
+            select: {
+              email: true,
+              name: true,
+              emailNotifications: true,
+              emailGroupInvitations: true
+            }
+          })
+
+          const inviter = await prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { name: true, email: true }
+          })
+
+          if (invitee?.emailNotifications && invitee?.emailGroupInvitations) {
+            await EmailService.sendGroupInvitationEmail(
+              invitee.email,
+              invitee.name || 'Golfer',
+              inviter?.name || inviter?.email || 'Unknown User',
+              group.name,
+              groupId
+            )
+          }
+        } catch (error) {
+          console.error('Failed to send group invitation email:', error)
+          // Don't fail the invitation if email fails
+        }
+
         return NextResponse.json(updatedInvitation)
       }
     }
@@ -191,6 +223,37 @@ export async function POST(request: Request) {
         groupId: groupId
       }
     })
+
+    // Send email notification if user has it enabled
+    try {
+      const invitee = await prisma.user.findUnique({
+        where: { id: inviteeId },
+        select: {
+          email: true,
+          name: true,
+          emailNotifications: true,
+          emailGroupInvitations: true
+        }
+      })
+
+      const inviter = await prisma.user.findUnique({
+        where: { id: session.user.id },
+        select: { name: true, email: true }
+      })
+
+      if (invitee?.emailNotifications && invitee?.emailGroupInvitations) {
+        await EmailService.sendGroupInvitationEmail(
+          invitee.email,
+          invitee.name || 'Golfer',
+          inviter?.name || inviter?.email || 'Unknown User',
+          group.name,
+          groupId
+        )
+      }
+    } catch (error) {
+      console.error('Failed to send group invitation email:', error)
+      // Don't fail the invitation if email fails
+    }
 
     return NextResponse.json(invitation, { status: 201 })
   } catch (error) {

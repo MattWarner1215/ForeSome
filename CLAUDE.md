@@ -81,11 +81,17 @@ ngrok http 3000
    - Enable Maps JavaScript API and Geocoding API
    - Create an API key and restrict it to your domain
    - Set `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` in your environment
-9. Run `npm run db:generate && npm run db:push` to initialize database
-10. Run `npx tsx scripts/setup-supabase-storage.ts` to create storage buckets
-11. Run `npx tsx scripts/seed-golf-courses.ts` to populate the golf course database with 172 Ohio courses
-12. (Optional) Run `node scripts/update-golf-course-coordinates.js` to geocode golf course coordinates
-13. (Optional) Run `node scripts/remove-duplicate-golf-courses.js` to clean up duplicate course records
+9. Set up Resend for email notifications:
+   - Sign up at [Resend](https://resend.com) (free tier: 3,000 emails/month)
+   - Get your API key from the dashboard
+   - Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` in your environment
+   - For development, use `onboarding@resend.dev` as sender
+   - For production, verify your domain and use `noreply@yourdomain.com`
+10. Run `npm run db:generate && npm run db:push` to initialize database
+11. Run `npx tsx scripts/setup-supabase-storage.ts` to create storage buckets
+12. Run `npx tsx scripts/seed-golf-courses.ts` to populate the golf course database with 172 Ohio courses
+13. (Optional) Run `node scripts/update-golf-course-coordinates.js` to geocode golf course coordinates
+14. (Optional) Run `node scripts/remove-duplicate-golf-courses.js` to clean up duplicate course records
 
 ## Architecture Overview
 
@@ -94,6 +100,7 @@ ngrok http 3000
 - **Database**: PostgreSQL with Prisma ORM
 - **File Storage**: Supabase Storage for images and assets
 - **Authentication**: NextAuth.js with credentials provider
+- **Email Notifications**: Resend (3,000 free emails/month)
 - **State Management**: TanStack Query (server state) + Zustand (client state)
 - **UI**: Tailwind CSS + shadcn/ui components
 - **Golf Course Data**: Database-driven golf course search with 172 Ohio courses (95 with coordinates, 55.2% coverage)
@@ -485,9 +492,13 @@ GOOGLE_CLIENT_SECRET=<your-google-client-secret>
 
 # Google Maps
 NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=AIzaSyAQ921igVhx1NedjGXnEaE-u5yqprLGK9I
+
+# Email Notifications (REQUIRED for email features)
+RESEND_API_KEY=re_your_resend_api_key
+RESEND_FROM_EMAIL=onboarding@resend.dev  # Use verified domain in production
 ```
 
-**⚠️ CRITICAL**: If these secrets are not configured correctly, deployments will break authentication and database connectivity. Missing GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET will disable Google Sign-In.
+**⚠️ CRITICAL**: If these secrets are not configured correctly, deployments will break authentication and database connectivity. Missing GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET will disable Google Sign-In. Missing RESEND_API_KEY and RESEND_FROM_EMAIL will disable email notifications.
 
 ### Key Deployment Fixes Applied
 1. **Hostname Binding**: Updated `server.js` from `localhost` to `0.0.0.0` for external container access
@@ -593,3 +604,175 @@ Azure Container Instances validates the Host header in requests. When using:
 - **Cloudflare proxy enabled (orange cloud)**: Turn OFF proxy (use gray cloud/DNS only)
 - **Using A record instead of CNAME**: Change to CNAME pointing to `foresum-app.eastus.azurecontainer.io`
 - **Trying to use HTTPS**: Azure ACI only supports HTTP on port 80
+
+## Email Notifications System (Latest Update)
+
+### Overview
+ForeSum uses **Resend** for sending email notifications to users about app activity. Users can control which types of emails they receive through their profile settings.
+
+### Email Service Architecture
+- **Provider**: Resend (https://resend.com)
+- **Cost**: FREE tier with 3,000 emails/month
+- **Templates**: Beautiful HTML emails with ForeSum branding
+- **User Control**: Granular email preferences per notification type
+
+### Email Notification Types
+
+| Type | Description | User Preference Field | Default |
+|------|-------------|----------------------|---------|
+| **Join Requests** | Sent to match creator when someone requests to join | `emailJoinRequests` | ✅ Enabled |
+| **Join Approvals** | Sent to requester when approved or declined | `emailJoinApprovals` | ✅ Enabled |
+| **Match Updates** | Sent to all participants when match details change | `emailMatchUpdates` | ✅ Enabled |
+| **Group Invitations** | Sent when invited to join a group | `emailGroupInvitations` | ✅ Enabled |
+| **Master Toggle** | Enable/disable all email notifications | `emailNotifications` | ✅ Enabled |
+
+### Setup Instructions
+
+1. **Sign up for Resend** (2 minutes):
+   - Go to https://resend.com
+   - Create free account (no credit card needed)
+   - Get your API key from dashboard
+
+2. **Configure Environment Variables**:
+   ```bash
+   # Add to .env.local
+   RESEND_API_KEY="re_your_api_key_here"
+   RESEND_FROM_EMAIL="onboarding@resend.dev"  # For testing
+   # Or use your verified domain: "noreply@foresumgolf.com"
+   ```
+
+3. **Add Database Columns** (if not already done):
+   ```bash
+   # Run SQL script in Supabase dashboard
+   # File: scripts/add-email-preferences.sql
+   ```
+
+4. **Test Email Sending**:
+   ```bash
+   npx tsx scripts/test-email.ts
+   ```
+
+### API Endpoints
+
+#### Get Email Preferences
+```http
+GET /api/profile/email-preferences
+Authorization: Required (session)
+
+Response:
+{
+  "emailNotifications": true,
+  "emailJoinRequests": true,
+  "emailJoinApprovals": true,
+  "emailMatchUpdates": true,
+  "emailGroupInvitations": true
+}
+```
+
+#### Update Email Preferences
+```http
+PATCH /api/profile/email-preferences
+Authorization: Required (session)
+Content-Type: application/json
+
+Body:
+{
+  "emailNotifications": false,
+  "emailJoinRequests": true
+}
+
+Response:
+{
+  "message": "Email preferences updated successfully",
+  "preferences": { ... }
+}
+```
+
+### Database Schema
+
+Email preferences are stored in the `User` model:
+
+```prisma
+model User {
+  // ... other fields ...
+
+  emailNotifications       Boolean @default(true)
+  emailJoinRequests        Boolean @default(true)
+  emailJoinApprovals       Boolean @default(true)
+  emailMatchUpdates        Boolean @default(true)
+  emailGroupInvitations    Boolean @default(true)
+}
+```
+
+### Key Implementation Files
+
+- `/src/lib/email.ts` - Email service with Resend client and HTML templates
+- `/src/lib/notifications.ts` - Notification service with email integration
+- `/src/app/api/profile/email-preferences/route.ts` - API for managing preferences
+- `/scripts/test-email.ts` - Email testing script
+- `/scripts/add-email-preferences.sql` - Database migration script
+- `/docs/EMAIL-NOTIFICATIONS-SETUP.md` - Complete setup documentation
+
+### Email Templates
+
+All emails feature:
+- ✅ ForeSum branding with green/emerald color scheme
+- ✅ Responsive HTML design (mobile-friendly)
+- ✅ Clear call-to-action buttons
+- ✅ Links back to the app
+- ✅ Email preference management link in footer
+
+### Production Configuration
+
+For production with custom domain:
+
+1. **Verify Domain in Resend**:
+   - Add domain in Resend dashboard
+   - Configure DNS records (SPF, DKIM, DMARC)
+   - Wait for verification
+
+2. **Update Environment Variables**:
+   ```bash
+   RESEND_FROM_EMAIL="noreply@foresumgolf.com"
+   ```
+
+3. **Test Deliverability**:
+   - Send test emails to various providers (Gmail, Outlook, etc.)
+   - Check spam folders
+   - Monitor Resend dashboard for delivery status
+
+### Cost Estimate
+
+Based on typical usage:
+- 100 active users
+- 2 rounds/user/month
+- 3 join requests per round
+- 80% approval rate
+
+**Monthly email volume**: ~1,700 emails ✅ Fits in free tier (3,000/month)
+
+### Troubleshooting
+
+**Emails Not Sending:**
+1. Check `RESEND_API_KEY` is set in environment
+2. Verify `RESEND_FROM_EMAIL` is configured
+3. For development, use `onboarding@resend.dev`
+4. Check server logs for errors
+5. View Resend dashboard for delivery status
+
+**Emails Going to Spam:**
+1. Verify your domain in Resend
+2. Complete all DNS verification (SPF, DKIM, DMARC)
+3. Use a verified sender domain (not test domain)
+4. Test with https://www.mail-tester.com
+
+### Features
+
+- **Automatic Sending**: Emails sent automatically when events occur
+- **User Preferences**: Granular control over notification types
+- **Graceful Failures**: Email failures don't block app functionality
+- **Rate Limiting**: Respects Resend rate limits
+- **Beautiful Templates**: Professional HTML emails with branding
+- **Mobile-Optimized**: Responsive design for all devices
+
+See `/docs/EMAIL-NOTIFICATIONS-SETUP.md` for comprehensive documentation.
