@@ -75,12 +75,13 @@ export class EmailService {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               line-height: 1.6;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
               padding: 40px 20px;
             }
             .email-wrapper { max-width: 600px; margin: 0 auto; }
@@ -93,28 +94,68 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #10b981 0%, #059669 100%);
               color: white;
-              padding: 24px 30px;
+              padding: 32px 30px;
               text-align: center;
+              position: relative;
+              overflow: hidden;
+            }
+            .header::before {
+              content: '';
+              position: absolute;
+              top: -50%;
+              right: -50%;
+              width: 200%;
+              height: 200%;
+              background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+              animation: pulse 3s ease-in-out infinite;
+            }
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); opacity: 0.5; }
+              50% { transform: scale(1.1); opacity: 0.8; }
+            }
+            .header-content {
+              position: relative;
+              z-index: 1;
+            }
+            .brand-icon {
+              display: inline-block;
+              width: 48px;
+              height: 48px;
+              background: rgba(255,255,255,0.2);
+              border-radius: 12px;
+              line-height: 48px;
+              font-size: 24px;
+              margin-bottom: 12px;
+              backdrop-filter: blur(10px);
+              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
             .header h1 {
-              font-size: 24px;
-              margin-bottom: 4px;
-              font-weight: 700;
+              font-size: 28px;
+              margin-bottom: 6px;
+              font-weight: 800;
+              letter-spacing: -0.5px;
             }
             .header p {
-              font-size: 14px;
-              opacity: 0.95;
-              font-weight: 400;
+              font-size: 13px;
+              opacity: 0.9;
+              font-weight: 500;
+              text-transform: uppercase;
+              letter-spacing: 1px;
             }
             .content {
               background: white;
               padding: 40px 30px;
             }
             .greeting {
-              font-size: 24px;
-              color: #1f2937;
-              margin-bottom: 20px;
-              font-weight: 600;
+              font-size: 26px;
+              color: #0f172a;
+              margin-bottom: 16px;
+              font-weight: 700;
+              letter-spacing: -0.5px;
+            }
+            .greeting i {
+              color: #10b981;
+              margin-right: 8px;
             }
             .message {
               color: #4b5563;
@@ -219,13 +260,18 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
-                <p>New Join Request</p>
+                <div class="header-content">
+                  <div class="brand-icon">
+                    <i class="fas fa-golf-ball-tee"></i>
+                  </div>
+                  <h1>ForeSum Golf</h1>
+                  <p>New Join Request</p>
+                </div>
               </div>
               <div class="content">
-                <div class="greeting">Hi ${recipientName}!</div>
+                <div class="greeting"><i class="fas fa-hand-wave"></i> Hi ${recipientName}!</div>
                 <div class="message">
-                  <strong>${requesterName}</strong> wants to join your golf round and is waiting for your approval!
+                  <i class="fas fa-user-circle" style="color: #10b981; margin-right: 6px;"></i><strong>${requesterName}</strong> wants to join your golf round and is waiting for your approval!
                 </div>
 
                 <div class="match-card">
@@ -257,7 +303,7 @@ export class EmailService {
                 </div>
               </div>
               <div class="footer">
-                <p><strong>ForeSum</strong> - Connect with golfers and enjoy the game</p>
+                <p><i class="fas fa-golf-ball-tee" style="color: #10b981;"></i> <strong>ForeSum Golf</strong> - Connect with golfers and enjoy the game</p>
                 <p>
                   <a href="${process.env.NEXTAUTH_URL}/profile"><i class="fas fa-cog"></i> Manage Email Preferences</a>
                 </p>
@@ -295,12 +341,13 @@ export class EmailService {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               line-height: 1.6;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
               padding: 40px 20px;
             }
             .email-wrapper { max-width: 600px; margin: 0 auto; }
@@ -313,18 +360,53 @@ export class EmailService {
             .header {
               background: linear-gradient(135deg, #10b981 0%, #059669 100%);
               color: white;
-              padding: 24px 30px;
+              padding: 32px 30px;
               text-align: center;
+              position: relative;
+              overflow: hidden;
+            }
+            .header::before {
+              content: '';
+              position: absolute;
+              top: -50%;
+              right: -50%;
+              width: 200%;
+              height: 200%;
+              background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+              animation: pulse 3s ease-in-out infinite;
+            }
+            @keyframes pulse {
+              0%, 100% { transform: scale(1); opacity: 0.5; }
+              50% { transform: scale(1.1); opacity: 0.8; }
+            }
+            .header-content {
+              position: relative;
+              z-index: 1;
+            }
+            .brand-icon {
+              display: inline-block;
+              width: 48px;
+              height: 48px;
+              background: rgba(255,255,255,0.2);
+              border-radius: 12px;
+              line-height: 48px;
+              font-size: 24px;
+              margin-bottom: 12px;
+              backdrop-filter: blur(10px);
+              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
             }
             .header h1 {
-              font-size: 24px;
-              margin-bottom: 4px;
-              font-weight: 700;
+              font-size: 28px;
+              margin-bottom: 6px;
+              font-weight: 800;
+              letter-spacing: -0.5px;
             }
             .header p {
-              font-size: 14px;
-              opacity: 0.95;
-              font-weight: 400;
+              font-size: 13px;
+              opacity: 0.9;
+              font-weight: 500;
+              text-transform: uppercase;
+              letter-spacing: 1px;
             }
             .content {
               background: white;
@@ -345,10 +427,15 @@ export class EmailService {
               margin-right: 8px;
             }
             .greeting {
-              font-size: 24px;
-              color: #1f2937;
-              margin-bottom: 20px;
-              font-weight: 600;
+              font-size: 26px;
+              color: #0f172a;
+              margin-bottom: 16px;
+              font-weight: 700;
+              letter-spacing: -0.5px;
+            }
+            .greeting i {
+              color: #10b981;
+              margin-right: 8px;
             }
             .message {
               color: #4b5563;
@@ -462,8 +549,13 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
-                <p>Request Approved!</p>
+                <div class="header-content">
+                  <div class="brand-icon">
+                    <i class="fas fa-golf-ball-tee"></i>
+                  </div>
+                  <h1>ForeSum Golf</h1>
+                  <p>Request Approved!</p>
+                </div>
               </div>
               <div class="content">
                 <div style="text-align: center;">
@@ -472,9 +564,9 @@ export class EmailService {
                   </div>
                 </div>
 
-                <div class="greeting">Great news, ${recipientName}!</div>
+                <div class="greeting"><i class="fas fa-party-horn"></i> Great news, ${recipientName}!</div>
                 <div class="message">
-                  Your request to join <strong>${matchTitle}</strong> has been approved! Time to dust off those clubs!
+                  <i class="fas fa-circle-check" style="color: #10b981; margin-right: 6px;"></i>Your request to join <strong>${matchTitle}</strong> has been approved! Time to dust off those clubs!
                 </div>
 
                 <div class="match-card">
@@ -513,7 +605,7 @@ export class EmailService {
                 </div>
               </div>
               <div class="footer">
-                <p><strong>ForeSum</strong> - Connect with golfers and enjoy the game</p>
+                <p><i class="fas fa-golf-ball-tee" style="color: #10b981;"></i> <strong>ForeSum Golf</strong> - Connect with golfers and enjoy the game</p>
                 <p>
                   <a href="${process.env.NEXTAUTH_URL}/profile"><i class="fas fa-cog"></i> Manage Email Preferences</a>
                 </p>
@@ -548,12 +640,13 @@ export class EmailService {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               line-height: 1.6;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
               padding: 40px 20px;
             }
             .email-wrapper { max-width: 600px; margin: 0 auto; }
@@ -584,10 +677,15 @@ export class EmailService {
               padding: 40px 30px;
             }
             .greeting {
-              font-size: 24px;
-              color: #1f2937;
-              margin-bottom: 20px;
-              font-weight: 600;
+              font-size: 26px;
+              color: #0f172a;
+              margin-bottom: 16px;
+              font-weight: 700;
+              letter-spacing: -0.5px;
+            }
+            .greeting i {
+              color: #10b981;
+              margin-right: 8px;
             }
             .message {
               color: #4b5563;
@@ -686,13 +784,18 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
-                <p>Request Update</p>
+                <div class="header-content">
+                  <div class="brand-icon">
+                    <i class="fas fa-golf-ball-tee"></i>
+                  </div>
+                  <h1>ForeSum Golf</h1>
+                  <p>Request Update</p>
+                </div>
               </div>
               <div class="content">
-                <div class="greeting">Hi ${recipientName},</div>
+                <div class="greeting"><i class="fas fa-hand-wave"></i> Hi ${recipientName},</div>
                 <div class="message">
-                  Your request to join <strong>${matchTitle}</strong> was not approved this time.
+                  <i class="fas fa-info-circle" style="color: #6b7280; margin-right: 6px;"></i>Your request to join <strong>${matchTitle}</strong> was not approved this time.
                 </div>
 
                 ${reason ? `
@@ -722,7 +825,7 @@ export class EmailService {
                 </div>
               </div>
               <div class="footer">
-                <p><strong>ForeSum</strong> - Connect with golfers and enjoy the game</p>
+                <p><i class="fas fa-golf-ball-tee" style="color: #10b981;"></i> <strong>ForeSum Golf</strong> - Connect with golfers and enjoy the game</p>
                 <p>
                   <a href="${process.env.NEXTAUTH_URL}/profile"><i class="fas fa-cog"></i> Manage Email Preferences</a>
                 </p>
@@ -758,12 +861,13 @@ export class EmailService {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               line-height: 1.6;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
               padding: 40px 20px;
             }
             .email-wrapper { max-width: 600px; margin: 0 auto; }
@@ -794,10 +898,15 @@ export class EmailService {
               padding: 40px 30px;
             }
             .greeting {
-              font-size: 24px;
-              color: #1f2937;
-              margin-bottom: 20px;
-              font-weight: 600;
+              font-size: 26px;
+              color: #0f172a;
+              margin-bottom: 16px;
+              font-weight: 700;
+              letter-spacing: -0.5px;
+            }
+            .greeting i {
+              color: #10b981;
+              margin-right: 8px;
             }
             .message {
               color: #4b5563;
@@ -902,13 +1011,18 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
-                <p>Group Invitation</p>
+                <div class="header-content">
+                  <div class="brand-icon">
+                    <i class="fas fa-golf-ball-tee"></i>
+                  </div>
+                  <h1>ForeSum Golf</h1>
+                  <p>Group Invitation</p>
+                </div>
               </div>
               <div class="content">
-                <div class="greeting">Hi ${recipientName}!</div>
+                <div class="greeting"><i class="fas fa-hand-wave"></i> Hi ${recipientName}!</div>
                 <div class="message">
-                  <strong>${inviterName}</strong> thinks you'd be a great fit for their golf group!
+                  <i class="fas fa-user-plus" style="color: #7c3aed; margin-right: 6px;"></i><strong>${inviterName}</strong> thinks you'd be a great fit for their golf group!
                 </div>
 
                 <div class="group-card">
@@ -953,7 +1067,7 @@ export class EmailService {
                 </div>
               </div>
               <div class="footer">
-                <p><strong>ForeSum</strong> - Connect with golfers and enjoy the game</p>
+                <p><i class="fas fa-golf-ball-tee" style="color: #10b981;"></i> <strong>ForeSum Golf</strong> - Connect with golfers and enjoy the game</p>
                 <p>
                   <a href="${process.env.NEXTAUTH_URL}/profile"><i class="fas fa-cog"></i> Manage Email Preferences</a>
                 </p>
@@ -989,12 +1103,13 @@ export class EmailService {
           <meta charset="utf-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
           <style>
             * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
-              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
               line-height: 1.6;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+              background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
               padding: 40px 20px;
             }
             .email-wrapper { max-width: 600px; margin: 0 auto; }
@@ -1025,10 +1140,15 @@ export class EmailService {
               padding: 40px 30px;
             }
             .greeting {
-              font-size: 24px;
-              color: #1f2937;
-              margin-bottom: 20px;
-              font-weight: 600;
+              font-size: 26px;
+              color: #0f172a;
+              margin-bottom: 16px;
+              font-weight: 700;
+              letter-spacing: -0.5px;
+            }
+            .greeting i {
+              color: #10b981;
+              margin-right: 8px;
             }
             .message {
               color: #4b5563;
@@ -1128,13 +1248,18 @@ export class EmailService {
           <div class="email-wrapper">
             <div class="email-container">
               <div class="header">
-                <h1><i class="fas fa-golf-ball-tee"></i> ForeSum</h1>
-                <p>Match Update</p>
+                <div class="header-content">
+                  <div class="brand-icon">
+                    <i class="fas fa-golf-ball-tee"></i>
+                  </div>
+                  <h1>ForeSum Golf</h1>
+                  <p>Match Update</p>
+                </div>
               </div>
               <div class="content">
-                <div class="greeting">Hi ${recipientName}!</div>
+                <div class="greeting"><i class="fas fa-hand-wave"></i> Hi ${recipientName}!</div>
                 <div class="message">
-                  There's been an update to your upcoming golf round:
+                  <i class="fas fa-bell" style="color: #2563eb; margin-right: 6px;"></i>There's been an update to your upcoming golf round:
                 </div>
 
                 <div class="update-card">
@@ -1162,7 +1287,7 @@ export class EmailService {
                 </div>
               </div>
               <div class="footer">
-                <p><strong>ForeSum</strong> - Connect with golfers and enjoy the game</p>
+                <p><i class="fas fa-golf-ball-tee" style="color: #10b981;"></i> <strong>ForeSum Golf</strong> - Connect with golfers and enjoy the game</p>
                 <p>
                   <a href="${process.env.NEXTAUTH_URL}/profile"><i class="fas fa-cog"></i> Manage Email Preferences</a>
                 </p>
