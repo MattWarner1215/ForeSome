@@ -13,7 +13,8 @@ export const BACKGROUND_IMAGES = {
 
 // Logo images from Supabase Storage
 export const LOGO_IMAGES = {
-  foresum_logo: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/foresum_logo.png',
+  foresum_logo: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/foresum-golf-logo.svg',
+  foresum_icon: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/foresum-golf-icon.svg',
   myrounds_icon: 'https://npmksisxmjgnqytcduhs.supabase.co/storage/v1/object/public/logos/MYRounds_Icon.png'
 } as const
 
