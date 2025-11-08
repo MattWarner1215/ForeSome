@@ -10,6 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEnvelope, faLock, faEye, faEyeSlash, faArrowRight } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import Link from 'next/link'
+import { LOGO_IMAGES } from '@/lib/images'
 
 export default function SignInPage() {
   const [email, setEmail] = useState('')
@@ -94,9 +95,9 @@ export default function SignInPage() {
         <Card className="w-full shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
-              <img 
-                src="/images/foresum_logo.png" 
-                alt="ForeSum Logo" 
+              <img
+                src={LOGO_IMAGES.foresum_logo}
+                alt="ForeSum Golf Logo"
                 className="h-[120px] w-[120px] object-contain"
               />
             </div>

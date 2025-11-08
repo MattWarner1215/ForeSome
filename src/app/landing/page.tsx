@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { LOGO_IMAGES } from '@/lib/images'
 
 export default function LandingPage() {
   const router = useRouter()
@@ -33,12 +34,12 @@ export default function LandingPage() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
       <div className="text-center">
         <img
-          src="/images/foresum_logo.png"
-          alt="ForeSum Logo"
+          src={LOGO_IMAGES.foresum_logo}
+          alt="ForeSum Golf Logo"
           className="w-32 h-32 mx-auto mb-6 animate-pulse"
         />
         <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
-        <p className="text-green-700 mt-4 font-medium">Loading ForeSum...</p>
+        <p className="text-green-700 mt-4 font-medium">Loading ForeSum Golf...</p>
       </div>
     </div>
   )

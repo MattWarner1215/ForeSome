@@ -11,6 +11,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faUser, faEnvelope, faLock, faEye, faEyeSlash, faUserPlus, faGolfBall, faLocationDot, faPhone, faAlignLeft } from '@fortawesome/free-solid-svg-icons'
 import { faGoogle } from '@fortawesome/free-brands-svg-icons'
 import Link from 'next/link'
+import { LOGO_IMAGES } from '@/lib/images'
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -146,14 +147,14 @@ export default function SignUpPage() {
         <Card className="w-full shadow-2xl border-0 bg-white/95 backdrop-blur-sm">
           <CardHeader className="text-center pb-4">
             <div className="flex justify-center mb-4">
-              <img 
-                src="/images/foresum_logo.png" 
-                alt="ForeSum Logo" 
+              <img
+                src={LOGO_IMAGES.foresum_logo}
+                alt="ForeSum Golf Logo"
                 className="h-[300px] w-[300px] object-contain"
               />
             </div>
             <CardTitle className="text-2xl font-bold text-green-700">
-              Join ForeSum
+              Join ForeSum Golf
             </CardTitle>
             <CardDescription className="text-gray-600 mt-2">
               Start your golf journey with our community

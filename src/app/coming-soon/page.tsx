@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faBell, faUsers, faCalendar, faTrophy } from '@fortawesome/free-solid-svg-icons'
+import { LOGO_IMAGES } from '@/lib/images'
 
 export default function ComingSoonPage() {
   const [email, setEmail] = useState('')
@@ -68,8 +69,8 @@ export default function ComingSoonPage() {
         {/* Logo with glow effect */}
         <div className="text-center mb-8">
           <img
-            src="/images/foresum_logo.png"
-            alt="ForeSum Logo"
+            src={LOGO_IMAGES.foresum_logo}
+            alt="ForeSum Golf Logo"
             className="w-48 h-48 md:w-56 md:h-56 object-contain mx-auto mb-8 filter drop-shadow-2xl brightness-110 hover:scale-105 transition-all duration-300"
           />
         </div>
@@ -84,7 +85,7 @@ export default function ComingSoonPage() {
             {/* Content */}
             <div className="relative z-10">
               <h1 className="text-5xl md:text-6xl font-black text-transparent bg-clip-text bg-gradient-to-r from-green-400 via-green-500 to-green-600 mb-4 text-center animate-pulse-slow">
-                ForeSum
+                ForeSum Golf
               </h1>
 
               <h2 className="text-2xl md:text-3xl font-light text-slate-200 mb-6 text-center opacity-90">
