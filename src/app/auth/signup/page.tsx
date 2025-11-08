@@ -150,7 +150,7 @@ export default function SignUpPage() {
               <img
                 src={LOGO_IMAGES.foresum_logo}
                 alt="ForeSum Golf Logo"
-                className="h-[300px] w-[300px] object-contain"
+                className="h-[600px] w-[600px] object-contain"
               />
             </div>
             <CardTitle className="text-2xl font-bold text-green-700">

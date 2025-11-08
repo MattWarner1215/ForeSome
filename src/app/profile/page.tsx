@@ -163,7 +163,7 @@ export default function ProfilePage() {
             <img
               src={LOGO_IMAGES.foresum_logo}
               alt="ForeSum Golf Logo"
-              className="h-[150px] w-[150px] object-contain"
+              className="h-[300px] w-[300px] object-contain"
             />
           </div>
           <Button 

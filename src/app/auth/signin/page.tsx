@@ -98,7 +98,7 @@ export default function SignInPage() {
               <img
                 src={LOGO_IMAGES.foresum_logo}
                 alt="ForeSum Golf Logo"
-                className="h-[120px] w-[120px] object-contain"
+                className="h-[240px] w-[240px] object-contain"
               />
             </div>
             <CardDescription className="text-gray-600 mt-2">

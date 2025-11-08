@@ -172,7 +172,7 @@ export default function CreateRoundPage() {
             <img
               src={LOGO_IMAGES.foresum_logo}
               alt="ForeSum Golf Logo"
-              className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] object-contain"
+              className="w-[240px] h-[240px] md:w-[300px] md:h-[300px] object-contain"
             />
           </div>
           <Button

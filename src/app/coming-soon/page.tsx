@@ -71,7 +71,7 @@ export default function ComingSoonPage() {
           <img
             src={LOGO_IMAGES.foresum_logo}
             alt="ForeSum Golf Logo"
-            className="w-48 h-48 md:w-56 md:h-56 object-contain mx-auto mb-8 filter drop-shadow-2xl brightness-110 hover:scale-105 transition-all duration-300"
+            className="w-96 h-96 md:w-112 md:h-112 object-contain mx-auto mb-8 filter drop-shadow-2xl brightness-110 hover:scale-105 transition-all duration-300"
           />
         </div>
 

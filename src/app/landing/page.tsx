@@ -36,7 +36,7 @@ export default function LandingPage() {
         <img
           src={LOGO_IMAGES.foresum_logo}
           alt="ForeSum Golf Logo"
-          className="w-32 h-32 mx-auto mb-6 animate-pulse"
+          className="w-64 h-64 mx-auto mb-6 animate-pulse"
         />
         <div className="w-8 h-8 border-4 border-green-600 border-t-transparent rounded-full animate-spin mx-auto"></div>
         <p className="text-green-700 mt-4 font-medium">Loading ForeSum Golf...</p>

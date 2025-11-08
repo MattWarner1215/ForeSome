@@ -89,7 +89,7 @@ export default function PublicRoundsPage() {
             <img
               src={LOGO_IMAGES.foresum_logo}
               alt="ForeSum Golf Logo"
-              className="h-[120px] w-[120px] object-contain animate-pulse"
+              className="h-[240px] w-[240px] object-contain animate-pulse"
             />
           </div>
           <div className="flex items-center space-x-2 text-green-700">
