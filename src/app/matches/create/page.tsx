@@ -170,8 +170,8 @@ export default function CreateRoundPage() {
         <div className="container mx-auto px-4 h-full flex items-center justify-between overflow-visible">
           <div className="flex items-center">
             <img
-              src="/images/foresum_logo.png"
-              alt="Foresum Logo"
+              src={LOGO_IMAGES.foresum_logo}
+              alt="ForeSum Golf Logo"
               className="w-[120px] h-[120px] md:w-[150px] md:h-[150px] object-contain"
             />
           </div>

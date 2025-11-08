@@ -777,18 +777,18 @@ export default function HomePage() {
             </div>
           </div>
           
-          {/* Right Section - Public Rounds + Create Round + Actions */}
+          {/* Right Section - Create Round + Public Rounds + Actions */}
           <div className="flex items-center space-x-2 sm:space-x-4 w-full md:w-auto md:flex-shrink-0 justify-end min-w-0">
-              <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm">
-                <Link href="/rounds">
-                  <span className="hidden sm:inline">Public Rounds</span>
-                  <span className="sm:hidden">Public</span>
-                </Link>
-              </Button>
               <Button asChild size="sm" className="bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-xs sm:text-sm">
                 <Link href="/matches/create">
                   <span className="hidden sm:inline">Create Round</span>
                   <span className="sm:hidden">Create</span>
+                </Link>
+              </Button>
+              <Button asChild size="sm" className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xs sm:text-sm">
+                <Link href="/rounds">
+                  <span className="hidden sm:inline">Public Rounds</span>
+                  <span className="sm:hidden">Public</span>
                 </Link>
               </Button>
               <NotificationBell />
@@ -986,9 +986,9 @@ export default function HomePage() {
                           disabled={myRoundsCarouselIndex === 0}
                           className="group relative flex items-center justify-center w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-300 disabled:to-gray-400 rounded-lg shadow-md hover:shadow-lg disabled:shadow-sm transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
                         >
-                          <FontAwesomeIcon 
-                            icon={faChevronUp} 
-                            className="h-3 w-3 text-white group-hover:text-green-50 transition-colors duration-200" 
+                          <FontAwesomeIcon
+                            icon={faChevronUp}
+                            className="h-3 w-3 text-white group-hover:text-green-50 transition-colors duration-200"
                           />
                           <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity duration-300"></div>
                         </button>
@@ -997,14 +997,14 @@ export default function HomePage() {
                         <div className="flex flex-col items-center space-y-1">
                           {/* Progress Bar */}
                           <div className="w-12 h-1 bg-green-100 rounded-full overflow-hidden shadow-inner">
-                            <div 
+                            <div
                               className="h-full bg-gradient-to-r from-green-500 to-green-600 rounded-full transition-all duration-500 ease-out"
                               style={{
                                 width: `${((myRoundsCarouselIndex / maxCarouselIndex) * 100) || 0}%`
                               }}
                             ></div>
                           </div>
-                          
+
                           {/* Compact Page Counter */}
                           <div className="text-xs font-bold text-green-800 leading-none">
                             {Math.floor(myRoundsCarouselIndex / itemsPerPage) + 1}/{Math.ceil(totalMyRounds / itemsPerPage)}
@@ -1017,21 +1017,15 @@ export default function HomePage() {
                           disabled={myRoundsCarouselIndex >= maxCarouselIndex}
                           className="group relative flex items-center justify-center w-8 h-8 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 disabled:from-gray-300 disabled:to-gray-400 rounded-lg shadow-md hover:shadow-lg disabled:shadow-sm transition-all duration-300 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
                         >
-                          <FontAwesomeIcon 
-                            icon={faChevronDown} 
-                            className="h-3 w-3 text-white group-hover:text-green-50 transition-colors duration-200" 
+                          <FontAwesomeIcon
+                            icon={faChevronDown}
+                            className="h-3 w-3 text-white group-hover:text-green-50 transition-colors duration-200"
                           />
                           <div className="absolute inset-0 bg-white/20 rounded-lg opacity-0 group-hover:opacity-100 disabled:opacity-0 transition-opacity duration-300"></div>
                         </button>
                       </div>
                     </div>
                   )}
-                  
-                  <div className="flex-1 flex justify-end">
-                    <Button asChild variant="outline" size="sm" className="border-green-200 hover:bg-green-50">
-                      <Link href="/rounds?myMatches=true">View All</Link>
-                    </Button>
-                  </div>
                 </div>
               </CardHeader>
               <div className="px-6 py-2">

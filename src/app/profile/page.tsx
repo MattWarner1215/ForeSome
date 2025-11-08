@@ -12,6 +12,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faStar, faUser, faLocationDot, faPhone, faEnvelope, faEdit, faArrowLeft, faChartLine } from '@fortawesome/free-solid-svg-icons'
 import AvatarUpload from '@/components/ui/avatar-upload'
 import UserStats from '@/components/ui/user-stats'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface UserProfile {
   id: string
@@ -159,9 +160,9 @@ export default function ProfilePage() {
       <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-green-100 sticky top-0 z-50 h-20 relative">
         <div className="container mx-auto px-4 h-full flex items-center justify-between overflow-visible">
           <div className="flex items-center">
-            <img 
-              src="/images/foresum_logo.png" 
-              alt="ForeSum Logo" 
+            <img
+              src={LOGO_IMAGES.foresum_logo}
+              alt="ForeSum Golf Logo"
               className="h-[150px] w-[150px] object-contain"
             />
           </div>

@@ -14,6 +14,7 @@ import Link from 'next/link'
 import UserSearch from '@/components/ui/user-search'
 import { GroupIconUpload } from '@/components/ui/group-icon-upload'
 import { GroupInvitations } from '@/components/ui/group-invitations'
+import { LOGO_IMAGES } from '@/lib/images'
 
 interface Group {
   id: string
@@ -176,9 +177,9 @@ export default function GroupsPage() {
       <nav className="bg-white/95 backdrop-blur-sm shadow-lg border-b border-green-100 sticky top-0 z-50 h-20 relative">
         <div className="container mx-auto px-4 h-full flex items-center justify-between overflow-visible">
           <div className="flex items-center">
-            <img 
-              src="/images/foresum_logo.png" 
-              alt="ForeSum Logo" 
+            <img
+              src={LOGO_IMAGES.foresum_logo}
+              alt="ForeSum Golf Logo"
               className="h-[150px] w-[150px] object-contain"
             />
           </div>

@@ -51,6 +51,13 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
+  // Email notification preferences
+  emailNotifications       Boolean @default(true)
+  emailJoinRequests        Boolean @default(true)
+  emailJoinApprovals       Boolean @default(true)
+  emailMatchUpdates        Boolean @default(true)
+  emailGroupInvitations    Boolean @default(true)
+
   accounts      Account[]
   sessions      Session[]
   matches       Match[]
